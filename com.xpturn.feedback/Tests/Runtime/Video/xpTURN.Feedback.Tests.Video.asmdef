@@ -1,0 +1,31 @@
+{
+    "name": "xpTURN.Feedback.Tests.Video",
+    "rootNamespace": "xpTURN.Feedback.Tests",
+    "references": [
+        "xpTURN.Feedback",
+        "xpTURN.Feedback.Video",
+        "xpTURN.Feedback.Tests",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS",
+        "XPTURN_FEEDBACK_TESTS_VIDEO"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.unity.modules.video",
+            "expression": "1.0.0",
+            "define": "XPTURN_FEEDBACK_TESTS_VIDEO"
+        }
+    ],
+    "noEngineReferences": false
+}

@@ -1,0 +1,7 @@
+{
+    "name": "xpTURN.Feedback.Samples.Editor",
+    "rootNamespace": "xpTURN.Feedback.Samples.Editor",
+    "references": ["xpTURN.Feedback", "xpTURN.Feedback.Samples"],
+    "includePlatforms": ["Editor"],
+    "autoReferenced": true
+}

@@ -1,0 +1,18 @@
+{
+  "name": "xpturn-feedback",
+  "version": "0.1.0",
+  "description": "Game feel feedback with the xpTURN.Feedback Unity package: FeedbackPlayer, presets, playing feedback from C# or UI events, and Unity Timeline.",
+  "author": {
+    "name": "xpTURN",
+    "url": "https://github.com/xpTURN"
+  },
+  "homepage": "https://github.com/xpTURN/Feedback",
+  "repository": "https://github.com/xpTURN/Feedback",
+  "license": "Apache-2.0",
+  "keywords": [
+    "unity",
+    "game-feel",
+    "feedback",
+    "juice"
+  ]
+}

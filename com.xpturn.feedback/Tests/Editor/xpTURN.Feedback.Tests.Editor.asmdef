@@ -1,0 +1,28 @@
+{
+    "name": "xpTURN.Feedback.Tests.Editor",
+    "rootNamespace": "xpTURN.Feedback.Tests.Editor",
+    "references": [
+        "xpTURN.Feedback",
+        "xpTURN.Feedback.Math",
+        "xpTURN.Feedback.Editor",
+        "xpTURN.Feedback.Tests",
+        "xpTURN.Feedback.Tests.Extension",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

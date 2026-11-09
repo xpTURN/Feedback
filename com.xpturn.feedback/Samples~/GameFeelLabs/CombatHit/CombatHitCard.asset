@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7265114aa1e7f41ada19d74a427f9e13, type: 3}
+  m_Name: CombatHitCard
+  m_EditorClassIdentifier: xpTURN.Feedback.Samples::xpTURN.Feedback.Samples.SampleCard
+  Title: Combat Hit Lab
+  Try: "Hit the dummy: 1 light, 2 heavy, 3 critical. See the hit stop, the flash,
+    the knockback and the number \u2014 set the time scale to 0.1 to see the hit
+    stop."
+  See: "Each tier plays its preset (Hit Light, Hit Heavy, Hit Critical). The number
+    takes the damage: intensity = damage / 100 with the number's \xD7100. Numbers
+    are game information \u2014 they stay in Before. A pad rumbles on heavy and critical.
+    The numbers' players are made at run time (after the TMP check) \u2014 the HUD's
+    Select Player does not pick them."
+  Controls: "1 \xB7 Space \xB7 Left click \xB7 Gamepad South \u2014 light \xB7 2
+    \xB7 West \u2014 heavy \xB7 3 \xB7 North \u2014 critical"
+  SceneGuid: 89b017b48748b445da166c40b3e87f3c
+  SceneName: CombatHit
+  RequiredType: xpTURN.Feedback.Samples.GameFeelLabs.CombatHitLab, xpTURN.Feedback.Samples.GameFeelLabs.CombatHit
+  RequiresText: 
+  OpenInEditor: 0

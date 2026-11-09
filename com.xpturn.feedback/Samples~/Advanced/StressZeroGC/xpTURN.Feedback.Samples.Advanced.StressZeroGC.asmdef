@@ -1,0 +1,9 @@
+{
+    "name": "xpTURN.Feedback.Samples.Advanced.StressZeroGC",
+    "rootNamespace": "xpTURN.Feedback.Samples.Advanced",
+    "references": ["xpTURN.Feedback", "xpTURN.Feedback.Samples", "xpTURN.Feedback.Samples.UI", "Unity.InputSystem", "UnityEngine.UI"],
+    "includePlatforms": [],
+    "autoReferenced": false,
+    "defineConstraints": ["XPTURN_FEEDBACK_SAMPLES_INPUTSYSTEM", "XPTURN_FEEDBACK_SAMPLES_UGUI", "XPTURN_FEEDBACK_SAMPLES_URP"],
+    "versionDefines": [ { "name": "com.unity.inputsystem", "expression": "1.0.0", "define": "XPTURN_FEEDBACK_SAMPLES_INPUTSYSTEM" }, { "name": "com.unity.ugui", "expression": "2.0.0", "define": "XPTURN_FEEDBACK_SAMPLES_UGUI" }, { "name": "com.unity.render-pipelines.universal", "expression": "17.0.0", "define": "XPTURN_FEEDBACK_SAMPLES_URP" } ]
+}

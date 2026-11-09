@@ -1,0 +1,12 @@
+{
+    "name": "xpTURN.Feedback.Samples.UI",
+    "rootNamespace": "xpTURN.Feedback.Samples",
+    "references": ["xpTURN.Feedback", "xpTURN.Feedback.Samples", "Unity.InputSystem", "UnityEngine.UI", "Unity.TextMeshPro"],
+    "includePlatforms": [],
+    "autoReferenced": true,
+    "defineConstraints": ["XPTURN_FEEDBACK_SAMPLES_INPUTSYSTEM", "XPTURN_FEEDBACK_SAMPLES_UGUI"],
+    "versionDefines": [
+        { "name": "com.unity.inputsystem", "expression": "1.0.0", "define": "XPTURN_FEEDBACK_SAMPLES_INPUTSYSTEM" },
+        { "name": "com.unity.ugui", "expression": "2.0.0", "define": "XPTURN_FEEDBACK_SAMPLES_UGUI" }
+    ]
+}

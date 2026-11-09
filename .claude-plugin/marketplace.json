@@ -1,0 +1,15 @@
+{
+  "name": "xpturn-feedback",
+  "owner": {
+    "name": "xpTURN",
+    "url": "https://github.com/xpTURN"
+  },
+  "description": "Agent skills for the xpTURN.Feedback Unity package.",
+  "plugins": [
+    {
+      "name": "xpturn-feedback",
+      "source": "./com.xpturn.feedback/Skills~",
+      "description": "Game feel feedback with the xpTURN.Feedback Unity package: FeedbackPlayer, presets, playing feedback from C# or UI events, and Unity Timeline."
+    }
+  ]
+}

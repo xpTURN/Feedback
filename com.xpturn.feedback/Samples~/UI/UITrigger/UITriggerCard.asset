@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7265114aa1e7f41ada19d74a427f9e13, type: 3}
+  m_Name: UITriggerCard
+  m_EditorClassIdentifier: xpTURN.Feedback.Samples::xpTURN.Feedback.Samples.SampleCard
+  Title: UI Trigger
+  Try: "Hover, press and click the menu, flip the toggle, drag the slider, hold and
+    release the button \u2014 then lower the time scale and change your mind halfway."
+  See: "No script plays anything here: each control's Feedback UI Trigger rows and
+    its own UnityEvent call the players. Pointer Exit and Deselect turn the running
+    hover back where it is (Play Backward); the toggle calls PlayFromEvent(bool)
+    and the slider PlayFromEvent(float), its value the intensity. Hold and Release
+    plays its press half and waits for a signal: Pointer Up sends it (after 3 s the
+    wait ends by itself), Pointer Exit stops with Revert, and Submit runs two rows
+    \u2014 Play, then Signal \u2014 for one whole press. The locked button turns
+    Require Interactable off to answer a click. Before turns the categories off;
+    the color touches are put in UI, while the selection frame and the toggle's knob
+    are in no category \u2014 they show the state."
+  Controls: "Mouse \xB7 Arrows \xB7 WASD \xB7 D-pad \xB7 Left stick \u2014 pick \xB7
+    Click \xB7 Enter \xB7 Gamepad South \u2014 press \xB7 Gamepad East \u2014 cancel"
+  SceneGuid: 67455f0bd46fb4fd28d14266a7f0aa3d
+  SceneName: UITrigger
+  RequiredType: xpTURN.Feedback.Samples.UI.UITriggerLab, xpTURN.Feedback.Samples.UI.UITrigger
+  RequiresText: 
+  OpenInEditor: 0

@@ -1,0 +1,21 @@
+<!--
+  xpTURN.Feedback.Math — dotnet build of the engine-free Runtime/Math asmdef.
+  Globs the same sources Unity compiles, at Unity's language level (-langversion:9.0) and API surface
+  (.NET Standard 2.1), so code that would break in Unity fails here too.
+-->
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>9.0</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <AssemblyName>xpTURN.Feedback.Math</AssemblyName>
+    <RootNamespace>xpTURN.Feedback</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <DefineConstants>$(DefineConstants);FEEDBACK_MATH_ASSERT</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="../../Runtime/Math/**/*.cs" Link="Runtime/Math/%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+</Project>

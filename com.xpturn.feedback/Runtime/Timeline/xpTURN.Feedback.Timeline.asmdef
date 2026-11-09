@@ -1,0 +1,25 @@
+{
+    "name": "xpTURN.Feedback.Timeline",
+    "rootNamespace": "xpTURN.Feedback",
+    "references": [
+        "xpTURN.Feedback",
+        "Unity.Timeline"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "XPTURN_FEEDBACK_TIMELINE"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.unity.timeline",
+            "expression": "1.8.0",
+            "define": "XPTURN_FEEDBACK_TIMELINE"
+        }
+    ],
+    "noEngineReferences": false
+}

@@ -1,0 +1,14 @@
+{
+    "name": "xpTURN.Feedback.Tests.Editor.Samples",
+    "rootNamespace": "xpTURN.Feedback.Tests.Editor.Samples",
+    "references": ["xpTURN.Feedback", "xpTURN.Feedback.Samples", "xpTURN.Feedback.Samples.UI", "xpTURN.Feedback.Samples.Editor", "Unity.InputSystem", "UnityEngine.UI", "UnityEngine.TestRunner", "UnityEditor.TestRunner"],
+    "includePlatforms": ["Editor"],
+    "overrideReferences": true,
+    "precompiledReferences": ["nunit.framework.dll"],
+    "autoReferenced": false,
+    "defineConstraints": ["UNITY_INCLUDE_TESTS", "XPTURN_FEEDBACK_TESTS_EDITOR_SAMPLES_INPUTSYSTEM", "XPTURN_FEEDBACK_TESTS_EDITOR_SAMPLES_UGUI"],
+    "versionDefines": [
+        { "name": "com.unity.inputsystem", "expression": "1.0.0", "define": "XPTURN_FEEDBACK_TESTS_EDITOR_SAMPLES_INPUTSYSTEM" },
+        { "name": "com.unity.ugui", "expression": "2.0.0", "define": "XPTURN_FEEDBACK_TESTS_EDITOR_SAMPLES_UGUI" }
+    ]
+}

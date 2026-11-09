@@ -1,0 +1,9 @@
+{
+    "name": "RecompileCheck.Editor",
+    "references": [
+        "RecompileCheck.Runtime"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ]
+}

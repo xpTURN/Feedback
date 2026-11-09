@@ -1,0 +1,27 @@
+{
+    "name": "xpTURN.Feedback.UGUI",
+    "rootNamespace": "xpTURN.Feedback",
+    "references": [
+        "xpTURN.Feedback",
+        "xpTURN.Feedback.Math",
+        "UnityEngine.UI",
+        "Unity.TextMeshPro"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "XPTURN_FEEDBACK_UGUI"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.unity.ugui",
+            "expression": "2.0.0",
+            "define": "XPTURN_FEEDBACK_UGUI"
+        }
+    ],
+    "noEngineReferences": false
+}

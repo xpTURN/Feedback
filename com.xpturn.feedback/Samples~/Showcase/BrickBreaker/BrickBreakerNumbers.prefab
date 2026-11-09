@@ -1,0 +1,217 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &6139749030128196566
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3221120469781907060}
+  - component: {fileID: 3997339071864554023}
+  m_Layer: 0
+  m_Name: Number
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3221120469781907060
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6139749030128196566}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1109491314701950869}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3997339071864554023
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6139749030128196566}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6dc1b1a00a6a44c3b159fc76ce605832, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: xpTURN.Feedback::xpTURN.Feedback.FeedbackPlayer
+  m_Items:
+  - rid: 1742887167292866856
+  m_Preset: {fileID: 0}
+  m_Anchors: []
+  m_FormatVersion: 1
+  m_Initialization: 1
+  m_Policy: 2
+  m_MaxOverlap: 8
+  m_DurationMultiplier: 1
+  m_StartDelay: 0
+  m_AutoPlay: 0
+  m_TimeMode: 1
+  m_Speed: 1
+  m_RandomizeDuration: 0
+  m_DurationRange: {x: 0.5, y: 2}
+  m_Cooldown: 0
+  m_Chance: 100
+  m_Intensity: 1
+  m_RemapIntensity: 0
+  m_IntensityRemap:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  m_UseDistanceGate: 0
+  m_GateReference: 0
+  m_GateAnchor: 
+  m_GateDistance: 5
+  m_UseGateFalloff: 0
+  m_GateFalloff:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: -1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: -1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  m_UnityEvents: []
+  m_Direction: 0
+  m_ApplyInitialState: 0
+  m_DisableBehavior: 0
+  references:
+    version: 2
+    RefIds:
+    - rid: 1742887167292866856
+      type: {class: FloatingTextItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: Score
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 0
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 0
+          m_IntensityRange: {x: 0, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 1742887167292866857
+        m_DirectWrite: 0
+        m_Style: {fileID: 0}
+        m_Source: 1
+        m_Text: 
+        m_Format: +{0:0}
+        m_Multiplier: 100
+        m_Offset: {x: 0, y: 0.4, z: 0}
+        m_Follow: 0
+        m_PoolSize: 8
+    - rid: 1742887167292866857
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+--- !u!1 &6178323364203572282
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1109491314701950869}
+  m_Layer: 0
+  m_Name: BrickBreakerNumbers
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1109491314701950869
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6178323364203572282}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 3221120469781907060}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

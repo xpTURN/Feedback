@@ -1,0 +1,52 @@
+{
+  "name": "com.xpturn.feedback",
+  "displayName": "xpTURN.Feedback",
+  "version": "0.1.0",
+  "unity": "6000.0",
+  "unityRelease": "85f2",
+  "hideInEditor": false,
+  "description": "Game feel feedbacks for Unity 6 URP, driven by a PlayerLoop scheduler with non-destructive property layers, zero-GC playback and edit-mode preview.",
+  "license": "Apache-2.0",
+  "documentationUrl": "https://github.com/xpTURN/Feedback/blob/main/com.xpturn.feedback/Documentation~/index.md",
+  "changelogUrl": "https://github.com/xpTURN/Feedback/blob/main/com.xpturn.feedback/CHANGELOG.md",
+  "licensesUrl": "https://github.com/xpTURN/Feedback/blob/main/LICENSE",
+  "keywords": [
+    "xpTURN",
+    "feedback",
+    "game feel",
+    "juice",
+    "tween"
+  ],
+  "author": {
+    "name": "xpTURN",
+    "email": "xpturn@gmail.com",
+    "url": "https://github.com/xpTURN"
+  },
+  "samples": [
+    {
+      "displayName": "Basics",
+      "description": "Getting Started (complete and empty) and the Feedback Gallery — every feedback type and the default presets.",
+      "path": "Samples~/Basics"
+    },
+    {
+      "displayName": "Game Feel Labs",
+      "description": "S3 Before / After, S4 Combat Hit Lab, S5 Camera Shake Lab (a Cinemachine card too), S6 Spring Playground and S10 PostFX Lab — layers of feedback, hits, camera shakes, springs and post effects.",
+      "path": "Samples~/GameFeelLabs"
+    },
+    {
+      "displayName": "UI",
+      "description": "S7 UI Juice — a shop screen whose feedback keeps moving while the game is paused: hovers, delayed HP and XP bars, a reward popup · S15 UI Trigger — feedback wired to uGUI events with no code: hovers that turn back, a toggle, a slider and a press that waits for its release.",
+      "path": "Samples~/UI"
+    },
+    {
+      "displayName": "Advanced",
+      "description": "S8 Timeline & Flow (start rules, loops, a signal, reverse, seek, a runtime timeline) · S9 Channels & Range (channel sends, a distance gate) · S11 Stress & Zero-GC (thousands of players, the frame's allocation, a coroutine baseline) · S12 Accessibility (category settings applied live) · S14 Unity Timeline Cutscene (the Timeline package: Feedback tracks with Driven and Triggered clips and a Signal, previewed in the Timeline window).",
+      "path": "Samples~/Advanced"
+    },
+    {
+      "displayName": "Showcase",
+      "description": "S13 Showcase (a short brick-breaker round: a combo that grows the feedback by intensity range, a score count-up, a boss's entrance, hits, rage and defeat, the same game with the feedback off).",
+      "path": "Samples~/Showcase"
+    }
+  ]
+}

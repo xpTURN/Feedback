@@ -1,0 +1,99 @@
+name: Check
+
+# Verifies pushed source: builds the package's engine-free math (com.xpturn.feedback/Runtime/Math) with the
+# .NET SDK and runs its NUnit tests (com.xpturn.feedback/Tests~/Math.Tests) in Debug and Release, checks that
+# every Unity file carries its .meta sidecar, and checks that the version manifests agree.
+# The Unity Test Runner suites and the gates in tools/ are not run here — they need a licensed editor.
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+    paths-ignore:
+      - '**/*.md'
+      - '**/*.png'
+      - '**/*.gif'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: check-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+
+jobs:
+  math-tests:
+    name: Math tests (.NET, ${{ matrix.configuration }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        configuration: [Debug, Release]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Tests~/Math.Tests targets net8.0; Tests~/Math builds the same sources as Unity (netstandard2.1, C# 9).
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: ${{ runner.os }}-nuget-
+
+      - name: Test
+        run: >-
+          dotnet test com.xpturn.feedback/Tests~/Math.Tests
+          --configuration ${{ matrix.configuration }}
+          --logger "trx;LogFileName=math-${{ matrix.configuration }}.trx"
+          --results-directory TestResults
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: math-tests-${{ matrix.configuration }}
+          path: TestResults/*.trx
+          if-no-files-found: warn
+
+  sidecar-check:
+    name: Unity sidecars are complete
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # A file without its .meta is invisible to Unity: a .cs is left out of the generated csproj and the
+      # assembly stops compiling, an asset simply does not exist — while the .NET tests stay green because
+      # they never read .meta. Checked on the tracked files of the package, the samples' test fixtures and
+      # the three development projects.
+      - name: Check .meta sidecars
+        run: .github/scripts/check-asset-sidecars.sh
+
+  version-check:
+    name: Version manifests agree
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check versions
+        run: |
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            .github/scripts/check-versions.sh --tag "${GITHUB_REF_NAME}"
+          else
+            .github/scripts/check-versions.sh
+          fi

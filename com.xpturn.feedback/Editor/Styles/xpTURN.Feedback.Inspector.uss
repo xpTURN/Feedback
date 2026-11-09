@@ -1,0 +1,223 @@
+.xpturn-feedback-row {
+    flex-direction: row;
+}
+
+.xpturn-feedback-grow {
+    flex-grow: 1;
+}
+
+.xpturn-feedback-status {
+    margin-bottom: 2px;
+}
+
+.xpturn-feedback-list {
+    margin-top: 4px;
+}
+
+.xpturn-feedback-item-header {
+    flex-direction: row;
+    align-items: center;
+    min-height: 20px;
+}
+
+.xpturn-feedback-item-header > Label {
+    margin-left: 4px;
+    -unity-text-align: middle-left;
+}
+
+.xpturn-feedback-item-summary {
+    flex-grow: 1;
+    flex-shrink: 1;
+    overflow: hidden;
+}
+
+.xpturn-feedback-item--off {
+    opacity: 0.5;
+}
+
+.xpturn-feedback-item-body {
+    margin-left: 16px;
+    margin-bottom: 4px;
+}
+
+.xpturn-feedback-category {
+    width: 4px;
+    height: 16px;
+    margin-left: 2px;
+    margin-right: 2px;
+    background-color: rgb(128, 128, 128);
+}
+
+.xpturn-feedback-category--motion {
+    background-color: rgb(77, 153, 255);
+}
+
+.xpturn-feedback-category--camera {
+    background-color: rgb(153, 102, 255);
+}
+
+.xpturn-feedback-category--flash {
+    background-color: rgb(255, 204, 51);
+}
+
+.xpturn-feedback-category--postfx {
+    background-color: rgb(255, 102, 179);
+}
+
+.xpturn-feedback-category--time {
+    background-color: rgb(255, 128, 51);
+}
+
+.xpturn-feedback-category--particles {
+    background-color: rgb(102, 204, 102);
+}
+
+.xpturn-feedback-category--ui {
+    background-color: rgb(51, 204, 204);
+}
+
+.xpturn-feedback-category--haptics {
+    background-color: rgb(204, 153, 102);
+}
+
+.xpturn-feedback-dimmed {
+    opacity: 0.5;
+}
+
+.xpturn-feedback-bottom {
+    flex-direction: row;
+    justify-content: flex-end;
+    margin-top: 4px;
+}
+
+.xpturn-feedback-add-menu {
+    flex-grow: 1;
+}
+
+.xpturn-feedback-add-menu-search {
+    width: auto;
+    margin: 4px;
+}
+
+.xpturn-feedback-add-menu-star {
+    width: 20px;
+    padding: 0;
+    border-width: 0;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.xpturn-feedback-ease-label {
+    min-width: 120px;
+    -unity-text-align: middle-left;
+}
+
+.xpturn-feedback-ease-thumb {
+    width: 32px;
+    height: 18px;
+    margin: 1px 4px;
+    flex-shrink: 0;
+}
+
+.xpturn-feedback-ease-grid {
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.xpturn-feedback-ease-cell {
+    width: 72px;
+    height: 54px;
+    margin: 2px;
+    padding: 2px;
+    align-items: center;
+}
+
+.xpturn-feedback-ease-cell > .xpturn-feedback-ease-thumb {
+    width: 56px;
+    height: 30px;
+}
+
+.xpturn-feedback-ease-cell > Label {
+    font-size: 9px;
+}
+
+.xpturn-feedback-strip {
+    margin-top: 4px;
+}
+
+.xpturn-feedback-strip-canvas {
+    min-height: 16px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 2px;
+}
+
+.xpturn-feedback-strip-band {
+    position: absolute;
+    font-size: 8px;
+    color: rgba(255, 255, 255, 0.6);
+    padding: 0;
+    margin: 0;
+}
+
+.xpturn-feedback-hint {
+    white-space: normal;
+    font-size: 10px;
+    opacity: 0.7;
+    margin-left: 3px;
+    margin-bottom: 2px;
+}
+
+.xpturn-feedback-intensity {
+    margin: 2px 3px;
+}
+
+.xpturn-feedback-intensity > Label {
+    white-space: normal;
+}
+
+.xpturn-feedback-events {
+    margin-top: 2px;
+}
+
+.xpturn-feedback-validation-warning {
+    width: 18px;
+    height: 16px;
+    padding: 0;
+    margin: 0 2px;
+    background-color: rgba(0, 0, 0, 0);
+    border-width: 0;
+}
+
+.xpturn-feedback-validation-results,
+.xpturn-feedback-validation-host {
+    margin: 2px 4px 4px 16px;
+}
+
+.xpturn-feedback-validation-row {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 2px;
+}
+
+.xpturn-feedback-validation-icon {
+    width: 16px;
+    height: 16px;
+    margin-right: 3px;
+}
+
+.xpturn-feedback-validation-text {
+    white-space: normal;
+    flex-shrink: 1;
+}
+
+.xpturn-feedback-validation-fix {
+    margin-left: 4px;
+}
+
+.xpturn-feedback-debugger-list {
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+    border-top-color: var(--unity-colors-default-border);
+    border-bottom-color: var(--unity-colors-default-border);
+    margin-bottom: 8px;
+}

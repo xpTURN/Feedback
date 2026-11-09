@@ -1,0 +1,15 @@
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("xpTURN.Feedback.Tests.Editor")]
+[assembly: InternalsVisibleTo("xpTURN.Feedback.Tests.Particles")]
+[assembly: InternalsVisibleTo("xpTURN.Feedback.Tests.Animation")]
+[assembly: InternalsVisibleTo("xpTURN.Feedback.Tests.Physics")]
+[assembly: InternalsVisibleTo("xpTURN.Feedback.Tests.Physics2D")]
+[assembly: InternalsVisibleTo("xpTURN.Feedback.Tests.UniTask")]
+[assembly: InternalsVisibleTo("xpTURN.Feedback.Tests.URP")]
+[assembly: InternalsVisibleTo("xpTURN.Feedback.Tests.Editor.URP")]
+[assembly: InternalsVisibleTo("xpTURN.Feedback.Tests.UGUI")]
+[assembly: InternalsVisibleTo("xpTURN.Feedback.Tests.Editor.UGUI")]
+[assembly: InternalsVisibleTo("xpTURN.Feedback.Tests.Video")]
+[assembly: InternalsVisibleTo("xpTURN.Feedback.Tests.Cinemachine")]
+[assembly: InternalsVisibleTo("xpTURN.Feedback.Tests.InputSystem")]

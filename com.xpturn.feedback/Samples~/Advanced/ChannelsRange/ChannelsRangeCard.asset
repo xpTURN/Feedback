@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7265114aa1e7f41ada19d74a427f9e13, type: 3}
+  m_Name: ChannelsRangeCard
+  m_EditorClassIdentifier: xpTURN.Feedback.Samples::xpTURN.Feedback.Samples.SampleCard
+  Title: Channels & Range
+  Try: Click the field (or move the marker and press Space) to set off a blast; pick
+    Red, Blue or both to send on.
+  See: "Every lamp has a receiver on the Red or the Blue channel \u2014 assets, not
+    channel 0 that every default would hear \u2014 and a player gated by its distance
+    from the blast: 5 m, a linear falloff into the intensity. The count is how many
+    receivers took the send; a lamp past the gate still counts, its player refuses
+    the play. A receiver's channel and range are set in the inspector. The lamps'
+    colour punch adds to the colour (no flash limit). Before sends nothing."
+  Controls: "Mouse \u2014 click \xB7 WASD \xB7 Arrows \xB7 Left stick \u2014 marker
+    \xB7 Space \xB7 1 \xB7 Gamepad South \u2014 blast at the marker \xB7 Z \xB7 X
+    \xB7 C \xB7 D-pad \u2014 Red \xB7 Blue \xB7 Both"
+  SceneGuid: 3d6c82cc3fd67436694f2316a3bd7784
+  SceneName: ChannelsRange
+  RequiredType: xpTURN.Feedback.Samples.Advanced.ChannelsRangeLab, xpTURN.Feedback.Samples.Advanced.ChannelsRange
+  RequiresText: 
+  OpenInEditor: 0

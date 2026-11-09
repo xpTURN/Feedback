@@ -1,0 +1,33 @@
+{
+    "name": "xpTURN.Feedback.Tests.UGUI",
+    "rootNamespace": "xpTURN.Feedback.Tests",
+    "references": [
+        "xpTURN.Feedback",
+        "xpTURN.Feedback.UGUI",
+        "xpTURN.Feedback.Tests",
+        "UnityEngine.UI",
+        "Unity.TextMeshPro",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS",
+        "XPTURN_FEEDBACK_TESTS_UGUI"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.unity.ugui",
+            "expression": "2.0.0",
+            "define": "XPTURN_FEEDBACK_TESTS_UGUI"
+        }
+    ],
+    "noEngineReferences": false
+}

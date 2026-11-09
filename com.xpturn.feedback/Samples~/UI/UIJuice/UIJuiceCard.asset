@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7265114aa1e7f41ada19d74a427f9e13, type: 3}
+  m_Name: UIJuiceCard
+  m_EditorClassIdentifier: xpTURN.Feedback.Samples::xpTURN.Feedback.Samples.SampleCard
+  Title: UI Juice
+  Try: "Hover and buy the items, hit and heal, fill the XP bar for the reward \u2014
+    then pause and do it all again."
+  See: "Every UI player runs on the unscaled clock: paused (the sample's time scale
+    0), the screen still moves while the Scaled ornament and the cube stop. The bars
+    are ProgressBar components \u2014 a loss stays red for a moment, a gain shows
+    green before the bar follows. Before plays nothing: the bars jump and the popup
+    shows its end at once. The popup's TMP player is made at run time (after the
+    TMP check) \u2014 the HUD's Select Player does not pick it."
+  Controls: "Mouse \xB7 Arrows \xB7 WASD \xB7 D-pad \xB7 Left stick \u2014 pick \xB7
+    Click \xB7 Enter \xB7 Gamepad South \u2014 press \xB7 3 \xB7 Gamepad North \u2014
+    pause"
+  SceneGuid: 51e720f2a7f914556924bf31daa0ca6c
+  SceneName: UIJuice
+  RequiredType: xpTURN.Feedback.Samples.UI.UIJuiceLab, xpTURN.Feedback.Samples.UI.UIJuice
+  RequiresText: 
+  OpenInEditor: 0

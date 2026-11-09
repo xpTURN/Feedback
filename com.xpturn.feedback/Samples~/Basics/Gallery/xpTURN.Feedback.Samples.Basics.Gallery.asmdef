@@ -1,0 +1,9 @@
+{
+    "name": "xpTURN.Feedback.Samples.Basics.Gallery",
+    "rootNamespace": "xpTURN.Feedback.Samples.Basics",
+    "references": ["xpTURN.Feedback", "xpTURN.Feedback.Samples", "xpTURN.Feedback.Samples.UI", "Unity.InputSystem", "UnityEngine.UI", "Unity.TextMeshPro"],
+    "includePlatforms": [],
+    "autoReferenced": false,
+    "defineConstraints": ["XPTURN_FEEDBACK_SAMPLES_INPUTSYSTEM", "XPTURN_FEEDBACK_SAMPLES_UGUI", "XPTURN_FEEDBACK_SAMPLES_URP", "XPTURN_FEEDBACK_SAMPLES_PARTICLES", "XPTURN_FEEDBACK_SAMPLES_PHYSICS", "XPTURN_FEEDBACK_SAMPLES_PHYSICS2D", "XPTURN_FEEDBACK_SAMPLES_ANIMATION"],
+    "versionDefines": [ { "name": "com.unity.inputsystem", "expression": "1.0.0", "define": "XPTURN_FEEDBACK_SAMPLES_INPUTSYSTEM" }, { "name": "com.unity.ugui", "expression": "2.0.0", "define": "XPTURN_FEEDBACK_SAMPLES_UGUI" }, { "name": "com.unity.render-pipelines.universal", "expression": "17.0.0", "define": "XPTURN_FEEDBACK_SAMPLES_URP" }, { "name": "com.unity.modules.particlesystem", "expression": "1.0.0", "define": "XPTURN_FEEDBACK_SAMPLES_PARTICLES" }, { "name": "com.unity.modules.physics", "expression": "1.0.0", "define": "XPTURN_FEEDBACK_SAMPLES_PHYSICS" }, { "name": "com.unity.modules.physics2d", "expression": "1.0.0", "define": "XPTURN_FEEDBACK_SAMPLES_PHYSICS2D" }, { "name": "com.unity.modules.animation", "expression": "1.0.0", "define": "XPTURN_FEEDBACK_SAMPLES_ANIMATION" } ]
+}

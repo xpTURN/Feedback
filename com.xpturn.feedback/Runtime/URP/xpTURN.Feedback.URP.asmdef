@@ -1,0 +1,27 @@
+{
+    "name": "xpTURN.Feedback.URP",
+    "rootNamespace": "xpTURN.Feedback",
+    "references": [
+        "xpTURN.Feedback",
+        "Unity.RenderPipelines.Core.Runtime",
+        "Unity.RenderPipelines.Universal.Runtime",
+        "Unity.RenderPipelines.Universal.2D.Runtime"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "XPTURN_FEEDBACK_URP"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.unity.render-pipelines.universal",
+            "expression": "17.0.0",
+            "define": "XPTURN_FEEDBACK_URP"
+        }
+    ],
+    "noEngineReferences": false
+}

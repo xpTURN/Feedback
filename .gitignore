@@ -1,0 +1,28 @@
+## files
+.DS_Store
+.idea/
+.vscode/
+.vs/
+.vsconfig
+*.pem
+*.p12
+
+## the maintainer's own notes and agent settings
+/IMP/
+**/.claude/
+
+## .NET build output (com.xpturn.feedback/Tests~)
+**/bin/
+**/obj/
+TestResults/
+
+## the development projects (tests/FeedbackTests.<version>)
+/tests/*/[Ll]ibrary/
+/tests/*/[Tt]emp/
+/tests/*/[Ll]ogs/
+/tests/*/[Uu]ser[Ss]ettings/
+/tests/*/[Bb]uild/
+/tests/*/[Bb]uilds/
+/tests/*/*.csproj
+/tests/*/*.sln
+/tests/*/*.slnx

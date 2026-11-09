@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7265114aa1e7f41ada19d74a427f9e13, type: 3}
+  m_Name: SpringPlaygroundCard
+  m_EditorClassIdentifier: xpTURN.Feedback.Samples::xpTURN.Feedback.Samples.SampleCard
+  Title: Spring Playground
+  Try: Drag the ring with the mouse or step it a cell with the arrows. Change the
+    frequency and the damping, then drag again.
+  See: "Grey: SpringFloat (the bar), SpringVector2 (the disc) and SpringVector3 (the
+    cube) stepped in code \u2014 the sliders set them. Blue: a MotionDriver following
+    the same target, its spring fixed in the scene. Moving the target keeps the velocity.
+    Bump and MoveTo are Spring motions on players; Before turns only those off."
+  Controls: "Drag \xB7 arrows \xB7 Left stick \u2014 target \xB7 Z X C V \xB7 D-pad
+    \u2014 spring \xB7 2 \xB7 3 \u2014 Bump \xB7 MoveTo"
+  SceneGuid: 6db32d8aad1bb4038aec29e1d8810c7f
+  SceneName: SpringPlayground
+  RequiredType: xpTURN.Feedback.Samples.GameFeelLabs.SpringPlayground, xpTURN.Feedback.Samples.GameFeelLabs.Springs
+  RequiresText: 
+  OpenInEditor: 0

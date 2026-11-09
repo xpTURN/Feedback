@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7265114aa1e7f41ada19d74a427f9e13, type: 3}
+  m_Name: TimelineCutsceneCard
+  m_EditorClassIdentifier: xpTURN.Feedback.Samples::xpTURN.Feedback.Samples.SampleCard
+  Title: Unity Timeline Cutscene
+  Try: 'Watch the six-second cutscene loop, then pause it and drag the slider: the
+    camera shake and the hero''s spring follow the timeline, the flash holds. In
+    the Editor, select Cutscene and open Window > Sequencing > Timeline to scrub
+    it in Edit mode (the burst plays in Play mode only).'
+  See: "A Feedback track for each player on one timeline (the Unity Timeline package).
+    Driven clips \u2014 the camera shake and the hero's looping spring \u2014 take
+    the timeline's time: a scrub, a pause and the director's speed show the same
+    values, and the clip's Seed gives the same shake each time. A Triggered clip
+    \u2014 the screen flash \u2014 starts with its clip and runs on its player's
+    clock. A Signal at 4.5 s calls the burst's PlayFromEvent through a Signal Receiver,
+    in Play mode only: the Timeline window's preview sends no signal while scrubbing,
+    and the receiver's call is Runtime Only.
+    Each clip ends with Revert. The HUD's intensity does not reach the clips (a clip's
+    Intensity is its own) and its time scale slows the director with the game. Before
+    leaves out the camera and the motion, and starts the cutscene over (a play keeps
+    the categories it began with); the flash is out of every category."
+  Controls: "Space \xB7 1 \xB7 Gamepad South \u2014 play from the start \xB7 2 \xB7
+    Gamepad West \u2014 pause \xB7 resume \xB7 Z \xB7 X \xB7 D-pad \u2014 scrub \xB7
+    Mouse \u2014 buttons \xB7 slider"
+  SceneGuid: cc5f520cc434f4f039c2c9ae46695dbf
+  SceneName: TimelineCutscene
+  RequiredType: xpTURN.Feedback.Samples.Advanced.TimelineCutsceneLab, xpTURN.Feedback.Samples.Advanced.TimelineCutscene
+  RequiresText: Timeline 1.8 or later
+  OpenInEditor: 1

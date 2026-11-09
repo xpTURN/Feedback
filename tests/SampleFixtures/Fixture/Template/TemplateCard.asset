@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7265114aa1e7f41ada19d74a427f9e13, type: 3}
+  m_Name: TemplateCard
+  m_EditorClassIdentifier: xpTURN.Feedback.Samples::xpTURN.Feedback.Samples.SampleCard
+  Title: Template
+  Try: Press Space, click the scene or press the gamepad's south button.
+  See: The white cube punches, flashes and the camera shakes (Hit Light).
+  Controls: "Space \xB7 Left click \xB7 Gamepad South \u2014 play"
+  SceneGuid: 22e860ddafb754759ab042312bfaad23
+  SceneName: Template
+  RequiredType: xpTURN.Feedback.Samples.Fixture.TemplateSample, xpTURN.Feedback.Samples.Fixture.Template
+  RequiresText: 
+  OpenInEditor: 0

@@ -1,0 +1,31 @@
+{
+    "name": "xpTURN.Feedback.Tests.Physics2D",
+    "rootNamespace": "xpTURN.Feedback.Tests",
+    "references": [
+        "xpTURN.Feedback",
+        "xpTURN.Feedback.Tests",
+        "xpTURN.Feedback.Physics2D",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS",
+        "XPTURN_FEEDBACK_TESTS_PHYSICS2D"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.unity.modules.physics2d",
+            "expression": "1.0.0",
+            "define": "XPTURN_FEEDBACK_TESTS_PHYSICS2D"
+        }
+    ],
+    "noEngineReferences": false
+}

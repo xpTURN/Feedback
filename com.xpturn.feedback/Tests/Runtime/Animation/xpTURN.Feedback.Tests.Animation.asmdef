@@ -1,0 +1,30 @@
+{
+    "name": "xpTURN.Feedback.Tests.Animation",
+    "rootNamespace": "xpTURN.Feedback.Tests",
+    "references": [
+        "xpTURN.Feedback",
+        "xpTURN.Feedback.Tests",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS",
+        "XPTURN_FEEDBACK_TESTS_ANIMATION"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.unity.modules.animation",
+            "expression": "1.0.0",
+            "define": "XPTURN_FEEDBACK_TESTS_ANIMATION"
+        }
+    ],
+    "noEngineReferences": false
+}

@@ -1,0 +1,40 @@
+{
+    "name": "xpTURN.Feedback.Tests.Editor.Interop",
+    "rootNamespace": "xpTURN.Feedback.Tests.Editor",
+    "references": [
+        "xpTURN.Feedback",
+        "xpTURN.Feedback.Tests",
+        "UniTask",
+        "VContainer",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS",
+        "XPTURN_FEEDBACK_TESTS_UNITASK",
+        "XPTURN_FEEDBACK_TESTS_VCONTAINER"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.cysharp.unitask",
+            "expression": "2.5.11",
+            "define": "XPTURN_FEEDBACK_TESTS_UNITASK"
+        },
+        {
+            "name": "jp.hadashikick.vcontainer",
+            "expression": "1.19.0",
+            "define": "XPTURN_FEEDBACK_TESTS_VCONTAINER"
+        }
+    ],
+    "noEngineReferences": false
+}

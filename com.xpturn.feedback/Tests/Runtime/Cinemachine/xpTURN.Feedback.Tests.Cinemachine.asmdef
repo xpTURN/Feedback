@@ -1,0 +1,32 @@
+{
+    "name": "xpTURN.Feedback.Tests.Cinemachine",
+    "rootNamespace": "xpTURN.Feedback.Tests",
+    "references": [
+        "xpTURN.Feedback",
+        "xpTURN.Feedback.Cinemachine",
+        "xpTURN.Feedback.Tests",
+        "Unity.Cinemachine",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS",
+        "XPTURN_FEEDBACK_TESTS_CINEMACHINE"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.unity.cinemachine",
+            "expression": "3.0.0",
+            "define": "XPTURN_FEEDBACK_TESTS_CINEMACHINE"
+        }
+    ],
+    "noEngineReferences": false
+}

@@ -1,0 +1,25 @@
+{
+    "name": "xpTURN.Feedback.InputSystem",
+    "rootNamespace": "xpTURN.Feedback",
+    "references": [
+        "xpTURN.Feedback",
+        "Unity.InputSystem"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "XPTURN_FEEDBACK_INPUTSYSTEM"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.unity.inputsystem",
+            "expression": "1.0.0",
+            "define": "XPTURN_FEEDBACK_INPUTSYSTEM"
+        }
+    ],
+    "noEngineReferences": false
+}

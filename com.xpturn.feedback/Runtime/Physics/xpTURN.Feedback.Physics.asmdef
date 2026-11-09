@@ -1,0 +1,25 @@
+{
+    "name": "xpTURN.Feedback.Physics",
+    "rootNamespace": "xpTURN.Feedback",
+    "references": [
+        "xpTURN.Feedback",
+        "xpTURN.Feedback.Math"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "XPTURN_FEEDBACK_PHYSICS"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.unity.modules.physics",
+            "expression": "1.0.0",
+            "define": "XPTURN_FEEDBACK_PHYSICS"
+        }
+    ],
+    "noEngineReferences": false
+}

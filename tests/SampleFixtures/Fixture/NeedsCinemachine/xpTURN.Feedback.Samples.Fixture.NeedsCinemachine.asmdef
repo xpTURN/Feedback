@@ -1,0 +1,9 @@
+{
+    "name": "xpTURN.Feedback.Samples.Fixture.NeedsCinemachine",
+    "rootNamespace": "xpTURN.Feedback.Samples.Fixture",
+    "references": ["xpTURN.Feedback", "xpTURN.Feedback.Samples", "Unity.Cinemachine"],
+    "includePlatforms": [],
+    "autoReferenced": false,
+    "defineConstraints": ["XPTURN_FEEDBACK_SAMPLES_CINEMACHINE", "XPTURN_FEEDBACK_SAMPLES_URP"],
+    "versionDefines": [ { "name": "com.unity.cinemachine", "expression": "3.0.0", "define": "XPTURN_FEEDBACK_SAMPLES_CINEMACHINE" }, { "name": "com.unity.render-pipelines.universal", "expression": "17.0.0", "define": "XPTURN_FEEDBACK_SAMPLES_URP" } ]
+}

@@ -1,0 +1,9 @@
+{
+    "name": "xpTURN.Feedback.Samples.Fixture.NeedsMissing",
+    "rootNamespace": "xpTURN.Feedback.Samples.Fixture",
+    "references": ["xpTURN.Feedback", "xpTURN.Feedback.Samples"],
+    "includePlatforms": [],
+    "autoReferenced": false,
+    "defineConstraints": ["XPTURN_FEEDBACK_SAMPLES_FIXTURE_ABSENT"],
+    "versionDefines": [ { "name": "com.example.absent", "expression": "1.0.0", "define": "XPTURN_FEEDBACK_SAMPLES_FIXTURE_ABSENT" } ]
+}

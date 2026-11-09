@@ -1,0 +1,14 @@
+{
+    "name": "xpTURN.Feedback.Math",
+    "rootNamespace": "xpTURN.Feedback",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": true
+}

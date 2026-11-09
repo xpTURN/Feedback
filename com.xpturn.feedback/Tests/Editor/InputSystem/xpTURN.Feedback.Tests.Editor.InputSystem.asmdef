@@ -1,0 +1,35 @@
+{
+    "name": "xpTURN.Feedback.Tests.Editor.InputSystem",
+    "rootNamespace": "xpTURN.Feedback.Tests.Editor",
+    "references": [
+        "xpTURN.Feedback",
+        "xpTURN.Feedback.Editor",
+        "xpTURN.Feedback.InputSystem",
+        "xpTURN.Feedback.Tests.InputSystem",
+        "Unity.InputSystem",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS",
+        "XPTURN_FEEDBACK_TESTS_EDITOR_INPUTSYSTEM"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.unity.inputsystem",
+            "expression": "1.0.0",
+            "define": "XPTURN_FEEDBACK_TESTS_EDITOR_INPUTSYSTEM"
+        }
+    ],
+    "noEngineReferences": false
+}

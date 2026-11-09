@@ -1,0 +1,7 @@
+{
+    "name": "RecompileCheck.Runtime",
+    "references": [
+        "xpTURN.Feedback",
+        "Unity.InputSystem"
+    ]
+}

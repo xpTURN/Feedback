@@ -1,0 +1,9 @@
+{
+    "name": "xpTURN.Feedback.Samples.GameFeelLabs.CinemachineShake",
+    "rootNamespace": "xpTURN.Feedback.Samples.GameFeelLabs",
+    "references": ["xpTURN.Feedback", "xpTURN.Feedback.Samples", "xpTURN.Feedback.Samples.UI", "Unity.InputSystem", "UnityEngine.UI", "Unity.Cinemachine"],
+    "includePlatforms": [],
+    "autoReferenced": false,
+    "defineConstraints": ["XPTURN_FEEDBACK_SAMPLES_INPUTSYSTEM", "XPTURN_FEEDBACK_SAMPLES_UGUI", "XPTURN_FEEDBACK_SAMPLES_URP", "XPTURN_FEEDBACK_SAMPLES_CINEMACHINE"],
+    "versionDefines": [ { "name": "com.unity.inputsystem", "expression": "1.0.0", "define": "XPTURN_FEEDBACK_SAMPLES_INPUTSYSTEM" }, { "name": "com.unity.ugui", "expression": "2.0.0", "define": "XPTURN_FEEDBACK_SAMPLES_UGUI" }, { "name": "com.unity.render-pipelines.universal", "expression": "17.0.0", "define": "XPTURN_FEEDBACK_SAMPLES_URP" }, { "name": "com.unity.cinemachine", "expression": "3.0.0", "define": "XPTURN_FEEDBACK_SAMPLES_CINEMACHINE" } ]
+}

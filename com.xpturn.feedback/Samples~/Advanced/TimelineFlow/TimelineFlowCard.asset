@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7265114aa1e7f41ada19d74a427f9e13, type: 3}
+  m_Name: TimelineFlowCard
+  m_EditorClassIdentifier: xpTURN.Feedback.Samples::xpTURN.Feedback.Samples.SampleCard
+  Title: Timeline & Flow
+  Try: 'Play the launch: the countdown, the charge, then press Launch inside the
+    2 s wait (or let it launch itself). Pause, drag the slider, land it back mid-flight
+    or from the top.'
+  See: "Action1 flies: from the pad it plays, in flight it launches (outside the
+    wait the signal is dropped); the mouse uses the buttons. One list (the Flight)
+    shows the start rules \u2014 with previous, after previous, after all \u2014
+    a stage loop \xD73 and a signal wait; its Player Control items start the endless
+    Flame forward and stop it on the way back. Backward is a time mirror. Seek works
+    on a nominal play only: an early Launch cuts the wait short and the play leaves
+    its axis, so the slider stops. Loop count is the total passes; an item's repeat
+    is extra runs. The bottom timeline is the sample's table of the list and its
+    own clock \u2014 the play's position has no public read. Before leaves out the
+    motion and the camera; the countdown, the pad light, the flame's show and the
+    flow still run (out of every category)."
+  Controls: "Space \xB7 1 \xB7 Gamepad South \u2014 play \xB7 launch \xB7 2 \xB7
+    Gamepad West \u2014 pause \xB7 3 \xB7 Gamepad North \u2014 land \xB7 Z \xB7 X
+    \xB7 D-pad \u2014 seek while paused \xB7 Mouse \u2014 buttons \xB7 slider"
+  SceneGuid: 60e7784a54a6e4a518b43fb78d309d8d
+  SceneName: TimelineFlow
+  RequiredType: xpTURN.Feedback.Samples.Advanced.TimelineFlowLab, xpTURN.Feedback.Samples.Advanced.TimelineFlow
+  RequiresText: 
+  OpenInEditor: 0

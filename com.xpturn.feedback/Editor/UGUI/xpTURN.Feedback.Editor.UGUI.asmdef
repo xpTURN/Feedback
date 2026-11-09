@@ -1,0 +1,29 @@
+{
+    "name": "xpTURN.Feedback.Editor.UGUI",
+    "rootNamespace": "xpTURN.Feedback.Editor",
+    "references": [
+        "xpTURN.Feedback",
+        "xpTURN.Feedback.Editor",
+        "xpTURN.Feedback.UGUI",
+        "UnityEngine.UI"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "XPTURN_FEEDBACK_EDITOR_UGUI"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.unity.ugui",
+            "expression": "2.0.0",
+            "define": "XPTURN_FEEDBACK_EDITOR_UGUI"
+        }
+    ],
+    "noEngineReferences": false
+}

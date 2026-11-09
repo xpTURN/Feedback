@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7265114aa1e7f41ada19d74a427f9e13, type: 3}
+  m_Name: StressZeroGCCard
+  m_EditorClassIdentifier: xpTURN.Feedback.Samples::xpTURN.Feedback.Samples.SampleCard
+  Title: Stress & Zero-GC
+  Try: Pick a player count and watch the meter; switch re-trigger on (every cube
+    plays again once a second), then the coroutine baseline on and off.
+  See: "The players are copies of one template (a cube with one long punch on itself
+    \u2014 the package's performance test's shape), built 500 a frame, each played
+    once, and destroyed when the count drops: that steady state is the test's. Re-trigger
+    adds a start and a stop per cube a second. The meter's allocation is the frame's
+    against the baseline taken when the comparison was last switched: the players
+    stay at it, the coroutine baseline (a coroutine and a delay object per start)
+    climbs while re-triggered. The three Feedback markers and the main thread are
+    the profiler's \u2014 a development build reads them exactly, the editor adds
+    its own work, a release build has none. Don't select the cubes in the Hierarchy
+    while measuring (the inspector rebuilds what it shows). The players are made
+    at run time \u2014 the HUD's Select Player does not pick them."
+  Controls: "Z \xB7 X \xB7 C \xB7 V \xB7 D-pad \u2014 player count \xB7 2 \xB7 Gamepad
+    West \u2014 coroutine baseline \xB7 3 \xB7 Gamepad North \u2014 re-trigger \xB7
+    Mouse \u2014 buttons"
+  SceneGuid: 2e6e67bd9e96243c0af68ba875d271aa
+  SceneName: StressZeroGC
+  RequiredType: xpTURN.Feedback.Samples.Advanced.StressLab, xpTURN.Feedback.Samples.Advanced.StressZeroGC
+  RequiresText: 
+  OpenInEditor: 0

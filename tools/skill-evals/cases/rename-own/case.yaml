@@ -1,0 +1,5 @@
+schema_version: "1.1"
+name: rename-own
+tags: [code]
+context:
+  scaffold_script: fixture.sh

@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7265114aa1e7f41ada19d74a427f9e13, type: 3}
+  m_Name: CameraShakeCard
+  m_EditorClassIdentifier: xpTURN.Feedback.Samples::xpTURN.Feedback.Samples.SampleCard
+  Title: Camera Shake Lab
+  Try: Press 1 2 3 for the presets on the left screen, Z X to shake one screen, C
+    V to keep a screen shaking.
+  See: One player per button. The presets aim at the main camera (the left screen);
+    the right screen hears channel 2. An endless shake adds under a preset and stops
+    at once; switched on in Before it starts at After.
+  Controls: "1 2 3 \xB7 Gamepad South West North \u2014 presets \xB7 Z X \xB7 C V
+    \xB7 D-pad \u2014 screens \xB7 endless"
+  SceneGuid: 6fc35abd6f80643aa932c8ba0c2002cb
+  SceneName: CameraShakeLab
+  RequiredType: xpTURN.Feedback.Samples.GameFeelLabs.CameraShakeLab, xpTURN.Feedback.Samples.GameFeelLabs.CameraShake
+  RequiresText: 
+  OpenInEditor: 0

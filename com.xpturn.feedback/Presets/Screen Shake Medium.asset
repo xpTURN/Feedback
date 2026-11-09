@@ -1,0 +1,83 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0e735b4a5ecd45b2967b65b972557a56, type: 3}
+  m_Name: Screen Shake Medium
+  m_EditorClassIdentifier: xpTURN.Feedback::xpTURN.Feedback.FeedbackPreset
+  m_Items:
+  - rid: 1742886720032735247
+  m_FormatVersion: 1
+  references:
+    version: 2
+    RefIds:
+    - rid: 1742886720032735247
+      type: {class: CameraShakeItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.15
+          m_Infinite: 0
+          m_Clock: 0
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 0
+          m_IntensityRange: {x: 0, y: 1}
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 5
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 1742886720032735248
+        m_DirectWrite: 0
+        m_RotationAmplitude: {x: 0, y: 0, z: 0}
+    - rid: 1742886720032735248
+      type: {class: ShakeMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Amplitude: {x: 0.4, y: 0.4, z: 0.4, w: 0.4}
+          m_Frequency: 10
+          m_Noise: 0
+          m_Falloff:
+            m_Type: 0
+            m_P1: 0
+            m_P2: 0
+            m_Curve:
+              serializedVersion: 2
+              m_Curve: []
+              m_PreInfinity: 2
+              m_PostInfinity: 2
+              m_RotationOrder: 4

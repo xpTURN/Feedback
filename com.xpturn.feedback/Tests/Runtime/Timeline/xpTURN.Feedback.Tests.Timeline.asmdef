@@ -1,0 +1,33 @@
+{
+    "name": "xpTURN.Feedback.Tests.Timeline",
+    "rootNamespace": "xpTURN.Feedback.Tests",
+    "references": [
+        "xpTURN.Feedback",
+        "xpTURN.Feedback.Math",
+        "xpTURN.Feedback.Timeline",
+        "xpTURN.Feedback.Tests",
+        "Unity.Timeline",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS",
+        "XPTURN_FEEDBACK_TESTS_TIMELINE"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.unity.timeline",
+            "expression": "1.8.0",
+            "define": "XPTURN_FEEDBACK_TESTS_TIMELINE"
+        }
+    ],
+    "noEngineReferences": false
+}

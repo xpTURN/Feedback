@@ -1,0 +1,24 @@
+{
+    "name": "xpTURN.Feedback.Video",
+    "rootNamespace": "xpTURN.Feedback",
+    "references": [
+        "xpTURN.Feedback"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "XPTURN_FEEDBACK_VIDEO"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.unity.modules.video",
+            "expression": "1.0.0",
+            "define": "XPTURN_FEEDBACK_VIDEO"
+        }
+    ],
+    "noEngineReferences": false
+}

@@ -1,0 +1,37 @@
+{
+    "name": "xpTURN.Feedback.Tests.Editor.URP",
+    "rootNamespace": "xpTURN.Feedback.Tests.Editor",
+    "references": [
+        "xpTURN.Feedback",
+        "xpTURN.Feedback.Editor",
+        "xpTURN.Feedback.URP",
+        "xpTURN.Feedback.Tests",
+        "Unity.RenderPipelines.Core.Runtime",
+        "Unity.RenderPipelines.Universal.Runtime",
+        "Unity.RenderPipelines.Universal.2D.Runtime",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS",
+        "XPTURN_FEEDBACK_TESTS_EDITOR_URP"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.unity.render-pipelines.universal",
+            "expression": "17.0.0",
+            "define": "XPTURN_FEEDBACK_TESTS_EDITOR_URP"
+        }
+    ],
+    "noEngineReferences": false
+}

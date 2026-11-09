@@ -1,0 +1,21 @@
+{
+  "shots": [
+    { "id": "R1", "file": "hero.gif", "state": "Hero" },
+    { "id": "R2", "file": "inspector.png", "state": "Inspector" },
+    { "id": "F1", "file": "first-player.png", "state": "FirstEmpty" },
+    { "id": "F2", "file": "first-add-menu.png", "state": "FirstAddMenu" },
+    { "id": "F3", "file": "first-preview.png", "state": "FirstPreview" },
+    { "id": "F4", "file": "first-jump-field.png", "state": "FirstJumpField" },
+    { "id": "F5", "file": "first-keep.png", "state": "FirstKeep" },
+    { "id": "E1", "file": "item-header.png", "state": "ItemHeader" },
+    { "id": "E2", "file": "add-menu.png", "state": "AddMenu" },
+    { "id": "E3", "file": "preview-bar.png", "state": "PreviewBar" },
+    { "id": "E4", "file": "preset-linked.png", "state": "PresetLinked" },
+    { "id": "E5", "file": "debugger.png", "state": "Debugger" },
+    { "id": "E6", "file": "validator.png", "state": "Validator" },
+    { "id": "C1", "file": "items.png", "state": "Items" },
+    { "id": "C2", "file": "timeline-strip.png", "state": "Strip" },
+    { "id": "C3", "file": "layers.png", "state": "Layers" },
+    { "id": "C4", "file": "timeline-track.png", "state": "Timeline" }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+    "name": "xpTURN.Feedback.Tests.Extension",
+    "rootNamespace": "xpTURN.Feedback.Tests.Extension",
+    "references": [
+        "xpTURN.Feedback"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

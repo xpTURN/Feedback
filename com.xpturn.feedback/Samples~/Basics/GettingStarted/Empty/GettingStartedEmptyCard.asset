@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7265114aa1e7f41ada19d74a427f9e13, type: 3}
+  m_Name: GettingStartedEmptyCard
+  m_EditorClassIdentifier: xpTURN.Feedback.Samples::xpTURN.Feedback.Samples.SampleCard
+  Title: Getting Started (Empty)
+  Try: "1. Select 'Body' (under 'Hero') and add a Feedback Player \u2014 or drag
+    the Jump preset (Packages > xpTURN.Feedback > Presets) onto it.\n2. In the player,
+    click Add, type 'punch' and pick Transform/Scale/Punch \u2014 its target is the
+    Body itself.\n3. Press the player's \u25B6 to see it in edit mode; change the
+    amplitude and play it again.\n4. Select 'Hero' and drag the player into its Jump
+    field \u2014 the script already calls Play() on a jump.\n5. Save the scene, turn
+    on the player's 'Keep Play Mode Changes', press Play and Space \u2014 tune it
+    while playing; the change stays."
+  See: 'The same scene as ''Getting Started'' without its players: Space jumps the
+    cube, nothing more until you add the feedback.'
+  Controls: "Space \xB7 Left click \xB7 Gamepad South \u2014 jump"
+  SceneGuid: bd32f54a1f13e4db5a4fb4ee736a0423
+  SceneName: GettingStartedEmpty
+  RequiredType: xpTURN.Feedback.Samples.Basics.GettingStartedHero, xpTURN.Feedback.Samples.Basics.GettingStarted
+  RequiresText: 
+  OpenInEditor: 1

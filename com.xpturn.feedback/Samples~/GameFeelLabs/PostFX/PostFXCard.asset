@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7265114aa1e7f41ada19d74a427f9e13, type: 3}
+  m_Name: PostFXCard
+  m_EditorClassIdentifier: xpTURN.Feedback.Samples::xpTURN.Feedback.Samples.SampleCard
+  Title: PostFX Lab
+  Try: "Pick an effect and play it, then the hit, the slow-mo and the low-health
+    pulse \u2014 and stack them."
+  See: "Each item weighs its own overlay volume above the scene's volume; the later
+    prepared sits on top (the hit over the pulse). The slow-mo's desaturation runs
+    on the unscaled clock. Leaving the scene reverts every effect. Tab turns every
+    category off \u2014 the slow-mo too."
+  Controls: "1 2 3 \xB7 Gamepad South West North \u2014 hit \xB7 slow-mo \xB7 low
+    health \xB7 Z X C \xB7 D-pad \u2014 pick \xB7 play \xB7 V \u2014 stop all"
+  SceneGuid: bfd49eb140986471a96e64b201db0be4
+  SceneName: PostFXLab
+  RequiredType: xpTURN.Feedback.Samples.GameFeelLabs.PostFXLab, xpTURN.Feedback.Samples.GameFeelLabs.PostFX
+  RequiresText: 
+  OpenInEditor: 0

@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7265114aa1e7f41ada19d74a427f9e13, type: 3}
+  m_Name: GalleryCard
+  m_EditorClassIdentifier: xpTURN.Feedback.Samples::xpTURN.Feedback.Samples.SampleCard
+  Title: Feedback Gallery
+  Try: 'Pick a tab, then a button: the feedback plays on the object in the middle.
+    ''Compare'' plays every motion on the same cube; ''Presets'' plays the package''s
+    default presets.'
+  See: "Every feedback type of the package with the add menu's motion \u2014 the
+    line at the bottom says what it does, its motion and its category (an item of
+    category None plays in Before too). Short flashes are easier to see at a lower
+    time scale. Hit Stop and Time Scale act on game time \u2014 watch the turning
+    cube stop or slow down."
+  Controls: "Mouse \u2014 tabs and buttons \xB7 Gamepad \u2014 D-pad and South"
+  SceneGuid: de80cf4368503402ba9c24f30696341b
+  SceneName: FeedbackGallery
+  RequiredType: xpTURN.Feedback.Samples.Basics.FeedbackGallery, xpTURN.Feedback.Samples.Basics.Gallery
+  RequiresText: the Particle System, Physics, Physics 2D and Animation modules
+  OpenInEditor: 0

@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7265114aa1e7f41ada19d74a427f9e13, type: 3}
+  m_Name: CinemachineShakeCard
+  m_EditorClassIdentifier: xpTURN.Feedback.Samples::xpTURN.Feedback.Samples.SampleCard
+  Title: Cinemachine Shake Lab
+  Try: "Shake with 1 2 3, press Z for the plain camera and shake again \u2014 the
+    same players. Try the Cinemachine items with C V."
+  See: 'One shake path: the main camera''s shake goes through the Cinemachine shake
+    extension or the plain camera''s transform. The Cinemachine items play on the
+    Cinemachine camera only, a lens button when the lens has that size. Each camera
+    switch allocates once (then 0 B). Impulse Clear and the Go buttons run in Before
+    too.'
+  Controls: "1 2 3 \u2014 presets \xB7 Z \u2014 plain or Cinemachine \xB7 X \u2014
+    endless \xB7 C V \xB7 D-pad \u2014 pick \xB7 play an item"
+  SceneGuid: bff857b4aaf2342c4a050b7fe902914b
+  SceneName: CinemachineShakeLab
+  RequiredType: xpTURN.Feedback.Samples.GameFeelLabs.CinemachineShakeLab, xpTURN.Feedback.Samples.GameFeelLabs.CinemachineShake
+  RequiresText: Cinemachine 3 or later
+  OpenInEditor: 0

@@ -1,0 +1,95 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2095314858179149967
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 94217783733718264}
+  - component: {fileID: 521965045456803233}
+  - component: {fileID: 824478569317888441}
+  - component: {fileID: 969574672452886933}
+  m_Layer: 0
+  m_Name: SampleEventSystem
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &94217783733718264
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2095314858179149967}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &521965045456803233
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2095314858179149967}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76c392e42b5098c458856cdf6ecaaaa1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.EventSystems.EventSystem
+  m_FirstSelected: {fileID: 0}
+  m_sendNavigationEvents: 1
+  m_DragThreshold: 10
+--- !u!114 &824478569317888441
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2095314858179149967}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01614664b831546d2ae94a42149d80ac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.UI.InputSystemUIInputModule
+  m_SendPointerHoverToParent: 1
+  m_MoveRepeatDelay: 0.5
+  m_MoveRepeatRate: 0.1
+  m_XRTrackingOrigin: {fileID: 0}
+  m_ActionsAsset: {fileID: -944628639613478452, guid: ca3572dee16b6406998881d672af3e2a, type: 3}
+  m_PointAction: {fileID: -8547061117238538552, guid: ca3572dee16b6406998881d672af3e2a, type: 3}
+  m_MoveAction: {fileID: -6293883606483071521, guid: ca3572dee16b6406998881d672af3e2a, type: 3}
+  m_SubmitAction: {fileID: 8932743394094128393, guid: ca3572dee16b6406998881d672af3e2a, type: 3}
+  m_CancelAction: {fileID: -3621969019670051632, guid: ca3572dee16b6406998881d672af3e2a, type: 3}
+  m_LeftClickAction: {fileID: -6275724917446519022, guid: ca3572dee16b6406998881d672af3e2a, type: 3}
+  m_MiddleClickAction: {fileID: -5145166542505517931, guid: ca3572dee16b6406998881d672af3e2a, type: 3}
+  m_RightClickAction: {fileID: 8054173785486410186, guid: ca3572dee16b6406998881d672af3e2a, type: 3}
+  m_ScrollWheelAction: {fileID: -8376814582467518887, guid: ca3572dee16b6406998881d672af3e2a, type: 3}
+  m_TrackedDevicePositionAction: {fileID: -644643732934010352, guid: ca3572dee16b6406998881d672af3e2a, type: 3}
+  m_TrackedDeviceOrientationAction: {fileID: -962107228823986675, guid: ca3572dee16b6406998881d672af3e2a, type: 3}
+  m_DeselectOnBackgroundClick: 1
+  m_PointerBehavior: 0
+  m_CursorLockBehavior: 0
+  m_ScrollDeltaPerTick: 6
+--- !u!114 &969574672452886933
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2095314858179149967}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e16688aee7114821b6e9340989d28fc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: xpTURN.Feedback.Samples.UI::xpTURN.Feedback.Samples.SampleSceneUI
+  m_Actions: {fileID: -944628639613478452, guid: ca3572dee16b6406998881d672af3e2a, type: 3}
