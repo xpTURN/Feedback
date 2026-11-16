@@ -15,6 +15,16 @@ namespace xpTURN.Feedback.Editor
         // the flow markers — a loop's two ends and Hold: no length of their own
         internal static bool Marker(FeedbackItem item) => item is LoopStartItem || item is LoopEndItem || item is HoldItem;
 
+        // a motion that keeps moving on an endless item — it runs on the item's seconds, while an endless item's time stays at
+        // its start
+        internal static bool KeepsMoving(MotionKind kind)
+            => kind == MotionKind.Oscillate || kind == MotionKind.Wiggle || kind == MotionKind.Shake || kind == MotionKind.Blink;
+
+        // a target item whose motion has no use for Infinite — a Spring ends when it settles, a Set is instant, the others stay
+        // at their start
+        internal static bool InfiniteUnused(FeedbackItem item)
+            => item is TargetItem t && t.m_Motion != null && !KeepsMoving(t.m_Motion.Kind);
+
         internal static bool Visible(FeedbackItem item, string field)
         {
             if (item == null)
@@ -35,7 +45,9 @@ namespace xpTURN.Feedback.Editor
                 case Duration:
                 case Infinite:
                     // an action item has its own length · a signal wait has its time limit
-                    return !Marker(item) && !action && !(item is WaitForSignalItem);
+                    // · a motion with no use for Infinite shows it only while it is on, to be turned off
+                    return !Marker(item) && !action && !(item is WaitForSignalItem)
+                        && (field != Infinite || !InfiniteUnused(item) || item.m_Timing.m_Infinite);
                 case RepeatCount:
                 case RepeatForever:
                 case RepeatGap:

@@ -103,6 +103,9 @@ namespace xpTURN.Feedback.Editor
                 // a Parameter's kind and pick choose its other fields · a 2D force's kind
                 if ((value is AnimatorParameterItem && (field == "m_Kind" || field == "m_Pick")) || (value is Rigidbody2DForceItem && field == "m_Kind"))
                     f.TrackPropertyValue(p, _ => Build(item, foldKey, host));
+                // an Infinite shown only while it is on — turned off, the body is built without it
+                if (field == ItemRules.Infinite && ItemRules.InfiniteUnused(value))
+                    f.TrackPropertyValue(p, _ => Build(item, foldKey, host));
                 (ItemRules.Advanced(field) ? Advanced.contentContainer : this).Add(f);
                 Fields.Add(field);
             }

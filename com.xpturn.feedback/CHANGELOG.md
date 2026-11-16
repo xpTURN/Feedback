@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.2.1] - 2026-11-16
+
+The Infinite field only where a motion keeps moving, and the validator on the rest. Requires Unity 6000.0.85f2 or later;
+no package dependencies.
+
+### Changed
+- **Infinite** shows only on an item whose motion keeps moving — Oscillate, Wiggle, Shake or Blink — or that has no
+  motion; another motion stays at its start on an endless item. FB-D07 now also tells an Infinite that leaves a Curve,
+  Punch, Tween, Flash, Gradient or Bounce at its start, or that a Spring or a Set ignores, with **Clear Infinite** and
+  **Loop with Repeat Forever**.
+
 ## [0.2.0] - 2026-11-16
 
 Unity's audio, new motion shapes, camera trauma, player variants and graphs in the inspector. Requires Unity

@@ -116,6 +116,68 @@ namespace xpTURN.Feedback.Tests.Editor
             Assert.That(p.m_Items[0].m_Timing.m_Infinite, Is.False);
         }
 
+        // a target item's Infinite its motion has no use for — a motion that does not keep moving stays at its start (Clear
+        // Infinite · Loop with Repeat Forever), a Spring or a Set ignores it (Clear Infinite); a motion that keeps moving, no
+        // motion and a finite item are quiet · a preset's list is checked, a Motion Driver's item is not
+        [Test]
+        public void VT06g2_AnInfiniteTheMotionHasNoUseFor()
+        {
+            var kinds = (MotionKind[])System.Enum.GetValues(typeof(MotionKind));
+            var keeps = new[] { MotionKind.Oscillate, MotionKind.Wiggle, MotionKind.Shake, MotionKind.Blink };
+            var items = new List<FeedbackItem>();
+            foreach (MotionKind k in kinds)
+            {
+                PositionItem item = F.Item<PositionItem>(InspectorTesting.Motion(k));
+                item.m_Timing.m_Infinite = true;
+                items.Add(item);
+            }
+            PositionItem none = F.Item<PositionItem>(null);
+            none.m_Timing.m_Infinite = true;
+            items.Add(none);
+            items.Add(F.Item<PositionItem>(new CurveMotion()));
+            FeedbackPlayer p = m_Fx.Player("VT06g2", items.ToArray());
+            List<RuleResult> r = F.Of(p, "FB-D07");
+            var want = new List<string>();
+            for (int i = 0; i < kinds.Length; i++)
+            {
+                MotionKind k = kinds[i];
+                if (k == MotionKind.Spring)
+                    want.Add(i + ":A Spring's Infinite is ignored — it ends when it settles:Clear Infinite");
+                else if (k == MotionKind.Set)
+                    want.Add(i + ":A Set's Infinite is ignored — it is instant:Clear Infinite");
+                else if (!keeps.Contains(k))
+                    want.Add(i + ":An endless " + k + " stays at its start — Repeat Forever loops it:Clear Infinite|Loop with Repeat Forever");
+            }
+            Assert.That(r.Select(x => x.Item + ":" + x.Message + ":" + string.Join("|", x.Fixes.Select(f => f.Name))), Is.EquivalentTo(want));
+
+            int curve = System.Array.IndexOf(kinds, MotionKind.Curve);
+            RuleResult loop = r.Single(x => x.Item == curve);
+            FeedbackValidator.Apply(loop, loop.Fixes.Single(f => f.Name == "Loop with Repeat Forever"));
+            Assert.That((p.m_Items[curve].m_Timing.m_Infinite, p.m_Items[curve].m_Timing.m_RepeatForever), Is.EqualTo((false, true)), "looped");
+            Undo.PerformUndo();
+            Assert.That((p.m_Items[curve].m_Timing.m_Infinite, p.m_Items[curve].m_Timing.m_RepeatForever), Is.EqualTo((true, false)), "one undo");
+            int spring = System.Array.IndexOf(kinds, MotionKind.Spring);
+            RuleResult clear = r.Single(x => x.Item == spring);
+            FeedbackValidator.Apply(clear, clear.Fixes.Single());
+            Assert.That(p.m_Items[spring].m_Timing.m_Infinite, Is.False, "cleared");
+            Assert.That(F.Of(p, "FB-D07").Select(x => x.Item), Has.No.Member(spring));
+
+            var preset = ScriptableObject.CreateInstance<FeedbackPreset>();
+            m_Fx.Made.Add(preset);
+            PositionItem held = F.Item<PositionItem>(new CurveMotion(), TargetRefMode.Direct);
+            held.m_Timing.m_Infinite = true;
+            preset.m_Items.Add(held);
+            Assert.That(F.Of(preset, "FB-D07").Select(x => x.Message), Is.EqualTo(new[] { "An endless Curve stays at its start — Repeat Forever loops it" }), "a preset's list");
+
+            var g = new GameObject("VT06g2Driver");
+            m_Fx.Made.Add(g);
+            var driver = g.AddComponent<MotionDriver>();
+            PositionItem driven = F.Item<PositionItem>(new CurveMotion());
+            driven.m_Timing.m_Infinite = true;
+            driver.m_Item = driven;
+            Assert.That(F.Of(driver, "FB-D07"), Is.Empty, "a Motion Driver's item");
+        }
+
         // a project rule: two Resources/FeedbackSettings
         [Test]
         public void VT06h_TwoSettings()

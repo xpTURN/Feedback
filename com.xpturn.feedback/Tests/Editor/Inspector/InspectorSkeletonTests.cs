@@ -579,6 +579,54 @@ namespace xpTURN.Feedback.Tests.Editor
             Assert.That(ItemRules.Visible(new WaitItem(), "m_Timing.m_Clock"), Is.True);
         }
 
+        // Infinite shows where the motion keeps moving on an endless item — Oscillate · Wiggle · Shake · Blink — and where no
+        // motion is picked; the other motions show it only while it is on, to be turned off
+        [Test]
+        public void IX07b_InfiniteFollowsTheMotion()
+        {
+            var keeps = new[] { MotionKind.Oscillate, MotionKind.Wiggle, MotionKind.Shake, MotionKind.Blink };
+            foreach (MotionKind k in Enum.GetValues(typeof(MotionKind)))
+            {
+                var item = new PositionItem { m_Motion = InspectorTesting.Motion(k) };
+                Assert.That(ItemRules.Visible(item, ItemRules.Infinite), Is.EqualTo(keeps.Contains(k)), k.ToString());
+                Assert.That(ItemRules.Visible(item, ItemRules.Duration), Is.True, k + "'s Duration");
+                item.m_Timing.m_Infinite = true;
+                Assert.That(ItemRules.Visible(item, ItemRules.Infinite), Is.True, k + " with Infinite on");
+            }
+            Assert.That(ItemRules.Visible(new PositionItem(), ItemRules.Infinite), Is.True, "no motion");
+            Assert.That(ItemRules.Visible(new WaitItem(), ItemRules.Infinite), Is.True, "a Wait");
+            Assert.That(ItemRules.Visible(new HitStopItem(), ItemRules.Infinite), Is.False, "an action");
+            Assert.That(ItemRules.Visible(new HoldItem(), ItemRules.Infinite), Is.False, "a marker");
+        }
+
+        // a Curve item's body has no Infinite · one with Infinite on shows it, and turned off the body is built again without it
+        // · Oscillate picked, the body shows it
+        [UnityTest]
+        public IEnumerator IX07d_TheBodyFollowsInfinite()
+        {
+            var on = InspectorTesting.Item<PositionItem>(new CurveMotion(), 1f);
+            on.m_Timing.m_Infinite = true;
+            FeedbackPlayer p = Player("Infinite", InspectorTesting.Item<PositionItem>(new CurveMotion(), 1f), on);
+            InspectorElement inspector = InspectorTesting.Inspector(m_Window, p);
+            yield return InspectorTesting.Wait(0.2);
+            foreach (ItemElement row in InspectorTesting.Rows(inspector))
+                row.Header.Fold.value = true;
+            yield return InspectorTesting.Wait(0.2);
+            List<ItemElement> rows = InspectorTesting.Rows(inspector).OrderBy(r => r.Index).ToList();
+            Assert.That(rows[0].Body.Fields, Has.No.Member(ItemRules.Infinite), "a Curve");
+            Assert.That(rows[1].Body.Fields, Has.Member(ItemRules.Infinite), "a Curve with Infinite on");
+            var so = new SerializedObject(p);
+            so.FindProperty("m_Items").GetArrayElementAtIndex(1).FindPropertyRelative(ItemRules.Infinite).boolValue = false;
+            so.ApplyModifiedProperties();
+            yield return InspectorTesting.Wait(0.5);
+            rows = InspectorTesting.Rows(inspector).OrderBy(r => r.Index).ToList();
+            Assert.That(rows[1].Body.Fields, Has.No.Member(ItemRules.Infinite), "turned off, the body built again");
+            rows[0].Body.Q<MotionField>().Choice.value = nameof(MotionKind.Oscillate);
+            yield return InspectorTesting.Wait(0.5);
+            rows = InspectorTesting.Rows(inspector).OrderBy(r => r.Index).ToList();
+            Assert.That(rows[0].Body.Fields, Has.Member(ItemRules.Infinite), "Oscillate picked");
+        }
+
         // the body hides and renames as the rules say — a Loop End's runs, no duration on a Hold
         [UnityTest]
         public IEnumerator IX07c_TheBodyHidesAndRenames()

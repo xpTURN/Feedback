@@ -89,6 +89,8 @@ namespace xpTURN.Feedback.Editor
         internal double Start;
         internal double To;
         internal bool Endless;
+        // the motion of an Infinite item that stays at its start — null when the motion keeps moving or the item ends
+        internal string Stays;
         internal MotionWrite Write;
         // the values are on/off (a toggle) or a weight (an override, a shape that weighs toward the item's fields)
         internal bool Toggle;
@@ -183,6 +185,8 @@ namespace xpTURN.Feedback.Editor
             if (items == null || listIndex < 0 || listIndex >= items.Count || !Describe(items[listIndex], model, channel))
                 return model;
             var target = (TargetItem)items[listIndex];
+            if (target.m_Timing.m_Infinite && ItemRules.InfiniteUnused(target))
+                model.Stays = target.m_Motion.Kind.ToString();
             model.Allocate(columns);
             var descs = new List<TimelineItemDesc>(items.Count);
             var map = new List<int>(items.Count);

@@ -605,6 +605,29 @@ namespace xpTURN.Feedback.Tests.Editor
             Assert.That(endless.Endless, Is.True);
         }
 
+        // an endless item's note: a motion that does not keep moving stays at its start · one that keeps moving, and an item
+        // endless through Repeat Forever, show the first seconds
+        [UnityTest]
+        public IEnumerator MG20b_AnEndlessItemsNote()
+        {
+            PositionItem held = Pos(Make(0), 0.2f);
+            held.m_Timing.m_Infinite = true;
+            PositionItem keeps = Pos(Make(2), 0.2f);
+            keeps.m_Timing.m_Infinite = true;
+            PositionItem looped = Pos(Make(0), 0.2f);
+            looped.m_Timing.m_RepeatForever = true;
+            FeedbackPlayer p = Player(Go("endless"), null, new FeedbackItem[] { held, keeps, looped });
+            List<ItemGraphModel> m = Models(p, Inputs(1u));
+            Assert.That(m.Select(x => (x.Endless, x.Stays)), Is.EqualTo(new[] { (true, "Punch"), (true, (string)null), (true, (string)null) }));
+            ItemGraphField a = OpenGraph(p, 0);
+            ItemGraphField b = OpenGraph(p, 1);
+            ItemGraphField c = OpenGraph(p, 2);
+            yield return InspectorTesting.Wait(0.3);
+            Assert.That(a.Notes.text, Does.Contain("Endless — a Punch stays at its start; Repeat Forever loops it"));
+            Assert.That(b.Notes.text, Does.Contain("Endless — the first").And.Not.Contain("stays at its start"));
+            Assert.That(c.Notes.text, Does.Contain("Endless — the first").And.Not.Contain("stays at its start"));
+        }
+
         ItemGraphField OpenGraph(FeedbackPlayer p, int index)
         {
             if (m_Window == null)

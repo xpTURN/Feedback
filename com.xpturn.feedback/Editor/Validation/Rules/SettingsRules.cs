@@ -218,7 +218,8 @@ namespace xpTURN.Feedback.Editor
         }
     }
 
-    // FB-D07: an action item's Infinite — ignored, it lasts its own length
+    // FB-D07: an Infinite the item has no use for — an action lasts its own length, a Spring ends when it settles, a Set is
+    // instant, and a motion that does not keep moving stays at its start
     internal sealed class ActionInfiniteRule : FeedbackRule
     {
         internal override string Id => "FB-D07";
@@ -229,6 +230,23 @@ namespace xpTURN.Feedback.Editor
         {
             for (int i = 0; i < c.Items.Count; i++)
             {
+                if (c.Items[i] is TargetItem t && t.m_Timing.m_Infinite && ItemRules.InfiniteUnused(t))
+                {
+                    MotionKind kind = t.m_Motion.Kind;
+                    bool ignored = kind == MotionKind.Spring || kind == MotionKind.Set;
+                    RuleResult held = Result(c, i, kind == MotionKind.Spring ? "A Spring's Infinite is ignored — it ends when it settles"
+                        : kind == MotionKind.Set ? "A Set's Infinite is ignored — it is instant"
+                        : "An endless " + kind + " stays at its start — Repeat Forever loops it");
+                    held.Fixes.Add(c.ItemFix("Clear Infinite", c.ItemPath(i, "m_Timing.m_Infinite"), p => p.boolValue = false));
+                    if (!ignored)
+                        held.Fixes.Add(c.ItemFix("Loop with Repeat Forever", c.ItemPath(i), p =>
+                        {
+                            p.FindPropertyRelative("m_Timing.m_Infinite").boolValue = false;
+                            p.FindPropertyRelative("m_Timing.m_RepeatForever").boolValue = true;
+                        }));
+                    into.Add(held);
+                    continue;
+                }
                 if (!(c.Items[i] is ActionItem a) || !a.m_Timing.m_Infinite)
                     continue;
                 RuleResult r = Result(c, i, "An action's Infinite is ignored — it lasts its own length");

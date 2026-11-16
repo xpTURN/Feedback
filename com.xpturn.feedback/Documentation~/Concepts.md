@@ -163,8 +163,11 @@ works on your volume, and `PostFX/Volume Blend` blends your profile into its own
 
 An item's **Rule** places it in the list: **With Previous** (the default) starts it with the item before it,
 **After Previous** when that item ends, **After All** when everything before it has ended. **Delay** waits first, and
-**Duration** is its length — a Set is instant, a Spring lasts until it settles, and an action has its own length. Under
-**Advanced**, **Extra Runs** plays the item again that many more times with **Repeat Gap** between runs,
+**Duration** is its length — a Set is instant, a Spring lasts until it settles, and an action has its own length.
+**Infinite** plays the item until it is stopped; the inspector shows it for a motion that keeps moving on its own clock —
+Oscillate, Wiggle, Shake or Blink — since another motion stays at its start: loop that one with **Repeat Forever**, as
+the validator's FB-D07 says. Under **Advanced**, **Extra Runs** plays the item again that many more times with
+**Repeat Gap** between runs,
 **Repeat Forever** makes the list endless unless the item is **Background**, and a **Background** item does not count
 toward the list's length and is cut where the rest ends.
 

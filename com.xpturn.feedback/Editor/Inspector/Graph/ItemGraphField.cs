@@ -400,7 +400,7 @@ namespace xpTURN.Feedback.Editor
             if (Model.StartMatters && !Model.StartKnown)
                 parts.Add("From the target's start, drawn at 0");
             if (Model.Endless)
-                parts.Add("Endless — the first " + Number((float)(Model.To - Model.Start)) + " s");
+                parts.Add(Model.Stays != null ? "Endless — a " + Model.Stays + " stays at its start; Repeat Forever loops it" : "Endless — the first " + Number((float)(Model.To - Model.Start)) + " s");
             FeedbackPlayer player = Player;
             PlayerDirection direction = player != null ? player.m_Direction : PlayerDirection.Forward;
             PreviewSession session = PreviewSession.Current;
