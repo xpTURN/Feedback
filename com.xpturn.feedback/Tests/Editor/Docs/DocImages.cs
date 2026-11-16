@@ -71,6 +71,7 @@ namespace xpTURN.Feedback.Tests.Editor.Docs
         static IEnumerator<int> s_Steps;
         static int s_Wait;
         static double s_Start;
+        static Func<double> s_Clock;
         static readonly List<EditorWindow> s_Windows = new List<EditorWindow>();
 
         public static void Run()
@@ -89,6 +90,7 @@ namespace xpTURN.Feedback.Tests.Editor.Docs
             Directory.CreateDirectory(s_State);
             s_Log = new StreamWriter(Path.Combine(s_Out, "driver.log")) { AutoFlush = true };
             s_Start = EditorApplication.timeSinceStartup;
+            s_Clock = PreviewClock.Source;
             string[] only = (Environment.GetEnvironmentVariable("DOCIMG_ONLY") ?? "").Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries);
             List<Shot> list = JsonUtility.FromJson<ShotList>(File.ReadAllText(shots)).shots.Where(s => only.Length == 0 || only.Contains(s.id)).ToList();
             s_Steps = Steps(list);
@@ -192,6 +194,9 @@ namespace xpTURN.Feedback.Tests.Editor.Docs
                 case "Strip": return Strip(shot);
                 case "Layers": return Layers(shot);
                 case "Timeline": return TimelineShot(shot);
+                case "Eases": return EasesShot(shot);
+                case "Motions": return MotionsShot(shot);
+                case "Graphs": return GraphsShot(shot);
             }
             throw new ShotFailed("no state " + shot.state);
         }
@@ -503,6 +508,219 @@ namespace xpTURN.Feedback.Tests.Editor.Docs
                 yield return w;
         }
 
+        // the ease field's picker grid with every cell in sight, in a window of its own — the picker is a popup that scrolls
+        static IEnumerable<int> EasesShot(Shot shot)
+        {
+            const int columns = 8;
+            const float cell = 76f;
+            const float row = 58f;
+            int cells = EaseField.Thumbed().Count() + 1;
+            int rows = (cells + columns - 1) / columns;
+            EditorWindow window = Canvas("Eases", new Rect(120, 100, columns * cell + 24, rows * row + 48));
+            VisualElement grid = new EasePopup(_ => { }).CreateGUI();
+            window.rootVisualElement.Add(grid);
+            yield return Settle;
+            VisualElement inner = grid.Query(className: InspectorStyles.EaseGrid).First();
+            Check(inner != null, "no ease grid");
+            List<VisualElement> shown = inner.Query(className: InspectorStyles.EaseCell).ToList();
+            Rect bound = window.rootVisualElement.worldBound;
+            Check(shown.Count == Enum.GetValues(typeof(EaseType)).Length, $"{shown.Count} ease cells for {Enum.GetValues(typeof(EaseType)).Length} eases");
+            Check(shown.All(c => c.worldBound.yMax <= bound.yMax && c.worldBound.xMax <= bound.xMax), "an ease cell is out of sight");
+            foreach (int w in Capture(window, Within(window, inner), shot.id))
+                yield return w;
+        }
+
+        // each motion's shape over one item of 1 s (a Spring over the time it takes to settle) at intensity 1, with the
+        // motions' own defaults: an Offset motion's shape, a Tween's or a Spring's value, a Flash's or a Blink's weight, a
+        // Gradient's colors. A Set is drawn from before its moment; a Set and a Gradient take values of their own (their
+        // defaults are 0 and white)
+        static IEnumerable<int> MotionsShot(Shot shot)
+        {
+            const int columns = 4;
+            const float graphWidth = 136f;
+            const float graphHeight = 52f;
+            var grid = new VisualElement { style = { flexDirection = FlexDirection.Row, flexWrap = Wrap.Wrap, paddingLeft = 6, paddingTop = 6 } };
+            int count = 0;
+            foreach (MotionKind kind in Enum.GetValues(typeof(MotionKind)))
+            {
+                FeedbackMotion motion = DocSources.MotionData()[kind];
+                if (motion is SetMotion set)
+                    set.m_Params.m_Value = Vector4.one;
+                if (motion is GradientMotion gradient)
+                    gradient.m_Params.m_Gradient = new Gradient { colorKeys = new[] { new GradientColorKey(new Color(1f, 0.55f, 0.1f), 0f), new GradientColorKey(new Color(0.85f, 0.2f, 0.6f), 0.5f), new GradientColorKey(new Color(0.2f, 0.45f, 1f), 1f) } };
+                var cell = new VisualElement { style = { width = graphWidth + 8, marginRight = 6, marginBottom = 8 } };
+                cell.Add(new Label(kind.ToString()));
+                cell.Add(Graph(motion, graphWidth, graphHeight));
+                grid.Add(cell);
+                count++;
+            }
+            int rows = (count + columns - 1) / columns;
+            EditorWindow window = Canvas("Motions", new Rect(120, 100, columns * (graphWidth + 14) + 24, rows * (graphHeight + 30) + 48));
+            window.rootVisualElement.Add(grid);
+            yield return Settle;
+            Rect bound = window.rootVisualElement.worldBound;
+            Check(grid.childCount == Enum.GetValues(typeof(MotionKind)).Length, "a graph per motion");
+            Check(grid.Children().All(c => c.worldBound.yMax <= bound.yMax && c.worldBound.xMax <= bound.xMax), "a graph is out of sight");
+            foreach (int w in Capture(window, Within(window, grid), shot.id))
+                yield return w;
+        }
+
+        // a floating window of the tests' own type, for an element the driver puts in it
+        static EditorWindow Canvas(string title, Rect place)
+        {
+            var window = ScriptableObject.CreateInstance<PreviewBarTestWindow>();
+            window.titleContent = new GUIContent(title);
+            window.Show();
+            Float(window, place);
+            InspectorStyles.Attach(window.rootVisualElement);
+            return window;
+        }
+
+        // a motion's shape in a box: the values at 97 even steps of the item, a zero line, the box's height the values' range
+        // (an Offset motion's symmetric about zero)
+        static VisualElement Graph(FeedbackMotion motion, float boxWidth, float boxHeight)
+        {
+            // a Gradient's four components are its color
+            MotionEvaluator e = MotionEvaluators.Create(motion, motion is GradientMotion ? 4 : 1);
+            var state = new MotionState();
+            e.Begin(ref state, Vector4.zero, new MotionBegin { Seed = 20251108u, Intensity = 1f });
+            const int steps = 97;
+            float length = motion.NaturalDuration > 0f ? motion.NaturalDuration : 1f;
+            bool instant = e.IsInstant;
+            var values = new float[steps];
+            var colors = motion is GradientMotion ? new Color[steps] : null;
+            for (int i = 0; i < steps; i++)
+            {
+                float t = i / (float)(steps - 1);
+                // a Set from before its moment: its first fifth is the value it found
+                if (instant && t < 0.2f)
+                {
+                    values[i] = 0f;
+                    continue;
+                }
+                var time = new MotionTime(instant ? 0f : t, instant ? 0.0 : t * (double)length);
+                e.Evaluate(in state, in time, out MotionSample sample);
+                if (colors != null)
+                    colors[i] = new Color(sample.Value.x, sample.Value.y, sample.Value.z, 1f);
+                values[i] = e.Write == MotionWrite.Offset ? e.EvaluateShape(in state, in time) : e.Write == MotionWrite.Override ? sample.Weight : sample.Value.x;
+            }
+            float lo, hi;
+            if (e.Write == MotionWrite.Offset)
+            {
+                float m = Mathf.Max(1e-6f, values.Max(v => Mathf.Abs(v)));
+                lo = -m;
+                hi = m;
+            }
+            else
+            {
+                lo = Mathf.Min(0f, values.Min());
+                hi = Mathf.Max(1f, values.Max());
+            }
+            var box = new VisualElement { style = { width = boxWidth, height = boxHeight, marginTop = 2 } };
+            box.generateVisualContent += context =>
+            {
+                Rect r = box.contentRect;
+                Painter2D p = context.painter2D;
+                Color ink = box.resolvedStyle.color;
+                float Y(float v) => r.yMax - 2f - (v - lo) / (hi - lo) * (r.height - 4f);
+                if (colors != null)
+                {
+                    float step = r.width / (steps - 1);
+                    for (int i = 0; i < steps - 1; i++)
+                    {
+                        p.fillColor = colors[i];
+                        p.BeginPath();
+                        p.MoveTo(new Vector2(r.x + i * step, r.y + 2f));
+                        p.LineTo(new Vector2(r.x + (i + 1) * step + 0.5f, r.y + 2f));
+                        p.LineTo(new Vector2(r.x + (i + 1) * step + 0.5f, r.yMax - 2f));
+                        p.LineTo(new Vector2(r.x + i * step, r.yMax - 2f));
+                        p.ClosePath();
+                        p.Fill();
+                    }
+                    return;
+                }
+                p.strokeColor = new Color(ink.r, ink.g, ink.b, 0.35f);
+                p.lineWidth = 1f;
+                p.BeginPath();
+                p.MoveTo(new Vector2(r.x, Y(0f)));
+                p.LineTo(new Vector2(r.xMax, Y(0f)));
+                p.Stroke();
+                p.strokeColor = ink;
+                p.lineWidth = 1.5f;
+                p.BeginPath();
+                for (int i = 0; i < steps; i++)
+                {
+                    var at = new Vector2(r.x + i / (float)(steps - 1) * r.width, Y(values[i]));
+                    if (i == 0)
+                        p.MoveTo(at);
+                    else
+                        p.LineTo(at);
+                }
+                p.Stroke();
+            };
+            return box;
+        }
+
+        // the graphs: a cube's player of a Punch on its position's Y and a small Shake, the strip's Graph and the first item's
+        // body and Graph open, Dots on, the preview played on a stepped clock to 0.3 s and paused — the part from the strip to
+        // the item's Graph
+        static IEnumerable<int> GraphsShot(Shot shot)
+        {
+            NewScene();
+            GameObject crate = Cube("Crate");
+            var player = crate.AddComponent<FeedbackPlayer>();
+            var punch = (TargetItem)ItemFactory.Create(Leaf("Transform/Position/Punch"));
+            ((PunchMotion)punch.m_Motion).m_Params.m_Amplitude = new Vector4(0f, 0.5f, 0f, 0f);
+            punch.m_Timing.m_Duration = 0.4f;
+            var shake = (TargetItem)ItemFactory.Create(Leaf("Transform/Position/Shake"));
+            ((ShakeMotion)shake.m_Motion).m_Params.m_Amplitude = new Vector4(0.1f, 0.1f, 0.1f, 0f);
+            shake.m_Timing.m_Duration = 0.4f;
+            player.m_Items.Add(punch);
+            player.m_Items.Add(shake);
+            // the items' reference ids fixed before the player is first serialized: an item's random parts are keyed by its
+            // id, so the Shake's noise is the same at each run
+            Check(UnityEngine.Serialization.ManagedReferenceUtility.SetManagedReferenceIdForObject(player, punch, 1000)
+                && UnityEngine.Serialization.ManagedReferenceUtility.SetManagedReferenceIdForObject(player, shake, 1001), "the items' reference ids cannot be set");
+            EditorUtility.SetDirty(player);
+            EditorSceneManager.SaveScene(crate.scene);
+            long rid = new SerializedObject(player).FindProperty("m_Items").GetArrayElementAtIndex(0).managedReferenceId;
+            Check(rid == 1000, "the first item's reference id is " + rid);
+            string fold = ItemListView.FoldKey(player, rid);
+            SessionState.SetBool(SlotGraphField.FoldPrefix + player.GetEntityId(), true);
+            SessionState.SetBool(fold, true);
+            SessionState.SetBool(fold + ItemGraphField.FoldSuffix, true);
+            EditorPrefs.SetBool(MotionGraphView.DotsKey, true);
+            EditorWindow inspector = Inspect(crate);
+            yield return Settle;
+            double now = 1000.0;
+            PreviewClock.Source = () => now;
+            Check(PreviewSession.Start(player, Args) == PreviewRefusal.None, "the preview did not start");
+            // the clock's first reading is the start, then 18 ticks
+            yield return 1;
+            for (int i = 0; i < 18; i++)
+            {
+                now += PreviewClock.TickInterval + 1e-7;
+                yield return 1;
+            }
+            player.Pause();
+            yield return Settle;
+            Check(PreviewSession.Current != null && PreviewSession.Current.ScrubState(out _, out _, out double place) == SeekRefusal.None && Math.Abs(place - 0.3) < 0.01, "the preview is not paused at 0.30 s");
+            var strip = inspector.rootVisualElement.Q<TimelineStrip>();
+            var slot = inspector.rootVisualElement.Q<SlotGraphField>();
+            var graph = inspector.rootVisualElement.Q<ItemGraphField>();
+            Check(strip != null && slot != null && graph != null, "no strip, strip's Graph or item's Graph");
+            Check(slot.View.Dots != null && slot.View.Dots.Count > 0 && graph.View.Dots != null && graph.View.Dots.Count > 0, "the graphs recorded no frame");
+            Check(slot.Notes.text.Contains("Play 1") && graph.Notes.text.Contains("Play 1"), "the graphs do not follow the preview's play");
+            ScrollTo(inspector, strip);
+            yield return Settle;
+            Vector2 origin = inspector.rootVisualElement.worldBound.position;
+            float top = strip.worldBound.yMin - origin.y - 4f;
+            float bottom = graph.worldBound.yMax - origin.y + 4f;
+            Check(top >= 0f && bottom <= inspector.position.height, $"the strip to the item's Graph ({bottom - top:F0} pt) does not fit the inspector");
+            foreach (int w in Capture(inspector, Rect.MinMaxRect(0f, top, Within(inspector, strip).xMax, bottom), shot.id))
+                yield return w;
+        }
+
         // ---- the states
 
         static void NewScene()
@@ -632,6 +850,8 @@ namespace xpTURN.Feedback.Tests.Editor.Docs
                 EditorPrefs.DeleteKey(FeedbackDebuggerWindow.FoldKey + panel);
             EditorPrefs.DeleteKey(FeedbackCatalog.FavoritesKey);
             EditorPrefs.DeleteKey(FeedbackCatalog.RecentKey);
+            EditorPrefs.DeleteKey(MotionGraphView.DotsKey);
+            PreviewClock.Source = s_Clock;
             yield return Settle;
         }
 
@@ -728,9 +948,24 @@ namespace xpTURN.Feedback.Tests.Editor.Docs
         {
             VisualElement whole = ComponentElement(inspector, target);
             Check(whole != null, "the inspector does not show " + target.GetType().Name);
-            Rect crop = Within(inspector, whole);
-            Check(crop.yMax <= inspector.position.height, $"the component ({crop.height:F0} pt) does not fit the inspector");
-            return Capture(inspector, crop, name);
+            ScrollTo(inspector, whole);
+            yield return Settle;
+            float bottom = whole.worldBound.yMax - inspector.rootVisualElement.worldBound.y + 4f;
+            Check(bottom <= inspector.position.height, $"the component ({whole.worldBound.height:F0} pt) does not fit the inspector");
+            foreach (int w in Capture(inspector, Within(inspector, whole), name))
+                yield return w;
+        }
+
+        // the inspector scrolled so the element's top is near the window's top, by whole points — content that fits the window
+        // does not scroll, and a whole point keeps the pixels as they were
+        static void ScrollTo(EditorWindow inspector, VisualElement e)
+        {
+            ScrollView scroll = inspector.rootVisualElement.Q<ScrollView>();
+            if (scroll == null)
+                return;
+            float y = Mathf.Round(e.worldBound.yMin - scroll.contentContainer.worldBound.yMin - 4f);
+            scroll.scrollOffset = new Vector2(scroll.scrollOffset.x, Mathf.Max(0f, y));
+            scroll.scrollOffset = new Vector2(scroll.scrollOffset.x, Mathf.Floor(scroll.scrollOffset.y));
         }
 
         static IEnumerable<int> CapturePopup(string name)
@@ -802,9 +1037,10 @@ namespace xpTURN.Feedback.Tests.Editor.Docs
         static string Backup => Path.Combine(s_State, "prefs-backup.txt");
         static Dictionary<string, (string kind, string value)> s_Saved;
 
-        // the package's keys a run writes by itself — the floating windows' places, written when they close
+        // the package's keys a run writes by itself — the floating windows' places, written when they close. The canvas is a
+        // window of the tests' own type: its keys are kept and put back with the package's, the tests' other keys are not
         static IEnumerable<string> Written()
-            => new[] { typeof(FeedbackDebuggerWindow), typeof(FeedbackValidatorWindow) }.SelectMany(t => "xywhz".Select(c => t.FullName + c));
+            => new[] { typeof(FeedbackDebuggerWindow), typeof(FeedbackValidatorWindow), typeof(PreviewBarTestWindow) }.SelectMany(t => "xywhz".Select(c => t.FullName + c));
 
         // the package's keys in the editor preferences' file, through defaults(1). The editor writes its own changes to the
         // file later (at the latest when it quits) — this is the file, not the values the editor holds now
@@ -821,6 +1057,7 @@ namespace xpTURN.Feedback.Tests.Editor.Docs
             var doc = new XmlDocument { XmlResolver = null };
             doc.LoadXml(xml.Substring(xml.IndexOf("<plist", StringComparison.Ordinal)));
             XmlNode dict = doc.SelectSingleNode("/plist/dict");
+            var written = new HashSet<string>(Written());
             for (XmlNode n = dict?.FirstChild; n != null; n = n.NextSibling)
             {
                 if (n.Name != "key")
@@ -829,7 +1066,7 @@ namespace xpTURN.Feedback.Tests.Editor.Docs
                 while (v != null && v.NodeType != XmlNodeType.Element)
                     v = v.NextSibling;
                 string key = n.InnerText;
-                if (v != null && key.StartsWith(Prefix, StringComparison.Ordinal) && !key.StartsWith(Prefix + "Tests.", StringComparison.Ordinal))
+                if (v != null && key.StartsWith(Prefix, StringComparison.Ordinal) && (!key.StartsWith(Prefix + "Tests.", StringComparison.Ordinal) || written.Contains(key)))
                     keys[key] = (v.Name, v.InnerText);
             }
             return keys;

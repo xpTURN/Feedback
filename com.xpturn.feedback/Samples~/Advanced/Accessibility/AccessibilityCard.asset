@@ -14,19 +14,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: xpTURN.Feedback.Samples::xpTURN.Feedback.Samples.SampleCard
   Title: Accessibility
   Try: "Hit the dummy light, heavy and critical; turn screen shake and motion down,
-    reduce or turn off flashes, turn hit stop and rumble off \u2014 and hit again."
+    reduce or turn off flashes, turn hit stop and rumble off, turn the sound down
+    or off \u2014 and hit again."
   See: "Each setting is a category of the package: screen shake the Camera category's
     scale, motion Motion's, flashes the per-second limit or the Flash category off,
-    hit stop Time, rumble Haptics. A scale reaches a running play at once (watch
-    the banner); a category turned off leaves the item out of new plays, and a stop
-    already begun stays. The kit writes them, composed with the HUD's Before and
-    intensity (the panel shows what is in effect), and puts them back when the sample
-    closes \u2014 settings last the session only."
+    hit stop Time, rumble Haptics, sound Audio's scale. A scale reaches a running
+    play at once (watch the banner) \u2014 a sound takes it when it starts, so one
+    already ringing ends as it began; a category turned off leaves the item out of
+    new plays, and a stop already begun stays. The kit writes them, composed with
+    the HUD's Before and intensity (the panel shows what is in effect), and puts
+    them back when the sample closes \u2014 settings last the session only. The ambience
+    is the scene's own sound and stays."
   Controls: "Space \xB7 1 \xB7 2 \xB7 3 \xB7 Gamepad South \xB7 West \xB7 North \u2014
     light \xB7 heavy \xB7 critical \xB7 V \xB7 C \xB7 D-pad up \xB7 down \u2014 row
     \xB7 Z \xB7 X \xB7 D-pad left \xB7 right \u2014 value \xB7 Mouse \u2014 menu"
   SceneGuid: ad509c52cbb1c4fe6b5227248a6e6754
   SceneName: Accessibility
   RequiredType: xpTURN.Feedback.Samples.Advanced.AccessibilityLab, xpTURN.Feedback.Samples.Advanced.Accessibility
-  RequiresText: 
+  RequiresText: the Audio module
   OpenInEditor: 0

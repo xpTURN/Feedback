@@ -5,7 +5,7 @@ namespace xpTURN.Feedback
     // the 2D instants' common parts (PhysicsPrepare's in the other assembly — the two don't see each other)
     internal static class Physics2DPrepare
     {
-        internal static uint Seed(in BeginContext context) => Hash32.Tagged(context.ItemSeed, Hash32.Occurrence, Hash32.Fold(context.Occurrence));
+        internal static uint Seed(in BeginContext context) => PlayMath.OccurrenceSeed(context.ItemSeed, context.Occurrence);
 
         internal static float Unit(uint seed, uint axis) => Hash32.ToUnit(Hash32.Of(seed, axis));
 

@@ -106,6 +106,7 @@ Select an object with a Feedback Player. From the top, its inspector shows:
 - The timeline strip: each item as a bar on the player's time — its delay thin, its runs in the item's category color —
   with the total time at its head. Drag a bar to move its delay and its right end to change its duration, in 0.01 s
   steps (hold Shift for none); one drag is one Undo.
+- The **Graph** under the strip — see [The graphs](#the-graphs).
 - The item list, then a bar with the validation summary, **Paste** and **Add Feedback**.
 
 ![A Feedback Player's inspector: the preview bar, the player's settings, the timeline strip and a list of five items](images/inspector.png)
@@ -115,7 +116,7 @@ validator found something, and three buttons for the preview: **S** plays it wit
 out and ▶ plays it alone. **S** and **M** are not saved; the three are not on flow items and hide in Play mode.
 Right-click a header for Copy, Paste After, Duplicate, Delete, Move Up and Move Down, or drag it to reorder. Copied
 items are deep copies; pasted ones go after the selected item, or at the end, and references into another scene are
-cleared, with a warning.
+cleared, with a warning. An item that writes a value has its own **Graph** in its body, under its motion.
 
 ![Two item headers — the switch, the category color, the target, the motion and its time, S, M and ▶ — the second with a warning button](images/item-header.png)
 
@@ -159,6 +160,31 @@ The preview bar plays the player in edit mode, on the objects it moves, and puts
 The Scene view's **Feedback Preview** overlay names the previewed object — click it to select it — and has ■, and
 **Signal** while a play waits for one. Editing a property the preview drives ends the preview and keeps your edit. In
 Play mode ▶ ❚❚ ■ play, pause and stop the player itself, with **Intensity** and **Direction**.
+
+### The graphs
+
+An item that writes a value has a folded **Graph** under its motion — so does a Motion Driver in **Loop** mode — and the
+player has one under the timeline strip. Open, they draw what the player writes:
+
+- An item's graph is the value the item writes over its time — its motion and ease, its timing, the intensity and the
+  category's scale — in the motion's units. A band shows a random output's range, and an item its **Chance** would skip
+  says so. Outside a preview it draws one sample seed at intensity 1; during a preview, the preview's seed and
+  **Intensity**.
+- The strip's graph picks one property the list writes — an object's position, say — and draws the items on it as the
+  game combines them, on the strip's time: the sum strong, each item alone faint, the item selected in the list strong.
+  A camera shake's cap shows as its size and a dashed limit, a scale as a factor, and a rotation as angles, with a note
+  when the axes interact.
+- Press and drag on either graph to scrub the preview.
+
+![A player's inspector with its graphs open: the strip's Graph of the position its two items write, with a paused preview's frames as dots, and the first item's own Graph](images/graphs.png)
+
+While a graph is open, the next play of its player — in the preview or in Play mode — is followed: the line becomes that
+play's, with its seed, intensity and direction, and **Dots** in the graph's header — one choice for every graph, off at
+first — draws the value written at each frame. When the frames leave the line, a warning says so: another player, a
+Motion Driver or a script writes the same property. While a [Persist](Concepts.md#how-values-are-written) item runs, its
+writes cover the others. An edit lets the followed play go, and in Play mode an edit to the list waits for **Rebuild**.
+The graphs use the project's category settings and camera shake cap, while the preview plays at ×1 without the cap — a
+note under the graph says so.
 
 ### Presets
 
@@ -273,9 +299,9 @@ System, uGUI and Universal RP:
 |---|---|---|---|
 | Getting Started | Basics | Physics module | Two players that stretch a cube on its jump and squash it on landing — the first feedback, finished. |
 | Getting Started (Empty) | Basics | Physics module | The same scene without its players, to build that feedback in five steps. |
-| Feedback Gallery | Basics | Particle System module · Physics module · Physics 2D module · Animation module | Every feedback with a typical motion, one button each; Compare plays every motion on one cube and Presets the package's presets. |
+| Feedback Gallery | Basics | Particle System module · Physics module · Physics 2D module · Animation module · Audio module | Every feedback with a typical motion, one button each; Compare plays every motion on one cube and Presets the package's presets. |
 | Before / After | Game Feel Labs | Particle System module | One run and jump with and without feedback side by side — turn each layer (squash, dust, camera, trail) on and off. |
-| Combat Hit Lab | Game Feel Labs | — | Light, heavy and critical hits: hit stop, flash, knockback, a damage number and rumble, scaled by intensity. |
+| Combat Hit Lab | Game Feel Labs | Audio module | Light, heavy and critical hits: hit stop, flash, knockback, a hit sound, a damage number and rumble, scaled by intensity. |
 | Camera Shake Lab | Game Feel Labs | — | Camera shakes on the main camera and through a channel, from presets and endless. |
 | Cinemachine Shake Lab | Game Feel Labs | Cinemachine | The same shakes on a Cinemachine camera through its shake extension and on a plain camera, and the Cinemachine items. |
 | Spring Playground | Game Feel Labs | — | Springs stepped from code beside a Motion Driver following the same target, with live frequency and damping. |
@@ -285,9 +311,9 @@ System, uGUI and Universal RP:
 | Timeline & Flow | Advanced | — | Flow items in one list — start rules, a stage loop and a signal wait — with pause, seek and backward play. |
 | Channels & Range | Advanced | — | Sends to receivers on two channel assets, gated and faded by their distance from the source. |
 | Stress & Zero-GC | Advanced | — | Up to thousands of players played and stopped, with the frame's allocation against a coroutine baseline. |
-| Accessibility | Advanced | — | The category settings — screen shake, motion, flashes, hit stop and rumble — scaled or turned off while you hit. |
+| Accessibility | Advanced | Audio module | The category settings — screen shake, motion, flashes, hit stop, rumble and sound — scaled or turned off while you hit. |
 | Unity Timeline Cutscene | Advanced | Timeline | Feedback tracks on a timeline — a Driven shake and spring that follow a scrub, a Triggered flash and a Signal that plays a burst — previewed in the Timeline window in Edit mode. |
-| Showcase | Showcase | Particle System module | A small brick breaker whose feedback grows with the combo, a boss fight, and a switch to play it plain. |
+| Showcase | Showcase | Particle System module · Audio module | A small brick breaker whose feedback grows with the combo, a boss fight, and a switch to play it plain. |
 <!-- /gen:samples:all -->
 
 The samples' kit — the HUD, the cards and the hub in `SampleKit` — is how the samples are shown, not part of the

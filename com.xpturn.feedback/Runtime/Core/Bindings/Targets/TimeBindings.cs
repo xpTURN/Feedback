@@ -1,8 +1,8 @@
 namespace xpTURN.Feedback
 {
     // a hit stop asks the context's time scale for its occurrence's real length (the resolved length / Speed). Backward,
-    // under the minimum condition (the smaller of the engine's and the computed scale) or with no end (Speed 0) it asks
-    // nothing. The service counts the lifetime; the item's end takes the request back whatever the reason (a Skip leaves no
+    // under the minimum condition (the smaller of the engine's and the computed scale — an Extend one's leaves the other
+    // hit stops out) or with no end (Speed 0) it asks nothing. The service counts the lifetime; the item's end takes the request back whatever the reason (a Skip leaves no
     // freeze behind)
     internal sealed class HitStopBinding : ItemBinding
     {
@@ -37,7 +37,8 @@ namespace xpTURN.Feedback
         {
             if (context.Reverse)
                 return;
-            if (m_Service.Current < m_Item.m_MinimumTimeScale)
+            float current = m_Item.m_Overlap == HitStopOverlap.Extend ? m_Service.CurrentWithoutTimed : m_Service.Current;
+            if (current < m_Item.m_MinimumTimeScale)
                 return;
             // a freeze with no end is not asked for — a destroyed player's play would never let it go
             if (double.IsInfinity(context.Seconds))

@@ -43,11 +43,20 @@ namespace xpTURN.Feedback.Tests.Editor
             public string define;
         }
 
+        // and a Runtime assembly without a define constraint is one of them — a module's assembly that lost its constraint
+        // would compile where the module is off (the minimal manifest job keeps a module no versionDefines names)
         [Test]
         public void AlwaysCompiledAssembliesExist()
         {
             var compiled = CompiledAssemblyNames();
             Assert.That(AlwaysCompiled.Where(n => !compiled.Contains(n)), Is.Empty);
+            var package = PackageInfo.FindForAssetPath("Packages/" + PackageName);
+            Assert.That(package, Is.Not.Null, PackageName + " is not registered");
+            var unconstrained = Directory.GetFiles(Path.Combine(package.resolvedPath, "Runtime"), "*.asmdef", SearchOption.AllDirectories)
+                .Select(path => JsonUtility.FromJson<AsmdefData>(File.ReadAllText(path)))
+                .Where(a => a.defineConstraints == null || a.defineConstraints.Length == 0)
+                .Select(a => a.name);
+            Assert.That(unconstrained.Where(n => !AlwaysCompiled.Contains(n)), Is.Empty, "a Runtime assembly without a constraint");
         }
 
         // Holds in any project: the minimal manifest job runs it with the optional dependencies removed.
@@ -229,9 +238,10 @@ namespace xpTURN.Feedback.Tests.Editor
         static readonly Dictionary<string, string[]> ObjectTypes = new Dictionary<string, string[]>
         {
             { "xpTURN.Feedback.Cinemachine", new[] { "xpTURN.Feedback.CinemachineShakeExtension" } },
-            { "xpTURN.Feedback.Timeline", new[] { "xpTURN.Feedback.FeedbackClip", "xpTURN.Feedback.FeedbackTrack" } },
+            { "xpTURN.Feedback.Timeline", new[] { "xpTURN.Feedback.FeedbackClip", "xpTURN.Feedback.FeedbackTimelineOptions", "xpTURN.Feedback.FeedbackTrack" } },
             { "xpTURN.Feedback.UGUI", new[] { "xpTURN.Feedback.FeedbackUITrigger", "xpTURN.Feedback.FloatingTextInstance", "xpTURN.Feedback.FloatingTextStyle", "xpTURN.Feedback.ProgressBar" } },
             { "xpTURN.Feedback.Editor.UGUI", new[] { "xpTURN.Feedback.Editor.FeedbackUITriggerEditor" } },
+            { "xpTURN.Feedback.Editor.Timeline", new[] { "xpTURN.Feedback.Editor.FeedbackClipInspector", "xpTURN.Feedback.Editor.FeedbackTimelineOptionsEditor" } },
         };
 
         [Test]
@@ -368,6 +378,30 @@ namespace xpTURN.Feedback.Tests.Editor
             if (type.IsArray)
                 return type.GetElementType();
             return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>) ? type.GetGenericArguments()[0] : type;
+        }
+
+        // the audio rules are quiet for items without their implementation (a project without the audio module — the list's
+        // missing package speaks); with it, the same player's missing clip is told
+        [Test]
+        public void AudioRulesAreQuietWithoutTheImplementation()
+        {
+            var go = new GameObject("OptionalAudioRules");
+            try
+            {
+                var player = go.AddComponent<FeedbackPlayer>();
+                player.m_Items.Add(new AudioPlayClipItem { m_Motion = new SetMotion(), m_Target = new TargetRef { m_Mode = TargetRefMode.Self, m_Path = "", m_Anchor = "" } });
+                player.m_Items.Add(new AudioMixerParameterItem { m_Motion = new SetMotion() });
+                List<string> audio = xpTURN.Feedback.Editor.FeedbackValidator.Run(player).Where(r => r.Id.StartsWith("FB-T", StringComparison.Ordinal)).Select(r => r.Id + "@" + r.Item).ToList();
+                bool implemented = FeedbackImplementations.IsImplemented(typeof(AudioPlayClipItem));
+                if (implemented)
+                    Assert.That(audio.Where(r => r.StartsWith("FB-T01", StringComparison.Ordinal)), Is.EqualTo(new[] { "FB-T01@0", "FB-T01@1" }), "the audio module — the missing assets told");
+                else
+                    Assert.That(audio, Is.Empty, "no audio module — quiet");
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(go);
+            }
         }
 
         static bool TryParseVersion(string text, out Version version)

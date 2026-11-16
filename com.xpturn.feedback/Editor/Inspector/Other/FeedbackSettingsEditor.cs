@@ -12,6 +12,7 @@ namespace xpTURN.Feedback.Editor
     internal sealed class FeedbackSettingsEditor : UnityEditor.Editor
     {
         internal const string ContributionsText = "C — the shakes one camera shake receiver takes at once. A layer's 'maximum overlap' warning on a receiver is fixed by raising this.";
+        internal const string AudioOutputLabel = "Default Audio Output";
         internal const string NotLoadedText = "The runtime reads Resources/FeedbackSettings — this asset is not there and is not read.";
 
         internal HelpBox NotLoaded;
@@ -31,6 +32,12 @@ namespace xpTURN.Feedback.Editor
                 enter = false;
                 if (it.name == "m_Script")
                     continue;
+                if (it.name == "m_AudioOutput")
+                {
+                    if (FeedbackImplementations.IsImplemented(typeof(AudioPlayAtPointItem)))
+                        root.Add(PlayerSettingsView.AudioOutputField(it.Copy(), AudioOutputLabel));
+                    continue;
+                }
                 var field = new PropertyField(it.Copy());
                 field.BindProperty(it.Copy());
                 root.Add(field);
@@ -54,12 +61,15 @@ namespace xpTURN.Feedback.Editor
             cut |= AtLeast(so.FindProperty("m_TimeScaleCapacity"), 1);
             cut |= AtLeast(so.FindProperty("m_ShakeReceiversPerPlay"), 1);
             cut |= AtLeast(so.FindProperty("m_ReceiverContributions"), 1);
+            cut |= AtLeast(so.FindProperty("m_TraumaCapacity"), 1);
             SerializedProperty dt = so.FindProperty("m_MaximumUnscaledDelta");
             if (dt != null && !(dt.floatValue >= 0f && dt.floatValue < float.PositiveInfinity))
             {
                 dt.floatValue = 0f;
                 cut = true;
             }
+            cut |= ZeroOrAbove(so.FindProperty("m_MaximumShakeOffset"));
+            cut |= ZeroOrAbove(so.FindProperty("m_MaximumShakeAngle"));
             SerializedProperty categories = so.FindProperty("m_Categories");
             for (int i = 0; categories != null && i < categories.arraySize; i++)
             {
@@ -73,6 +83,15 @@ namespace xpTURN.Feedback.Editor
             if (cut)
                 so.ApplyModifiedProperties();
             return cut;
+        }
+
+        // a finite 0 or above — else 0
+        static bool ZeroOrAbove(SerializedProperty p)
+        {
+            if (p == null || (p.floatValue >= 0f && p.floatValue < float.PositiveInfinity))
+                return false;
+            p.floatValue = 0f;
+            return true;
         }
 
         static bool AtLeast(SerializedProperty p, int min)

@@ -22,6 +22,7 @@ namespace xpTURN.Feedback.Tests.Editor
                 new OscillateEvaluator(new OscillateParams { m_Amplitude = amplitude, m_Frequency = 2f, m_Phase = 0.1f }, 3),
                 new WiggleEvaluator(new WiggleParams { m_Amplitude = amplitude, m_Frequency = 3f, m_Octaves = 2 }, 3),
                 new SpringEvaluator(new SpringParams { m_Mode = SpringMode.Bump, m_Value = amplitude, m_Frequency = 4f, m_Damping = 0.4f, m_Settle = 0.001f }, 3),
+                new BounceEvaluator(new BounceParams { m_Amplitude = amplitude, m_Count = 3, m_Restitution = 0.5f }, 3),
             };
             foreach (var e in offsets)
             {
@@ -31,6 +32,13 @@ namespace xpTURN.Feedback.Tests.Editor
                     max = Mathf.Max(max, Mathf.Abs(ShapeAt(e, s, i / 200f)));
                 Assert.That(max, Is.InRange(0.05f, 0.5f + 1e-5f), e.GetType().Name);
             }
+            // Bounce is one-sided — never below 0
+            var bounce = new BounceEvaluator(new BounceParams { m_Amplitude = amplitude, m_Count = 3, m_Restitution = 0.5f }, 3);
+            var bs = Begin(bounce, Vector4.zero, 0.5f);
+            float min = float.MaxValue;
+            for (int i = 0; i <= 200; i++)
+                min = Mathf.Min(min, ShapeAt(bounce, bs, i / 200f));
+            Assert.That(min, Is.EqualTo(0f), "Bounce — 0 at the ends and never below");
             var curve = new CurveEvaluator(new CurveParams { m_Curve = new AnimationCurve(new Keyframe(0f, 0f), new Keyframe(1f, 2f)), m_RemapOne = amplitude }, 3);
             Assert.That(ShapeAt(curve, Begin(curve, Vector4.zero, 0.5f), 1f), Is.EqualTo(1f), "Curve — the curve's own range × I");
             foreach (var e in All(3).Where(x => x.Write != MotionWrite.Offset))

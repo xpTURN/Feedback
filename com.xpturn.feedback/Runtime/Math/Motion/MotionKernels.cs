@@ -83,6 +83,115 @@ namespace xpTURN.Feedback
             return 0f;
         }
 
+        // the envelope's linear height: exactly 1 without fades; with one, its end is exactly 0 off the slope (no ease reaches
+        // it); ramp is true on the slopes, where the Core puts the ease — the fall is the rise mirrored
+        internal static float Fade(float t, float fadeIn, float fadeOut, out bool ramp)
+        {
+            ramp = false;
+            t = Clamp01(t);
+            fadeIn = AtLeast(fadeIn, 0f);
+            fadeOut = AtLeast(fadeOut, 0f);
+            float sum = fadeIn + fadeOut;
+            if (!(sum > 0f))
+                return 1f;
+            if (sum > 1f)
+            {
+                fadeIn /= sum;
+                fadeOut /= sum;
+            }
+            if ((t <= 0f && fadeIn > 0f) || (t >= 1f && fadeOut > 0f))
+                return 0f;
+            if (t < fadeIn)
+            {
+                ramp = true;
+                return t / fadeIn;
+            }
+            if (t > 1f - fadeOut)
+            {
+                ramp = true;
+                return (1f - t) / fadeOut;
+            }
+            return 1f;
+        }
+
+        // a ball settling: the hops share the unit, each Restitution times as long as the one before and Restitution² as
+        // high, the first peaking at 1. Both ends are exactly 0 and the last hop runs to 1
+        internal static float Bounce(float t, int count, float restitution)
+        {
+            if (!(t > 0f && t < 1f))
+                return 0f;
+            int n = count < 1 ? 1 : count > 10 ? 10 : count;
+            double e = Within(restitution, 0.05f, 1f);
+            if (e >= 1.0)
+            {
+                double p = t * (double)n;
+                double f = p - Math.Floor(p);
+                return (float)(4.0 * f * (1.0 - f));
+            }
+            double power = 1.0;
+            for (int i = 0; i < n; i++)
+                power *= e;
+            double d = (1.0 - e) / (1.0 - power);
+            double start = 0.0, height = 1.0;
+            for (int k = 0; k < n; k++)
+            {
+                if (k == n - 1)
+                    d = 1.0 - start;
+                if (t < start + d)
+                {
+                    double u = (t - start) / d;
+                    return (float)(height * 4.0 * u * (1.0 - u));
+                }
+                start += d;
+                d *= e;
+                height *= e * e;
+            }
+            return 0f;
+        }
+
+        // a size softly capped at Limit: unchanged up to half of it, then a tanh that leaves with slope 1 and never passes it.
+        // A limit of 0 or below lets nothing through; a size of 0 or below, or NaN, is 0
+        internal static float SoftLimit(float x, float limit)
+        {
+            if (!(limit > 0f) || !(x > 0f))
+                return 0f;
+            float knee = limit * 0.5f;
+            if (x <= knee)
+                return x;
+            float room = limit - knee;
+            float y = knee + room * (float)Math.Tanh((x - knee) / (double)room);
+            return y < limit ? y : limit;
+        }
+
+        // a trauma level after an add — within 0 ~ 1; an add of 0 or below, or NaN, leaves it
+        internal static float TraumaAdd(float t, float amount)
+        {
+            t = Clamp01(t);
+            if (!(amount > 0f))
+                return t;
+            float sum = t + amount;
+            return sum < 1f ? sum : 1f;
+        }
+
+        // a trauma level faded for dt at Decay a second — never below 0; a decay or a step of 0 or below, or NaN, leaves it
+        internal static float TraumaDecay(float t, float decay, double dt)
+        {
+            t = Clamp01(t);
+            if (!(decay > 0f) || !(dt > 0.0))
+                return t;
+            double next = t - decay * dt;
+            return next > 0.0 ? (float)next : 0f;
+        }
+
+        // the shake's share of a trauma level, t^Exponent — the exponent within 1 ~ 3
+        internal static float TraumaShape(float t, float exponent)
+        {
+            t = Clamp01(t);
+            if (t <= 0f)
+                return 0f;
+            return (float)Math.Pow(t, Within(exponent, 1f, 3f));
+        }
+
         // period k is lit for Duty · Period · (1 + Jitter · (2h − 1)); StartOn false moves the lit part to the period's end
         internal static bool Blink(uint seed, double seconds, float period, float duty, float jitter, bool startOn)
         {

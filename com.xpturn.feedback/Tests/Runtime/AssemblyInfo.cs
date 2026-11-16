@@ -11,5 +11,6 @@ using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("xpTURN.Feedback.Tests.UGUI")]
 [assembly: InternalsVisibleTo("xpTURN.Feedback.Tests.Editor.UGUI")]
 [assembly: InternalsVisibleTo("xpTURN.Feedback.Tests.Video")]
+[assembly: InternalsVisibleTo("xpTURN.Feedback.Tests.Audio")]
 [assembly: InternalsVisibleTo("xpTURN.Feedback.Tests.Cinemachine")]
 [assembly: InternalsVisibleTo("xpTURN.Feedback.Tests.InputSystem")]

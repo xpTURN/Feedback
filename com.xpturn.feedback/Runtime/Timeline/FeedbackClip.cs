@@ -7,7 +7,7 @@ namespace xpTURN.Feedback
 {
     // a Feedback track's clip — one play of the track's player. Extrapolation is a Driven clip's only: a hold before the clip
     // turns the clip on before its start, where a triggered play would start early
-    /// <summary>A clip of a Feedback track: one play of the track's FeedbackPlayer, moved by the timeline's time or started with the clip.</summary>
+    /// <summary>A clip of a Feedback track: one play of the track's FeedbackPlayer — its list, or the linked preset or one of its Variants the clip's Preset picks — moved by the timeline's time or started with the clip.</summary>
     public sealed class FeedbackClip : PlayableAsset, ITimelineClipAsset
     {
         [SerializeField] internal FeedbackClipTiming m_Timing = FeedbackClipTiming.Auto;
@@ -15,6 +15,10 @@ namespace xpTURN.Feedback
         [SerializeField, Min(0f)] internal float m_Intensity = 1f;
         [SerializeField] internal uint m_Seed;
         [SerializeField] internal bool m_Loop;
+        // the list the clip plays — none: the player's list; else the player's linked preset or one of its Variants
+        [SerializeField] internal FeedbackPreset m_Preset;
+        // the clip's row in its director's FeedbackTimelineOptions — clips may share one
+        [SerializeField] internal string m_HitKey = "";
 
         // the not-scrubbable warning, once a clip
         [NonSerialized] internal bool m_Warned;
@@ -31,7 +35,9 @@ namespace xpTURN.Feedback
         public override Playable CreatePlayable(PlayableGraph graph, GameObject owner)
         {
             ScriptPlayable<FeedbackClipBehaviour> playable = ScriptPlayable<FeedbackClipBehaviour>.Create(graph);
-            playable.GetBehaviour().m_Clip = this;
+            FeedbackClipBehaviour behaviour = playable.GetBehaviour();
+            behaviour.m_Clip = this;
+            behaviour.m_Owner = owner;
             return playable;
         }
     }

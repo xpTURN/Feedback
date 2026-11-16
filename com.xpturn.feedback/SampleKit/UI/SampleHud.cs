@@ -22,7 +22,7 @@ namespace xpTURN.Feedback.Samples
         static readonly string[] s_IntensityText = { "[ ] · LB RB — Intensity 0.00", "[ ] · LB RB — Intensity 0.25", "[ ] · LB RB — Intensity 0.50", "[ ] · LB RB — Intensity 0.75", "[ ] · LB RB — Intensity 1.00", "[ ] · LB RB — Intensity 1.25", "[ ] · LB RB — Intensity 1.50", "[ ] · LB RB — Intensity 1.75", "[ ] · LB RB — Intensity 2.00" };
         // the HUD shows its own keys — a card's Controls are the sample's only
         internal const string Keys = "Esc · Start · Select — back · H · L3 — fold the HUD";
-        static readonly string[] s_CategoryNames = { "", "Motion", "Camera", "Flash", "PostFX", "Time", "Particles", "UI", "Haptics" };
+        static readonly string[] s_CategoryNames = { "", "Motion", "Camera", "Flash", "PostFX", "Time", "Particles", "UI", "Haptics", "Audio" };
 
         public static SampleHud Instance { get; private set; }
         internal static int Made { get; private set; }

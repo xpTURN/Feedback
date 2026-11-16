@@ -14,7 +14,7 @@ namespace xpTURN.Feedback.Tests.Editor
     {
         const string AssetPath = "Assets/DataModelTargetsTests.asset";
 
-        const MotionMask TransformMotions = MotionMask.Tween | MotionMask.Punch | MotionMask.Shake | MotionMask.Curve | MotionMask.Oscillate | MotionMask.Wiggle | MotionMask.Spring;
+        const MotionMask TransformMotions = MotionMask.Tween | MotionMask.Punch | MotionMask.Bounce | MotionMask.Shake | MotionMask.Curve | MotionMask.Oscillate | MotionMask.Wiggle | MotionMask.Spring;
 
         // the traits per target — written by hand, not read from the code. Every target applies as an offset
         static readonly (Type Type, ValueKind Value, MotionMask Motions, FeedbackCategory Category, bool FlashSensitive)[] TargetRows =
@@ -23,14 +23,16 @@ namespace xpTURN.Feedback.Tests.Editor
             (typeof(RotationItem), ValueKind.Vector3, TransformMotions, FeedbackCategory.Motion, false),
             (typeof(ScaleItem), ValueKind.Vector3, TransformMotions, FeedbackCategory.Motion, false),
             (typeof(MaterialColorItem), ValueKind.Color,
-                MotionMask.Tween | MotionMask.Flash | MotionMask.Gradient | MotionMask.Punch | MotionMask.Oscillate | MotionMask.Blink | MotionMask.Spring,
+                MotionMask.Tween | MotionMask.Flash | MotionMask.Gradient | MotionMask.Punch | MotionMask.Bounce | MotionMask.Oscillate | MotionMask.Blink | MotionMask.Spring,
                 FeedbackCategory.None, true),
             (typeof(LightIntensityItem), ValueKind.Float,
-                MotionMask.Tween | MotionMask.Flash | MotionMask.Punch | MotionMask.Shake | MotionMask.Oscillate | MotionMask.Blink | MotionMask.Spring,
+                MotionMask.Tween | MotionMask.Flash | MotionMask.Punch | MotionMask.Bounce | MotionMask.Shake | MotionMask.Oscillate | MotionMask.Blink | MotionMask.Spring,
                 FeedbackCategory.None, true),
-            (typeof(CameraShakeItem), ValueKind.Vector3, MotionMask.Shake | MotionMask.Punch | MotionMask.Wiggle | MotionMask.Curve, FeedbackCategory.Camera, false),
+            (typeof(CameraShakeItem), ValueKind.Vector3, MotionMask.Shake | MotionMask.Punch | MotionMask.Bounce | MotionMask.Wiggle | MotionMask.Curve, FeedbackCategory.Camera, false),
+            (typeof(CameraTraumaItem), ValueKind.Bool, MotionMask.Set, FeedbackCategory.Camera, false),
+            (typeof(TransformTraumaItem), ValueKind.Bool, MotionMask.Set, FeedbackCategory.Motion, false),
             (typeof(SetActiveItem), ValueKind.Bool, MotionMask.Set | MotionMask.Blink, FeedbackCategory.None, true),
-            (typeof(LightRangeItem), ValueKind.Float, MotionMask.Tween | MotionMask.Punch | MotionMask.Oscillate | MotionMask.Spring, FeedbackCategory.None, false),
+            (typeof(LightRangeItem), ValueKind.Float, MotionMask.Tween | MotionMask.Punch | MotionMask.Bounce | MotionMask.Oscillate | MotionMask.Spring, FeedbackCategory.None, false),
             (typeof(LightColorItem), ValueKind.Color, MotionMask.Tween | MotionMask.Flash | MotionMask.Gradient | MotionMask.Spring, FeedbackCategory.None, true),
             (typeof(LightSpotAngleItem), ValueKind.Float, MotionMask.Tween, FeedbackCategory.None, false),
             (typeof(LightShadowStrengthItem), ValueKind.Float, MotionMask.Tween, FeedbackCategory.None, false),
@@ -40,30 +42,30 @@ namespace xpTURN.Feedback.Tests.Editor
             (typeof(Light2DRadiusItem), ValueKind.Float, MotionMask.Tween | MotionMask.Oscillate, FeedbackCategory.None, false),
             (typeof(Light2DFalloffItem), ValueKind.Float, MotionMask.Tween | MotionMask.Oscillate, FeedbackCategory.None, false),
             // uGUI's · the RectTransform's (Core) · the Video Player's
-            (typeof(GraphicColorItem), ValueKind.Color, MotionMask.Tween | MotionMask.Flash | MotionMask.Gradient | MotionMask.Blink | MotionMask.Punch | MotionMask.Spring, FeedbackCategory.None, true),
-            (typeof(GraphicAlphaItem), ValueKind.Float, MotionMask.Tween | MotionMask.Flash | MotionMask.Blink | MotionMask.Punch | MotionMask.Spring, FeedbackCategory.None, true),
+            (typeof(GraphicColorItem), ValueKind.Color, MotionMask.Tween | MotionMask.Flash | MotionMask.Gradient | MotionMask.Blink | MotionMask.Punch | MotionMask.Bounce | MotionMask.Spring, FeedbackCategory.None, true),
+            (typeof(GraphicAlphaItem), ValueKind.Float, MotionMask.Tween | MotionMask.Flash | MotionMask.Blink | MotionMask.Punch | MotionMask.Bounce | MotionMask.Spring, FeedbackCategory.None, true),
             (typeof(GraphicCrossFadeItem), ValueKind.Color, MotionMask.Tween, FeedbackCategory.None, false),
             (typeof(GraphicMaterialItem), ValueKind.Bool, MotionMask.Set, FeedbackCategory.None, false),
             (typeof(GraphicRaycastTargetItem), ValueKind.Bool, MotionMask.Set, FeedbackCategory.None, false),
             (typeof(GraphicTextureOffsetItem), ValueKind.Vector2, MotionMask.Tween, FeedbackCategory.None, false),
             (typeof(GraphicTextureScaleItem), ValueKind.Vector2, MotionMask.Tween, FeedbackCategory.None, false),
-            (typeof(ImageFillItem), ValueKind.Float, MotionMask.Tween | MotionMask.Punch | MotionMask.Spring, FeedbackCategory.None, false),
+            (typeof(ImageFillItem), ValueKind.Float, MotionMask.Tween | MotionMask.Punch | MotionMask.Bounce | MotionMask.Spring, FeedbackCategory.None, false),
             (typeof(ImageSpriteItem), ValueKind.Bool, MotionMask.Set, FeedbackCategory.None, false),
             (typeof(ImageSpriteSheetItem), ValueKind.Float, MotionMask.Tween, FeedbackCategory.None, false),
             (typeof(CanvasGroupAlphaItem), ValueKind.Float, MotionMask.Tween | MotionMask.Flash | MotionMask.Blink, FeedbackCategory.None, true),
             (typeof(CanvasGroupInteractableItem), ValueKind.Bool, MotionMask.Set, FeedbackCategory.None, false),
             (typeof(CanvasGroupBlocksRaycastsItem), ValueKind.Bool, MotionMask.Set, FeedbackCategory.None, false),
             (typeof(TextContentItem), ValueKind.Bool, MotionMask.Set, FeedbackCategory.None, false),
-            (typeof(TextFontSizeItem), ValueKind.Float, MotionMask.Tween | MotionMask.Punch, FeedbackCategory.None, false),
+            (typeof(TextFontSizeItem), ValueKind.Float, MotionMask.Tween | MotionMask.Punch | MotionMask.Bounce, FeedbackCategory.None, false),
             (typeof(SelectableInteractableItem), ValueKind.Bool, MotionMask.Set, FeedbackCategory.None, false),
-            (typeof(RectSizeDeltaItem), ValueKind.Vector2, MotionMask.Tween | MotionMask.Punch | MotionMask.Spring, FeedbackCategory.Motion, false),
+            (typeof(RectSizeDeltaItem), ValueKind.Vector2, MotionMask.Tween | MotionMask.Punch | MotionMask.Bounce | MotionMask.Spring, FeedbackCategory.Motion, false),
             (typeof(RectPivotItem), ValueKind.Vector2, MotionMask.Tween, FeedbackCategory.Motion, false),
             (typeof(RectAnchorsItem), ValueKind.Vector4, MotionMask.Tween, FeedbackCategory.Motion, false),
-            (typeof(TMPFontSizeItem), ValueKind.Float, MotionMask.Tween | MotionMask.Punch | MotionMask.Spring, FeedbackCategory.None, false),
-            (typeof(TMPCharacterSpacingItem), ValueKind.Float, MotionMask.Tween | MotionMask.Punch | MotionMask.Oscillate | MotionMask.Spring, FeedbackCategory.None, false),
-            (typeof(TMPWordSpacingItem), ValueKind.Float, MotionMask.Tween | MotionMask.Punch | MotionMask.Oscillate | MotionMask.Spring, FeedbackCategory.None, false),
-            (typeof(TMPLineSpacingItem), ValueKind.Float, MotionMask.Tween | MotionMask.Punch | MotionMask.Oscillate | MotionMask.Spring, FeedbackCategory.None, false),
-            (typeof(TMPParagraphSpacingItem), ValueKind.Float, MotionMask.Tween | MotionMask.Punch | MotionMask.Oscillate | MotionMask.Spring, FeedbackCategory.None, false),
+            (typeof(TMPFontSizeItem), ValueKind.Float, MotionMask.Tween | MotionMask.Punch | MotionMask.Bounce | MotionMask.Spring, FeedbackCategory.None, false),
+            (typeof(TMPCharacterSpacingItem), ValueKind.Float, MotionMask.Tween | MotionMask.Punch | MotionMask.Bounce | MotionMask.Oscillate | MotionMask.Spring, FeedbackCategory.None, false),
+            (typeof(TMPWordSpacingItem), ValueKind.Float, MotionMask.Tween | MotionMask.Punch | MotionMask.Bounce | MotionMask.Oscillate | MotionMask.Spring, FeedbackCategory.None, false),
+            (typeof(TMPLineSpacingItem), ValueKind.Float, MotionMask.Tween | MotionMask.Punch | MotionMask.Bounce | MotionMask.Oscillate | MotionMask.Spring, FeedbackCategory.None, false),
+            (typeof(TMPParagraphSpacingItem), ValueKind.Float, MotionMask.Tween | MotionMask.Punch | MotionMask.Bounce | MotionMask.Oscillate | MotionMask.Spring, FeedbackCategory.None, false),
             (typeof(TMPDilateItem), ValueKind.Float, MotionMask.Tween | MotionMask.Flash | MotionMask.Oscillate | MotionMask.Spring, FeedbackCategory.None, false),
             (typeof(TMPSoftnessItem), ValueKind.Float, MotionMask.Tween | MotionMask.Flash | MotionMask.Oscillate | MotionMask.Spring, FeedbackCategory.None, false),
             (typeof(TMPOutlineWidthItem), ValueKind.Float, MotionMask.Tween | MotionMask.Flash | MotionMask.Oscillate | MotionMask.Spring, FeedbackCategory.None, false),
@@ -79,15 +81,15 @@ namespace xpTURN.Feedback.Tests.Editor
             (typeof(ScreenFlashItem), ValueKind.Float, MotionMask.Flash | MotionMask.Blink, FeedbackCategory.None, true),
             (typeof(ScreenFadeItem), ValueKind.Float, MotionMask.Tween, FeedbackCategory.None, false),
             (typeof(FloatingTextItem), ValueKind.Bool, MotionMask.Set, FeedbackCategory.None, false),
-            (typeof(PostFXBloomItem), ValueKind.Float, MotionMask.Tween | MotionMask.Flash | MotionMask.Punch | MotionMask.Oscillate | MotionMask.Curve, FeedbackCategory.PostFX, true),
-            (typeof(PostFXChromaticAberrationItem), ValueKind.Float, MotionMask.Tween | MotionMask.Flash | MotionMask.Punch | MotionMask.Oscillate | MotionMask.Curve, FeedbackCategory.PostFX, false),
-            (typeof(PostFXColorAdjustmentsItem), ValueKind.Float, MotionMask.Tween | MotionMask.Flash | MotionMask.Punch | MotionMask.Oscillate | MotionMask.Curve, FeedbackCategory.PostFX, true),
+            (typeof(PostFXBloomItem), ValueKind.Float, MotionMask.Tween | MotionMask.Flash | MotionMask.Punch | MotionMask.Bounce | MotionMask.Oscillate | MotionMask.Curve, FeedbackCategory.PostFX, true),
+            (typeof(PostFXChromaticAberrationItem), ValueKind.Float, MotionMask.Tween | MotionMask.Flash | MotionMask.Punch | MotionMask.Bounce | MotionMask.Oscillate | MotionMask.Curve, FeedbackCategory.PostFX, false),
+            (typeof(PostFXColorAdjustmentsItem), ValueKind.Float, MotionMask.Tween | MotionMask.Flash | MotionMask.Punch | MotionMask.Bounce | MotionMask.Oscillate | MotionMask.Curve, FeedbackCategory.PostFX, true),
             (typeof(PostFXDepthOfFieldItem), ValueKind.Float, MotionMask.Tween | MotionMask.Flash, FeedbackCategory.PostFX, false),
             (typeof(PostFXFilmGrainItem), ValueKind.Float, MotionMask.Tween | MotionMask.Flash, FeedbackCategory.PostFX, false),
-            (typeof(PostFXLensDistortionItem), ValueKind.Float, MotionMask.Tween | MotionMask.Flash | MotionMask.Punch | MotionMask.Oscillate, FeedbackCategory.PostFX, false),
+            (typeof(PostFXLensDistortionItem), ValueKind.Float, MotionMask.Tween | MotionMask.Flash | MotionMask.Punch | MotionMask.Bounce | MotionMask.Oscillate, FeedbackCategory.PostFX, false),
             (typeof(PostFXMotionBlurItem), ValueKind.Float, MotionMask.Tween | MotionMask.Flash, FeedbackCategory.PostFX, false),
             (typeof(PostFXPaniniProjectionItem), ValueKind.Float, MotionMask.Tween | MotionMask.Flash, FeedbackCategory.PostFX, false),
-            (typeof(PostFXVignetteItem), ValueKind.Float, MotionMask.Tween | MotionMask.Flash | MotionMask.Punch | MotionMask.Oscillate, FeedbackCategory.PostFX, false),
+            (typeof(PostFXVignetteItem), ValueKind.Float, MotionMask.Tween | MotionMask.Flash | MotionMask.Punch | MotionMask.Bounce | MotionMask.Oscillate, FeedbackCategory.PostFX, false),
             (typeof(PostFXWhiteBalanceItem), ValueKind.Float, MotionMask.Tween | MotionMask.Flash, FeedbackCategory.PostFX, false),
             (typeof(PostFXChannelMixerItem), ValueKind.Float, MotionMask.Tween | MotionMask.Flash, FeedbackCategory.PostFX, false),
             (typeof(PostFXSplitToningItem), ValueKind.Float, MotionMask.Tween | MotionMask.Flash, FeedbackCategory.PostFX, false),
@@ -95,27 +97,42 @@ namespace xpTURN.Feedback.Tests.Editor
             (typeof(PostFXShadowsMidtonesHighlightsItem), ValueKind.Float, MotionMask.Tween | MotionMask.Flash, FeedbackCategory.PostFX, false),
             (typeof(PostFXVolumeBlendItem), ValueKind.Float, MotionMask.Tween | MotionMask.Flash, FeedbackCategory.PostFX, false),
             (typeof(PostFXVolumeWeightItem), ValueKind.Float, MotionMask.Tween | MotionMask.Flash, FeedbackCategory.PostFX, false),
-            (typeof(CinemachineLensFieldOfViewItem), ValueKind.Float, MotionMask.Tween | MotionMask.Punch | MotionMask.Spring, FeedbackCategory.Camera, false),
-            (typeof(CinemachineLensOrthographicSizeItem), ValueKind.Float, MotionMask.Tween | MotionMask.Punch | MotionMask.Spring, FeedbackCategory.Camera, false),
-            (typeof(CinemachineLensDutchItem), ValueKind.Float, MotionMask.Tween | MotionMask.Punch | MotionMask.Spring, FeedbackCategory.Camera, false),
-            (typeof(CinemachineNoiseAmplitudeGainItem), ValueKind.Float, MotionMask.Tween | MotionMask.Flash | MotionMask.Punch, FeedbackCategory.Camera, false),
-            (typeof(CinemachineNoiseFrequencyGainItem), ValueKind.Float, MotionMask.Tween | MotionMask.Flash | MotionMask.Punch, FeedbackCategory.Camera, false),
+            (typeof(CinemachineLensFieldOfViewItem), ValueKind.Float, MotionMask.Tween | MotionMask.Punch | MotionMask.Bounce | MotionMask.Spring, FeedbackCategory.Camera, false),
+            (typeof(CinemachineLensOrthographicSizeItem), ValueKind.Float, MotionMask.Tween | MotionMask.Punch | MotionMask.Bounce | MotionMask.Spring, FeedbackCategory.Camera, false),
+            (typeof(CinemachineLensDutchItem), ValueKind.Float, MotionMask.Tween | MotionMask.Punch | MotionMask.Bounce | MotionMask.Spring, FeedbackCategory.Camera, false),
+            (typeof(CinemachineNoiseAmplitudeGainItem), ValueKind.Float, MotionMask.Tween | MotionMask.Flash | MotionMask.Punch | MotionMask.Bounce, FeedbackCategory.Camera, false),
+            (typeof(CinemachineNoiseFrequencyGainItem), ValueKind.Float, MotionMask.Tween | MotionMask.Flash | MotionMask.Punch | MotionMask.Bounce, FeedbackCategory.Camera, false),
             (typeof(CinemachineActivateCameraItem), ValueKind.Bool, MotionMask.Set, FeedbackCategory.None, false),
             (typeof(GamepadRumbleItem), ValueKind.Vector2, MotionMask.Tween | MotionMask.Flash | MotionMask.Curve, FeedbackCategory.Haptics, false),
             (typeof(RectOffsetsItem), ValueKind.Vector4, MotionMask.Tween, FeedbackCategory.Motion, false),
             (typeof(VideoPlayerControlItem), ValueKind.Bool, MotionMask.Set, FeedbackCategory.None, false),
-            (typeof(CameraFieldOfViewItem), ValueKind.Float, MotionMask.Tween | MotionMask.Punch | MotionMask.Shake | MotionMask.Spring, FeedbackCategory.Camera, false),
-            (typeof(CameraOrthographicSizeItem), ValueKind.Float, MotionMask.Tween | MotionMask.Punch | MotionMask.Shake | MotionMask.Spring, FeedbackCategory.Camera, false),
-            (typeof(CameraZoomItem), ValueKind.Float, MotionMask.Tween | MotionMask.Punch, FeedbackCategory.Camera, false),
+            // the Audio module's — a source's three, the filters' five (no shake), the listener's
+            (typeof(AudioVolumeItem), ValueKind.Float, MotionMask.Tween | MotionMask.Curve | MotionMask.Punch | MotionMask.Bounce | MotionMask.Shake | MotionMask.Oscillate | MotionMask.Spring, FeedbackCategory.Audio, false),
+            (typeof(AudioPitchItem), ValueKind.Float, MotionMask.Tween | MotionMask.Curve | MotionMask.Punch | MotionMask.Bounce | MotionMask.Shake | MotionMask.Oscillate | MotionMask.Spring, FeedbackCategory.Audio, false),
+            (typeof(AudioStereoPanItem), ValueKind.Float, MotionMask.Tween | MotionMask.Curve | MotionMask.Punch | MotionMask.Bounce | MotionMask.Shake | MotionMask.Oscillate | MotionMask.Spring, FeedbackCategory.Audio, false),
+            (typeof(AudioLowPassCutoffItem), ValueKind.Float, MotionMask.Tween | MotionMask.Curve | MotionMask.Punch | MotionMask.Bounce | MotionMask.Oscillate | MotionMask.Spring, FeedbackCategory.Audio, false),
+            (typeof(AudioHighPassCutoffItem), ValueKind.Float, MotionMask.Tween | MotionMask.Curve | MotionMask.Punch | MotionMask.Bounce | MotionMask.Oscillate | MotionMask.Spring, FeedbackCategory.Audio, false),
+            (typeof(AudioEchoWetMixItem), ValueKind.Float, MotionMask.Tween | MotionMask.Curve | MotionMask.Punch | MotionMask.Bounce | MotionMask.Oscillate | MotionMask.Spring, FeedbackCategory.Audio, false),
+            (typeof(AudioDistortionLevelItem), ValueKind.Float, MotionMask.Tween | MotionMask.Curve | MotionMask.Punch | MotionMask.Bounce | MotionMask.Oscillate | MotionMask.Spring, FeedbackCategory.Audio, false),
+            (typeof(AudioReverbLevelItem), ValueKind.Float, MotionMask.Tween | MotionMask.Curve | MotionMask.Punch | MotionMask.Bounce | MotionMask.Oscillate | MotionMask.Spring, FeedbackCategory.Audio, false),
+            (typeof(AudioListenerVolumeItem), ValueKind.Float, MotionMask.Tween | MotionMask.Curve | MotionMask.Punch | MotionMask.Bounce | MotionMask.Spring, FeedbackCategory.Audio, false),
+            (typeof(AudioSourceControlItem), ValueKind.Bool, MotionMask.Set, FeedbackCategory.Audio, false),
+            (typeof(AudioPlayClipItem), ValueKind.Bool, MotionMask.Set, FeedbackCategory.Audio, false),
+            (typeof(AudioMixerParameterItem), ValueKind.Float, MotionMask.Tween | MotionMask.Curve | MotionMask.Punch | MotionMask.Bounce | MotionMask.Oscillate | MotionMask.Spring, FeedbackCategory.Audio, false),
+            (typeof(AudioMixerSnapshotItem), ValueKind.Bool, MotionMask.Set, FeedbackCategory.Audio, false),
+            (typeof(AudioPlayAtPointItem), ValueKind.Bool, MotionMask.Set, FeedbackCategory.Audio, false),
+            (typeof(CameraFieldOfViewItem), ValueKind.Float, MotionMask.Tween | MotionMask.Punch | MotionMask.Bounce | MotionMask.Shake | MotionMask.Spring, FeedbackCategory.Camera, false),
+            (typeof(CameraOrthographicSizeItem), ValueKind.Float, MotionMask.Tween | MotionMask.Punch | MotionMask.Bounce | MotionMask.Shake | MotionMask.Spring, FeedbackCategory.Camera, false),
+            (typeof(CameraZoomItem), ValueKind.Float, MotionMask.Tween | MotionMask.Punch | MotionMask.Bounce, FeedbackCategory.Camera, false),
             (typeof(CameraClippingPlanesItem), ValueKind.Vector2, MotionMask.Tween, FeedbackCategory.Camera, false),
             (typeof(CameraBackgroundColorItem), ValueKind.Color, MotionMask.Tween | MotionMask.Flash, FeedbackCategory.Camera, true),
-            (typeof(SquashAndStretchItem), ValueKind.Float, MotionMask.Tween | MotionMask.Punch | MotionMask.Curve | MotionMask.Spring, FeedbackCategory.Motion, false),
+            (typeof(SquashAndStretchItem), ValueKind.Float, MotionMask.Tween | MotionMask.Punch | MotionMask.Bounce | MotionMask.Curve | MotionMask.Spring, FeedbackCategory.Motion, false),
             (typeof(LookAtItem), ValueKind.Float, MotionMask.Set | MotionMask.Tween, FeedbackCategory.Motion, false),
             (typeof(RotateAroundItem), ValueKind.Float, MotionMask.Tween | MotionMask.Oscillate, FeedbackCategory.Motion, false),
             (typeof(MatchTransformItem), ValueKind.Float, MotionMask.Tween, FeedbackCategory.Motion, false),
             (typeof(SetParentItem), ValueKind.Bool, MotionMask.Set, FeedbackCategory.Motion, false),
             (typeof(MaterialFloatItem), ValueKind.Float,
-                MotionMask.Tween | MotionMask.Flash | MotionMask.Punch | MotionMask.Shake | MotionMask.Curve | MotionMask.Oscillate | MotionMask.Spring,
+                MotionMask.Tween | MotionMask.Flash | MotionMask.Punch | MotionMask.Bounce | MotionMask.Shake | MotionMask.Curve | MotionMask.Oscillate | MotionMask.Spring,
                 FeedbackCategory.None, false),
             (typeof(MaterialVectorItem), ValueKind.Vector4, MotionMask.Tween | MotionMask.Curve | MotionMask.Oscillate, FeedbackCategory.None, false),
             (typeof(TextureOffsetItem), ValueKind.Vector2, MotionMask.Tween | MotionMask.Curve | MotionMask.Oscillate, FeedbackCategory.None, false),
@@ -139,8 +156,8 @@ namespace xpTURN.Feedback.Tests.Editor
             (typeof(SpriteSwapItem), ValueKind.Bool, MotionMask.Set, FeedbackCategory.None, false),
             (typeof(SpriteFlipItem), ValueKind.Bool, MotionMask.Set, FeedbackCategory.None, false),
             (typeof(SpriteSheetItem), ValueKind.Float, MotionMask.Tween, FeedbackCategory.None, false),
-            (typeof(LineWidthItem), ValueKind.Float, MotionMask.Tween | MotionMask.Punch, FeedbackCategory.None, false),
-            (typeof(LineColorItem), ValueKind.Color, MotionMask.Tween | MotionMask.Punch, FeedbackCategory.None, false),
+            (typeof(LineWidthItem), ValueKind.Float, MotionMask.Tween | MotionMask.Punch | MotionMask.Bounce, FeedbackCategory.None, false),
+            (typeof(LineColorItem), ValueKind.Color, MotionMask.Tween | MotionMask.Punch | MotionMask.Bounce, FeedbackCategory.None, false),
             (typeof(TrailTimeItem), ValueKind.Float, MotionMask.Set | MotionMask.Tween, FeedbackCategory.None, false),
             (typeof(TrailWidthItem), ValueKind.Float, MotionMask.Set | MotionMask.Tween, FeedbackCategory.None, false),
             (typeof(TrailEmittingItem), ValueKind.Bool, MotionMask.Set, FeedbackCategory.None, false),
@@ -156,7 +173,7 @@ namespace xpTURN.Feedback.Tests.Editor
             (typeof(ParticleEmissionRateItem), ValueKind.Float, MotionMask.Tween | MotionMask.Flash, FeedbackCategory.None, false),
             (typeof(AnimatorParameterItem), ValueKind.Bool, MotionMask.Set, FeedbackCategory.None, false),
             (typeof(AnimatorFloatItem), ValueKind.Float, MotionMask.Tween, FeedbackCategory.None, false),
-            (typeof(AnimatorSpeedItem), ValueKind.Float, MotionMask.Tween | MotionMask.Punch | MotionMask.Spring, FeedbackCategory.None, false),
+            (typeof(AnimatorSpeedItem), ValueKind.Float, MotionMask.Tween | MotionMask.Punch | MotionMask.Bounce | MotionMask.Spring, FeedbackCategory.None, false),
             (typeof(AnimatorLayerWeightItem), ValueKind.Float, MotionMask.Tween, FeedbackCategory.None, false),
             (typeof(AnimatorStateItem), ValueKind.Bool, MotionMask.Set, FeedbackCategory.None, false),
             (typeof(RigidbodyForceItem), ValueKind.Bool, MotionMask.Set, FeedbackCategory.None, false),
@@ -166,12 +183,12 @@ namespace xpTURN.Feedback.Tests.Editor
             (typeof(Rigidbody2DVelocityItem), ValueKind.Bool, MotionMask.Set, FeedbackCategory.None, false),
             (typeof(TimeScaleItem), ValueKind.Float, MotionMask.Set | MotionMask.Tween | MotionMask.Flash, FeedbackCategory.Time, false),
             (typeof(CustomFloatItem), ValueKind.Float,
-                MotionMask.Set | MotionMask.Tween | MotionMask.Punch | MotionMask.Shake | MotionMask.Curve | MotionMask.Flash | MotionMask.Oscillate | MotionMask.Wiggle | MotionMask.Spring,
+                MotionMask.Set | MotionMask.Tween | MotionMask.Punch | MotionMask.Bounce | MotionMask.Shake | MotionMask.Curve | MotionMask.Flash | MotionMask.Oscillate | MotionMask.Wiggle | MotionMask.Spring,
                 FeedbackCategory.None, false),
             (typeof(CustomVector3Item), ValueKind.Vector3,
-                MotionMask.Tween | MotionMask.Punch | MotionMask.Shake | MotionMask.Curve | MotionMask.Oscillate | MotionMask.Wiggle | MotionMask.Spring, FeedbackCategory.None, false),
+                MotionMask.Tween | MotionMask.Punch | MotionMask.Bounce | MotionMask.Shake | MotionMask.Curve | MotionMask.Oscillate | MotionMask.Wiggle | MotionMask.Spring, FeedbackCategory.None, false),
             (typeof(CustomColorItem), ValueKind.Color, MotionMask.Tween | MotionMask.Flash | MotionMask.Gradient | MotionMask.Spring, FeedbackCategory.None, true),
-            (typeof(CustomFloatEventItem), ValueKind.Float, MotionMask.Tween | MotionMask.Punch | MotionMask.Shake | MotionMask.Curve | MotionMask.Oscillate, FeedbackCategory.None, false),
+            (typeof(CustomFloatEventItem), ValueKind.Float, MotionMask.Tween | MotionMask.Punch | MotionMask.Bounce | MotionMask.Shake | MotionMask.Curve | MotionMask.Oscillate, FeedbackCategory.None, false),
         };
 
         static readonly (Type Type, FeedbackCategory Category, float NaturalDuration)[] ActionRows =
@@ -200,6 +217,8 @@ namespace xpTURN.Feedback.Tests.Editor
             (typeof(MaterialColorItem), "Renderer/Material Color", PreviewGrade.Full),
             (typeof(LightIntensityItem), "Light/Intensity", PreviewGrade.Full),
             (typeof(CameraShakeItem), "Camera/Shake", PreviewGrade.Full),
+            (typeof(CameraTraumaItem), "Camera/Trauma", PreviewGrade.Full),
+            (typeof(TransformTraumaItem), "Transform/Trauma", PreviewGrade.Full),
             (typeof(SetActiveItem), "GameObject/Set Active", PreviewGrade.Full),
             (typeof(UnityEventItem), "Flow/Unity Event", PreviewGrade.DisplayOnly),
             (typeof(HitStopItem), "Time/Hit Stop", PreviewGrade.DisplayOnly),
@@ -239,6 +258,20 @@ namespace xpTURN.Feedback.Tests.Editor
             (typeof(RectAnchorsItem), "Rect Transform/Anchors", PreviewGrade.Full),
             (typeof(RectOffsetsItem), "Rect Transform/Offsets", PreviewGrade.Full),
             (typeof(VideoPlayerControlItem), "Video/Player Control", PreviewGrade.None),
+            (typeof(AudioVolumeItem), "Audio/Volume", PreviewGrade.Full),
+            (typeof(AudioPitchItem), "Audio/Pitch", PreviewGrade.Full),
+            (typeof(AudioStereoPanItem), "Audio/Stereo Pan", PreviewGrade.Full),
+            (typeof(AudioLowPassCutoffItem), "Audio/Low Pass Cutoff", PreviewGrade.Full),
+            (typeof(AudioHighPassCutoffItem), "Audio/High Pass Cutoff", PreviewGrade.Full),
+            (typeof(AudioEchoWetMixItem), "Audio/Echo Wet Mix", PreviewGrade.Full),
+            (typeof(AudioDistortionLevelItem), "Audio/Distortion Level", PreviewGrade.Full),
+            (typeof(AudioReverbLevelItem), "Audio/Reverb Level", PreviewGrade.Full),
+            (typeof(AudioListenerVolumeItem), "Audio/Listener Volume", PreviewGrade.None),
+            (typeof(AudioSourceControlItem), "Audio/Source Control", PreviewGrade.Simulated),
+            (typeof(AudioPlayClipItem), "Audio/Play Clip", PreviewGrade.Simulated),
+            (typeof(AudioMixerParameterItem), "Audio/Mixer Parameter", PreviewGrade.None),
+            (typeof(AudioMixerSnapshotItem), "Audio/Mixer Snapshot", PreviewGrade.None),
+            (typeof(AudioPlayAtPointItem), "Audio/Play At Point", PreviewGrade.DisplayOnly),
             (typeof(TMPFontSizeItem), "TMP/Font Size", PreviewGrade.Full),
             (typeof(TMPCharacterSpacingItem), "TMP/Character Spacing", PreviewGrade.Full),
             (typeof(TMPWordSpacingItem), "TMP/Word Spacing", PreviewGrade.Full),
@@ -353,6 +386,21 @@ namespace xpTURN.Feedback.Tests.Editor
 
         static string Sorted(IEnumerable<string> names) => string.Join(" ", names.OrderBy(n => n, StringComparer.Ordinal));
 
+        // a target with a Punch takes a Bounce — Core's every target and a user's effect
+        [Test]
+        public void EveryPunchTargetTakesABounce()
+        {
+            int punches = 0;
+            foreach (Type type in TypeCache.GetTypesDerivedFrom<TargetItem>().Where(t => t.Assembly == typeof(TargetItem).Assembly && !t.IsAbstract))
+            {
+                TargetTraits traits = ((TargetItem)Activator.CreateInstance(type)).Traits;
+                Assert.That(traits.Supports(MotionKind.Bounce), Is.EqualTo(traits.Supports(MotionKind.Punch)), type.Name);
+                punches += traits.Supports(MotionKind.Punch) ? 1 : 0;
+            }
+            Assert.That(punches, Is.EqualTo(48), "Core's targets with a Punch");
+            Assert.That((ExtensionTraits.Motions & MotionMask.Bounce) != 0 && (ExtensionTraits.Motions & MotionMask.Punch) != 0, Is.True, "a user's effect");
+        }
+
         // the table covers every concrete effect item in Core, and the length follows the field — not only its default
         [Test]
         public void RepresentativeItemsCarryTheirTraits()
@@ -433,7 +481,7 @@ namespace xpTURN.Feedback.Tests.Editor
             Assert.That(unityEvent.m_Event, Is.Not.Null);
             Assert.That(unityEvent.m_Event.GetPersistentEventCount(), Is.EqualTo(0));
             var hitStop = new HitStopItem();
-            Assert.That((hitStop.m_FreezeDuration, hitStop.m_MinimumTimeScale, hitStop.m_TimeScale), Is.EqualTo((0.1f, 0.1f, 0f)));
+            Assert.That((hitStop.m_FreezeDuration, hitStop.m_MinimumTimeScale, hitStop.m_TimeScale, hitStop.m_Overlap), Is.EqualTo((0.1f, 0.1f, 0f, HitStopOverlap.Skip)));
             // the second references start empty (Direct) — a new parent's empty is the root
             Assert.That(new SquashAndStretchItem().m_Axis, Is.EqualTo(SquashAxis.YtoXZ));
             var look = new LookAtItem();
@@ -462,7 +510,7 @@ namespace xpTURN.Feedback.Tests.Editor
             Type[] globals = { typeof(ShaderGlobalFloatItem), typeof(ShaderGlobalColorItem), typeof(ShaderGlobalVectorItem), typeof(FogColorItem), typeof(FogDensityItem),
                 typeof(SkyboxExposureItem), typeof(SkyboxTintItem), typeof(SkyboxRotationItem), typeof(AmbientColorItem), typeof(AmbientIntensityItem),
                 typeof(TimeScaleItem), typeof(CustomFloatEventItem), typeof(ScreenFlashItem), typeof(ScreenFadeItem),
-                typeof(PostFXBloomItem), typeof(PostFXChromaticAberrationItem), typeof(PostFXColorAdjustmentsItem), typeof(PostFXDepthOfFieldItem), typeof(PostFXFilmGrainItem), typeof(PostFXLensDistortionItem), typeof(PostFXMotionBlurItem), typeof(PostFXPaniniProjectionItem), typeof(PostFXVignetteItem), typeof(PostFXWhiteBalanceItem), typeof(PostFXChannelMixerItem), typeof(PostFXSplitToningItem), typeof(PostFXLiftGammaGainItem), typeof(PostFXShadowsMidtonesHighlightsItem), typeof(PostFXVolumeBlendItem), typeof(GamepadRumbleItem) };
+                typeof(PostFXBloomItem), typeof(PostFXChromaticAberrationItem), typeof(PostFXColorAdjustmentsItem), typeof(PostFXDepthOfFieldItem), typeof(PostFXFilmGrainItem), typeof(PostFXLensDistortionItem), typeof(PostFXMotionBlurItem), typeof(PostFXPaniniProjectionItem), typeof(PostFXVignetteItem), typeof(PostFXWhiteBalanceItem), typeof(PostFXChannelMixerItem), typeof(PostFXSplitToningItem), typeof(PostFXLiftGammaGainItem), typeof(PostFXShadowsMidtonesHighlightsItem), typeof(PostFXVolumeBlendItem), typeof(GamepadRumbleItem), typeof(AudioListenerVolumeItem), typeof(AudioMixerParameterItem), typeof(AudioMixerSnapshotItem) };
             foreach (var (type, _, _, _, _) in TargetRows)
             {
                 var meta = type.GetCustomAttribute<FeedbackTargetAttribute>(false);
@@ -562,10 +610,56 @@ namespace xpTURN.Feedback.Tests.Editor
             // the rumble is the InputSystem assembly's · global — no target type
             var rumble = typeof(GamepadRumbleItem).GetCustomAttribute<FeedbackTargetAttribute>(false);
             Assert.That((rumble.Requires, rumble.RequiresName, rumble.Implementation), Is.EqualTo(((Type)null, (string)null, "xpTURN.Feedback.InputSystem")));
+            // the Audio items are the Audio assembly's · a source's or a filter's by name (the listener's volume and the mixer's
+            // two are global — no target type) · the clock starts unscaled
+            foreach (var (type, requires) in new (Type, string)[]
+            {
+                (typeof(AudioVolumeItem), "UnityEngine.AudioSource, UnityEngine.AudioModule"),
+                (typeof(AudioPitchItem), "UnityEngine.AudioSource, UnityEngine.AudioModule"),
+                (typeof(AudioStereoPanItem), "UnityEngine.AudioSource, UnityEngine.AudioModule"),
+                (typeof(AudioLowPassCutoffItem), "UnityEngine.AudioLowPassFilter, UnityEngine.AudioModule"),
+                (typeof(AudioHighPassCutoffItem), "UnityEngine.AudioHighPassFilter, UnityEngine.AudioModule"),
+                (typeof(AudioEchoWetMixItem), "UnityEngine.AudioEchoFilter, UnityEngine.AudioModule"),
+                (typeof(AudioDistortionLevelItem), "UnityEngine.AudioDistortionFilter, UnityEngine.AudioModule"),
+                (typeof(AudioReverbLevelItem), "UnityEngine.AudioReverbFilter, UnityEngine.AudioModule"),
+                (typeof(AudioListenerVolumeItem), (string)null),
+                (typeof(AudioSourceControlItem), "UnityEngine.AudioSource, UnityEngine.AudioModule"),
+                (typeof(AudioPlayClipItem), "UnityEngine.AudioSource, UnityEngine.AudioModule"),
+                (typeof(AudioMixerParameterItem), (string)null),
+                (typeof(AudioMixerSnapshotItem), (string)null),
+            })
+            {
+                var meta = type.GetCustomAttribute<FeedbackTargetAttribute>(false);
+                Assert.That((meta.Requires, meta.RequiresName, meta.Implementation), Is.EqualTo(((Type)null, requires, "xpTURN.Feedback.Audio")), type.Name);
+                Assert.That(((TargetItem)Activator.CreateInstance(type)).m_Timing.m_Clock, Is.EqualTo(ItemClock.Unscaled), type.Name + " clock");
+            }
+            // the fields' defaults (Play · no clip · full volume)
+            var playClip = new AudioPlayClipItem();
+            Assert.That((new AudioSourceControlItem().m_Action, playClip.m_Clip, playClip.m_Volume), Is.EqualTo((AudioSourceAction.Play, (UnityEngine.Object)null, 1f)));
+            // the mixer's two: no mixer · no name · no snapshot · half a second · no Back To, the time kept to 0 and up
+            var exposed = new AudioMixerParameterItem();
+            var snapshot = new AudioMixerSnapshotItem();
+            Assert.That((exposed.m_Mixer, exposed.m_Parameter, snapshot.m_Snapshot, snapshot.m_TransitionTime, snapshot.m_BackTo),
+                Is.EqualTo(((UnityEngine.Object)null, "", (UnityEngine.Object)null, 0.5f, (UnityEngine.Object)null)));
+            Assert.That(typeof(AudioMixerSnapshotItem).GetField("m_TransitionTime", BindingFlags.Instance | BindingFlags.NonPublic).GetCustomAttribute<MinAttribute>().min, Is.EqualTo(0f));
+            // the pooled sound — a Transform's · the Audio assembly's · the clock starts unscaled · its fields' defaults (no resource ·
+            // no output · full volume · pitch 1 kept to 0.1 to 3 · 3D · 1 to 500 · no Stop After · a 0.1 s fade · 8 voices)
+            var point = typeof(AudioPlayAtPointItem).GetCustomAttribute<FeedbackTargetAttribute>(false);
+            Assert.That((point.Requires, point.RequiresName, point.Implementation), Is.EqualTo((typeof(Transform), (string)null, "xpTURN.Feedback.Audio")));
+            var voice = new AudioPlayAtPointItem();
+            Assert.That((voice.m_Timing.m_Clock, voice.m_Resource, voice.m_Output, voice.m_Volume, voice.m_Pitch, voice.m_PitchRandom, voice.m_SpatialBlend),
+                Is.EqualTo((ItemClock.Unscaled, (UnityEngine.Object)null, (UnityEngine.Object)null, 1f, 1f, 0f, 1f)));
+            Assert.That((voice.m_MinDistance, voice.m_MaxDistance, voice.m_Offset, voice.m_StopAfter, voice.m_FadeOut, voice.m_IgnoreListenerPause, voice.m_PoolSize),
+                Is.EqualTo((1f, 500f, Vector3.zero, 0f, 0.1f, false, 8)));
+            UnityEngine.RangeAttribute RangeOf(string field) => typeof(AudioPlayAtPointItem).GetField(field, BindingFlags.Instance | BindingFlags.NonPublic).GetCustomAttribute<UnityEngine.RangeAttribute>();
+            float MinOf(string field) => typeof(AudioPlayAtPointItem).GetField(field, BindingFlags.Instance | BindingFlags.NonPublic).GetCustomAttribute<MinAttribute>().min;
+            Assert.That(new[] { "m_Volume", "m_Pitch", "m_PitchRandom", "m_SpatialBlend" }.Select(f => (RangeOf(f).min, RangeOf(f).max)),
+                Is.EqualTo(new[] { (0f, 1f), (0.1f, 3f), (0f, 1f), (0f, 1f) }));
+            Assert.That(new[] { "m_MinDistance", "m_MaxDistance", "m_StopAfter", "m_FadeOut", "m_PoolSize" }.Select(MinOf), Is.EqualTo(new[] { 0f, 0f, 0f, 0f, 1f }));
             // every other item is Core's
             foreach (var (type, _, _, _, _) in TargetRows.Where(r => !r.Type.Name.StartsWith("Particle", StringComparison.Ordinal) && !r.Type.Name.StartsWith("Animator", StringComparison.Ordinal)
                 && !r.Type.Name.StartsWith("Rigidbody", StringComparison.Ordinal) && !r.Type.Name.StartsWith("Light2D", StringComparison.Ordinal)
-                && !new[] { "Graphic", "Image", "CanvasGroup", "Text", "Selectable", "Video", "TMP", "Screen", "FloatingText", "PostFX", "Cinemachine", "Gamepad" }.Any(prefix => r.Type.Name.StartsWith(prefix, StringComparison.Ordinal))))
+                && !new[] { "Graphic", "Image", "CanvasGroup", "Text", "Selectable", "Video", "TMP", "Screen", "FloatingText", "PostFX", "Cinemachine", "Gamepad", "Audio" }.Any(prefix => r.Type.Name.StartsWith(prefix, StringComparison.Ordinal))))
                 Assert.That(type.GetCustomAttribute<FeedbackTargetAttribute>(false).Implementation, Is.Empty, type.Name + " Implementation");
         }
 

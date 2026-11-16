@@ -106,7 +106,7 @@ namespace xpTURN.Feedback
     [Serializable]
     public sealed class CinemachineLensFieldOfViewItem : TargetItem
     {
-        static readonly TargetTraits s_Traits = new TargetTraits(valueKind: ValueKind.Float, supportedMotions: MotionMask.Tween | MotionMask.Punch | MotionMask.Spring,
+        static readonly TargetTraits s_Traits = new TargetTraits(valueKind: ValueKind.Float, supportedMotions: MotionMask.Tween | MotionMask.Punch | MotionMask.Bounce | MotionMask.Spring,
             category: FeedbackCategory.Camera, flashSensitive: false, applyMode: ApplyMode.Offset);
 
         public CinemachineLensFieldOfViewItem()
@@ -121,7 +121,7 @@ namespace xpTURN.Feedback
     [Serializable]
     public sealed class CinemachineLensOrthographicSizeItem : TargetItem
     {
-        static readonly TargetTraits s_Traits = new TargetTraits(valueKind: ValueKind.Float, supportedMotions: MotionMask.Tween | MotionMask.Punch | MotionMask.Spring,
+        static readonly TargetTraits s_Traits = new TargetTraits(valueKind: ValueKind.Float, supportedMotions: MotionMask.Tween | MotionMask.Punch | MotionMask.Bounce | MotionMask.Spring,
             category: FeedbackCategory.Camera, flashSensitive: false, applyMode: ApplyMode.Offset);
 
         public CinemachineLensOrthographicSizeItem()
@@ -136,7 +136,7 @@ namespace xpTURN.Feedback
     [Serializable]
     public sealed class CinemachineLensDutchItem : TargetItem
     {
-        static readonly TargetTraits s_Traits = new TargetTraits(valueKind: ValueKind.Float, supportedMotions: MotionMask.Tween | MotionMask.Punch | MotionMask.Spring,
+        static readonly TargetTraits s_Traits = new TargetTraits(valueKind: ValueKind.Float, supportedMotions: MotionMask.Tween | MotionMask.Punch | MotionMask.Bounce | MotionMask.Spring,
             category: FeedbackCategory.Camera, flashSensitive: false, applyMode: ApplyMode.Offset);
 
         public CinemachineLensDutchItem()
@@ -152,7 +152,7 @@ namespace xpTURN.Feedback
     [Serializable]
     public sealed class CinemachineNoiseAmplitudeGainItem : TargetItem
     {
-        static readonly TargetTraits s_Traits = new TargetTraits(valueKind: ValueKind.Float, supportedMotions: MotionMask.Tween | MotionMask.Flash | MotionMask.Punch,
+        static readonly TargetTraits s_Traits = new TargetTraits(valueKind: ValueKind.Float, supportedMotions: MotionMask.Tween | MotionMask.Flash | MotionMask.Punch | MotionMask.Bounce,
             category: FeedbackCategory.Camera, flashSensitive: false, applyMode: ApplyMode.Offset);
 
         public CinemachineNoiseAmplitudeGainItem()
@@ -167,7 +167,7 @@ namespace xpTURN.Feedback
     [Serializable]
     public sealed class CinemachineNoiseFrequencyGainItem : TargetItem
     {
-        static readonly TargetTraits s_Traits = new TargetTraits(valueKind: ValueKind.Float, supportedMotions: MotionMask.Tween | MotionMask.Flash | MotionMask.Punch,
+        static readonly TargetTraits s_Traits = new TargetTraits(valueKind: ValueKind.Float, supportedMotions: MotionMask.Tween | MotionMask.Flash | MotionMask.Punch | MotionMask.Bounce,
             category: FeedbackCategory.Camera, flashSensitive: false, applyMode: ApplyMode.Offset);
 
         public CinemachineNoiseFrequencyGainItem()

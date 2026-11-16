@@ -7,6 +7,7 @@ using NUnit.Framework;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 using xpTURN.Feedback.Editor;
@@ -781,6 +782,78 @@ namespace xpTURN.Feedback.Tests.Editor
             TestContext.WriteLine($"Motion Blur — peak {peak * 100f:F2} % · over 0.5 % for {over:F2} s · longest frame {longest:F3} s");
             yield return new ExitPlayMode();
             Assert.That(peak, Is.GreaterThanOrEqualTo(0.01f), "nothing blurs");
+        }
+
+        // the gallery's mixer (written by hand): one exposed volume · the two snapshots · Update Mode Unscaled Time (the
+        // snapshot item runs on the unscaled clock) · the stage's tone goes through it
+        [Test]
+        public void BQ05e_TheMixer()
+        {
+            EditorSceneManager.OpenScene(ScenePath(), OpenSceneMode.Single);
+            object e = Entry(Gallery(), "Audio", "Mixer Snapshot · Set");
+            Assert.That(e, Is.Not.Null, "no Mixer Snapshot entry");
+            var item = (AudioMixerSnapshotItem)F<FeedbackPlayer>(e, "Player").m_Items[0];
+            AudioMixer mixer = ((AudioMixerSnapshot)item.m_Snapshot).audioMixer;
+            SerializedProperty list = new SerializedObject(mixer).FindProperty("m_ExposedParameters");
+            string[] names = Enumerable.Range(0, list.arraySize).Select(i => list.GetArrayElementAtIndex(i).FindPropertyRelative("name").stringValue).ToArray();
+            AudioMixerGroup output = F<GameObject>(e, "Target").GetComponent<AudioSource>().outputAudioMixerGroup;
+            Assert.That(names, Is.EqualTo(new[] { "GalleryVolume" }), "the exposed parameters");
+            Assert.That((mixer.name, mixer.FindSnapshot("Default") != null, mixer.FindSnapshot("Quiet") != null, mixer.updateMode, output != null && output.audioMixer == mixer),
+                Is.EqualTo(("GalleryMixer", true, true, AudioMixerUpdateMode.UnscaledTime, true)));
+        }
+
+        static IEnumerator Wait(float seconds)
+        {
+            float until = Time.realtimeSinceStartup + seconds;
+            while (Time.realtimeSinceStartup < until)
+                yield return null;
+        }
+
+        static float Exposed(AudioMixer mixer) => mixer.GetFloat("GalleryVolume", out float v) ? v : float.NaN;
+
+        // the Audio tab: the stage's tone (a scene source — playOnAwake) sounds while the stage is shown and stops when another
+        // entry's target takes the stage · Source Control plays the hit's source · the snapshot moves the exposed volume to Quiet
+        // and back · the parameter dips it and gives it back. A fixed window from each press
+        [UnityTest, Timeout(300000)]
+        public IEnumerator BQ06k_TheAudioTabSounds()
+        {
+            yield return new EnterPlayMode();
+            EditorSceneManager.LoadSceneInPlayMode(ScenePath(), new LoadSceneParameters(LoadSceneMode.Single));
+            for (int i = 0; i < 10; i++)
+                yield return null;
+            Component g = Gallery();
+            MethodInfo press = g.GetType().GetMethod("Press");
+            object volume = Entry(g, "Audio", "Volume · Punch"), control = Entry(g, "Audio", "Source Control · Set");
+            object snapshot = Entry(g, "Audio", "Mixer Snapshot · Set"), parameter = Entry(g, "Audio", "Mixer Parameter · Curve");
+            Assert.That(new[] { volume, control, snapshot, parameter }.Count(x => x == null), Is.EqualTo(0), "an Audio entry is missing");
+            AudioSource tone = F<GameObject>(volume, "Target").GetComponent<AudioSource>();
+            AudioSource hit = F<GameObject>(control, "Target").GetComponent<AudioSource>();
+            AudioMixer mixer = tone.outputAudioMixerGroup.audioMixer;
+            press.Invoke(g, new[] { volume });
+            yield return Wait(0.3f);
+            bool shown = tone.isPlaying;
+            press.Invoke(g, new[] { control });
+            yield return Wait(0.1f);
+            bool hidden = !tone.isPlaying, plays = hit.isPlaying;
+            yield return Wait(1f);
+            press.Invoke(g, new[] { snapshot });
+            yield return Wait(0.8f);
+            float quiet = Exposed(mixer);
+            yield return Wait(1.6f);
+            float back = Exposed(mixer);
+            bool again = tone.isPlaying;
+            press.Invoke(g, new[] { parameter });
+            yield return Wait(0.45f);
+            float dip = Exposed(mixer);
+            yield return Wait(1.6f);
+            float after = Exposed(mixer);
+            TestContext.WriteLine($"tone shown {shown} · hidden {hidden} · again {again} · the hit {plays} · Quiet {quiet:F1} dB · back {back:F1} · dip {dip:F1} · after {after:F1}");
+            yield return new ExitPlayMode();
+            Assert.That((shown, hidden, plays, again), Is.EqualTo((true, true, true, true)), "the tone shown · hidden · shown again · the hit's source");
+            Assert.That(quiet, Is.EqualTo(-12f).Within(0.5f), "the Quiet snapshot");
+            Assert.That(back, Is.EqualTo(0f).Within(0.5f), "back to Default");
+            Assert.That(dip, Is.LessThan(-20f), "the parameter's dip");
+            Assert.That(after, Is.EqualTo(0f).Within(0.5f), "the parameter given back");
         }
     }
 }

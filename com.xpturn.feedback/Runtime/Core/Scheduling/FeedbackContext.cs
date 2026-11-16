@@ -114,6 +114,25 @@ namespace xpTURN.Feedback
 
         internal PoolService PoolsIfMade => m_Pools;
 
+        // the trauma — a Core service made when first asked (a trauma feedback's prepare, FeedbackTrauma.Add). The debugger
+        // reads it without making one
+        TraumaService m_Trauma;
+
+        internal TraumaService Trauma
+        {
+            get
+            {
+                if (m_Trauma == null)
+                {
+                    m_Trauma = new TraumaService(this, Settings);
+                    AddService(m_Trauma);
+                }
+                return m_Trauma;
+            }
+        }
+
+        internal TraumaService TraumaIfMade => m_Trauma;
+
         // the global distance reference (FeedbackRange.Center): DistanceReference.Global measures from it
         internal UnityEngine.Transform RangeCenter { get; set; }
 

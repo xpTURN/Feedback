@@ -16,6 +16,8 @@ namespace xpTURN.Feedback.Editor
     {
         internal PlaybackHandle Handle;
         internal Object Owner;
+        // a Variant's play — that preset (null for the player's list)
+        internal Object List;
         internal RunnerKind Kind;
         internal int Slot;
         internal int State;
@@ -112,6 +114,7 @@ namespace xpTURN.Feedback.Editor
         internal TimeScaleService TimeScale;
         internal ChannelService ChannelService;
         internal PoolService Pools;
+        internal TraumaService Trauma;
         internal double Now;
         internal PlaybackHandle Selected;
         internal Object SelectedOwner;
@@ -153,6 +156,7 @@ namespace xpTURN.Feedback.Editor
             if (scheduler == null)
                 return;
             bool found = false;
+            PlayerRuntime selectedRuntime = null;
             int count = scheduler.SlotCount;
             for (int i = 0; i < count; i++)
             {
@@ -163,6 +167,8 @@ namespace xpTURN.Feedback.Editor
                 if (a.Runner is PlayerRuntime runtime)
                 {
                     row.Kind = RunnerKind.Player;
+                    if (a.DebugOwner is FeedbackPlayer player && !ReferenceEquals(runtime, player.Runtime))
+                        row.List = runtime.ItemsOwner;
                     PlaybackRecord r = runtime.Record(a.State);
                     row.Position = runtime.Position(a.State);
                     row.Total = r.Resolved.TotalSeconds;
@@ -183,7 +189,10 @@ namespace xpTURN.Feedback.Editor
                     }
                     row.Token = r.Token;
                     if (selected)
+                    {
                         ReadItems(runtime, r, a.State, a.DebugOwner as FeedbackPlayer);
+                        selectedRuntime = runtime;
+                    }
                 }
                 else if (a.Runner is MotionDriver driver)
                 {
@@ -202,8 +211,9 @@ namespace xpTURN.Feedback.Editor
             // a destroyed owner is let go (the engine's null)
             if (SelectedOwner == null)
                 SelectedOwner = null;
-            if (SelectedOwner is FeedbackPlayer owner && owner.Runtime != null)
-                ReadTokens(owner.Runtime);
+            // the tokens of the runtime the selected play is of — the player's list's after it ended
+            if (SelectedOwner is FeedbackPlayer owner && (selectedRuntime ?? owner.Runtime) != null)
+                ReadTokens(selectedRuntime ?? owner.Runtime);
             Group();
             m_TargetOf.Clear();
             m_TypeOf.Clear();
@@ -232,6 +242,7 @@ namespace xpTURN.Feedback.Editor
             ChannelService = context.ChannelsIfMade;
             ChannelService?.Describe(Channels);
             Pools = context.PoolsIfMade;
+            Trauma = context.TraumaIfMade;
             Pools?.Describe(PoolRows);
             ExtensionNames.Clear();
             int e = 0;
@@ -302,9 +313,10 @@ namespace xpTURN.Feedback.Editor
             }
         }
 
+        // the player's list for its runtime (a link let go before the Rebuild reads as changed), a Variant's own list for its
         void ReadItems(PlayerRuntime runtime, PlaybackRecord record, int state, FeedbackPlayer player)
         {
-            List<FeedbackItem> items = player != null ? player.Items : null;
+            List<FeedbackItem> items = player != null && !ReferenceEquals(runtime, player.Runtime) ? runtime.Items : player != null ? player.Items : null;
             int n = runtime.ItemCount;
             for (int i = 0; i < n; i++)
             {

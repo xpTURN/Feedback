@@ -1,20 +1,22 @@
 using System.Linq;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace xpTURN.Feedback.Editor
 {
-    // the preset asset's inspector — the two ways, the strip and the list without a host, Add · Paste, the results, the
-    // hierarchy drop's way, and in play the linked players' Rebuild
+    // the preset asset's inspector — the two ways, the alias, the strip and the list without a host, Add · Paste, the results,
+    // the hierarchy drop's way, and in play the linked players' Rebuild
     [CustomEditor(typeof(FeedbackPreset))]
     [CanEditMultipleObjects]
     internal sealed class FeedbackPresetEditor : UnityEditor.Editor
     {
         internal const string HelpText = "A Feedback Preset holds an item list — copy it into a player, or link players to it (they play this list). A Unity Preset of a FeedbackPlayer holds the whole component, settings too — a copy only, and its scene references are cleared when it is saved.";
         internal const string DropLinkText = "Link on hierarchy drop (all presets)";
-        internal const string PlayText = "Edits reach the linked players at their next Rebuild";
+        internal const string PlayText = "Edits reach the players using it at their next Rebuild";
         internal const string RebuildText = "Rebuild Them";
+        internal const string AliasTooltip = "The text a Variant key picks this list by — FeedbackPlayer.VariantKey, PlayArgs.WithVariant, a director's FeedbackTimelineOptions — on every player that links this preset or holds it in its Variants";
 
         internal HelpBox Banner;
 
@@ -27,6 +29,7 @@ namespace xpTURN.Feedback.Editor
             var drop = new Toggle(DropLinkText) { value = PresetDrop.Links };
             drop.RegisterValueChangedCallback(e => PresetDrop.Links = e.newValue);
             root.Add(drop);
+            root.Add(new PropertyField(serializedObject.FindProperty("m_Alias"), "Alias") { tooltip = AliasTooltip });
             if (targets.Length > 1)
             {
                 root.Add(new HelpBox(FeedbackPlayerEditor.OneAtATimeText, HelpBoxMessageType.Info));

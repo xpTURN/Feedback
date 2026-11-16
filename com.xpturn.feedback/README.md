@@ -24,10 +24,11 @@ public class Enemy : MonoBehaviour
 
 ## What you get
 
-- **Targets × motions** — <!-- gen:count:targets -->141<!-- /gen:count:targets --> targets take <!-- gen:count:motions -->11<!-- /gen:count:motions --> motions in <!-- gen:count:combinations -->361<!-- /gen:count:combinations --> combinations.
-- **The Add menu** — <!-- gen:count:leaves -->377<!-- /gen:count:leaves --> entries with search, favorites and recent items.
-- **Edit-mode preview** — press ▶ on a player to see it in the Scene and Game views; the values come back when it stops.
-- **Presets** — <!-- gen:count:presets -->21<!-- /gen:count:presets --> presets to drop on an object or link from a player.
+- **Targets × motions** — <!-- gen:count:targets -->157<!-- /gen:count:targets --> targets take <!-- gen:count:motions -->12<!-- /gen:count:motions --> motions in <!-- gen:count:combinations -->467<!-- /gen:count:combinations --> combinations.
+- **The Add menu** — <!-- gen:count:leaves -->483<!-- /gen:count:leaves --> entries with search, favorites and recent items.
+- **Edit-mode preview** — press ▶ on a player to see it in the Scene and Game views; the values come back when it stops;
+  graphs in the inspector draw the values each item and the list write.
+- **Presets** — <!-- gen:count:presets -->21<!-- /gen:count:presets --> presets to drop on an object, link from a player or play as its variants.
 - **A validator and a debugger** — `Window > xpTURN > Feedback Validator` with one-click fixes, and
   `Window > xpTURN > Feedback Debugger` for what is playing now.
 - **Samples** — <!-- gen:count:bundles -->5<!-- /gen:count:bundles --> bundles, from a first feedback to a short game.
@@ -54,6 +55,7 @@ compiles only when that package is installed at the version shown or later.
 | Physics module | 1.0.0 | Rigidbody forces, velocities and explosions · Collider switches |
 | Physics 2D module | 1.0.0 | Rigidbody 2D forces and velocities |
 | Video module | 1.0.0 | Video Player control |
+| Audio module | 1.0.0 | playing sounds · sound volumes, pitch, pan and filters · the listener's volume · mixer parameters and snapshots · pooled sounds at a point |
 
 The versions shown are where each assembly starts to compile. The package is tested with Universal RP 17.3.0, uGUI
 2.0.0, Cinemachine 3.1.7, Input System 1.20.1, UniTask 2.5.11 and Timeline 1.8.13 (Unity 6000.6: its built-in Timeline
@@ -67,7 +69,7 @@ reinstalled.
 ## Install
 
 - In the Package Manager, choose **+ > Add package from git URL…** and enter
-  `https://github.com/xpTURN/Feedback.git?path=/com.xpturn.feedback#v0.1.0`.
+  `https://github.com/xpTURN/Feedback.git?path=/com.xpturn.feedback#v0.2.0`.
 - Or choose **+ > Add package from disk…** and select `package.json` in the `com.xpturn.feedback` folder.
 - Or choose **+ > Add package from tarball…** and select the package's `.tgz`.
 - Or add it to `Packages/manifest.json` (a relative path starts from the `Packages` folder):
@@ -97,8 +99,9 @@ puts both back.
 - [Concepts](Documentation~/Concepts.md) — targets and motions, how values are written, time and playback, Unity
   Timeline
 - [Scripting API](Documentation~/ScriptingAPI.md) — the types you call from code, and the bases for feedbacks of your
-  own (a sound, a middleware event, a phone's vibration)
+  own (a middleware event, a phone's vibration)
 - [Feedback reference](Documentation~/Feedbacks.md) — every feedback and the motions it takes
+- [Motion reference](Documentation~/Motions.md) — each motion's shape and parameters, and the eases
 - [Performance](Documentation~/Performance.md) — no allocation per play, against a coroutine per play, the cost by
   target
 

@@ -296,8 +296,8 @@ namespace xpTURN.Feedback
                 m_Context.SkippedCustom++;
                 return;
             }
-            uint seed = Hash32.Tagged(context.ItemSeed, Hash32.Occurrence, Hash32.Fold(context.Occurrence));
-            m_Evaluator.Begin(ref m_States[record], new Vector4(m_Item.m_Base, 0f, 0f, 0f), new MotionBegin { Seed = seed, Intensity = context.Intensity });
+            uint seed = PlayMath.OccurrenceSeed(context.ItemSeed, context.Occurrence);
+            m_Evaluator.Begin(ref m_States[record], new Vector4(m_Item.m_Base, 0f, 0f, 0f), new MotionBegin { Seed = seed, Intensity = context.Intensity, Endless = context.Endless });
             m_Started[record] = true;
             m_Faulted[record] = false;
             m_Muted[record] = false;
@@ -332,8 +332,8 @@ namespace xpTURN.Feedback
             m_Muted[record] = false;
             if (Muted(record))
                 return;
-            uint seed = Hash32.Tagged(context.ItemSeed, Hash32.Occurrence, Hash32.Fold(context.Occurrence));
-            m_Evaluator.Begin(ref m_States[record], new Vector4(m_Item.m_Base, 0f, 0f, 0f), new MotionBegin { Seed = seed, Intensity = context.Intensity });
+            uint seed = PlayMath.OccurrenceSeed(context.ItemSeed, context.Occurrence);
+            m_Evaluator.Begin(ref m_States[record], new Vector4(m_Item.m_Base, 0f, 0f, 0f), new MotionBegin { Seed = seed, Intensity = context.Intensity, Endless = context.Endless });
             m_Evaluator.Evaluate(in m_States[record], new MotionTime(context.Reverse ? 0f : 1f, 0.0), out MotionSample sample);
             Apply(record, Value(in sample));
         }

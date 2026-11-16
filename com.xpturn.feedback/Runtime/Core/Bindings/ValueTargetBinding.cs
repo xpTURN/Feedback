@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace xpTURN.Feedback
@@ -114,6 +115,77 @@ namespace xpTURN.Feedback
             return false;
         }
 
+        // Prepare's and Describe's evaluator
+        static MotionEvaluator EvaluatorFor(FeedbackMotion motion, TargetTraits traits) => MotionEvaluators.Create(motion, Dimension(traits.ValueKind));
+
+        internal override void Describe(List<GraphChannel> into)
+        {
+            FeedbackMotion motion = m_Item.m_Motion;
+            TargetTraits traits = m_Item.Traits;
+            if (motion == null || !traits.Supports(motion.Kind))
+                return;
+            MotionEvaluator evaluator = EvaluatorFor(motion, traits);
+            if (evaluator != null)
+                into.Add(new GraphChannel("", evaluator, DescribedSpace, unit: GraphUnit));
+        }
+
+        internal override void GraphSlots(List<LayerSlot> into)
+        {
+            if (m_Slot != null)
+                into.Add(m_Slot);
+        }
+
+        // the offsets' space from the item alone — what Space is once prepared
+        protected virtual LayerSpace DescribedSpace => LayerSpace.Local;
+
+        // what the motion's value means to the property when it is not the property's own value
+        protected virtual string GraphUnit => "";
+
+        // observation
+        internal LayerSpace PreparedSpace => Space;
+        internal MotionEvaluator PreparedEvaluator => m_Evaluator;
+
+        internal override bool TryGetStartValue(int record, out Vector4 start)
+        {
+            if (m_States == null || record < 0 || record >= m_States.Length)
+            {
+                start = default;
+                return false;
+            }
+            start = m_States[record].Start;
+            return true;
+        }
+
+        internal override bool GraphRecord(int record, int channel, in MotionTime time, out Vector4 value)
+        {
+            value = default;
+            if (m_Slot == null || m_Running == null || record < 0 || record >= m_Running.Length || !m_Running[record])
+                return false;
+            float scale = m_Write == MotionWrite.Persist ? 1f : m_Gate.Scale(m_Category);
+            return GraphSample(m_Evaluator, in m_States[record], in time, m_Write, m_TowardTarget, false, scale, out value);
+        }
+
+        internal override bool SeedStart(int record, ItemBinding dry)
+        {
+            if (m_Write != MotionWrite.Persist || m_HasStart == null || record < 0 || record >= m_HasStart.Length || !m_HasStart[record]
+                || !(dry is ValueTargetBinding<T, TOps> other) || other.m_Slot == null)
+                return false;
+            return other.m_Slot.SeedValue(in m_Starts[record]);
+        }
+
+        internal override bool TakeStart(int record, ItemBinding from, int fromRecord)
+        {
+            if (m_Write != MotionWrite.Persist || !(from is ValueTargetBinding<T, TOps> live) || live.m_HasStart == null || fromRecord < 0
+                || fromRecord >= live.m_HasStart.Length || !live.m_HasStart[fromRecord] || m_HasStart == null || record < 0 || record >= m_HasStart.Length
+                || !m_HasStart[record])
+                return false;
+            m_Starts[record] = live.m_Starts[fromRecord];
+            m_From[record] = live.m_From[fromRecord];
+            MotionState s = m_States[record];
+            m_Evaluator.Begin(ref m_States[record], ToMotion(m_From[record]), new MotionBegin { Seed = s.Seed, Intensity = s.Intensity, Endless = s.Endless });
+            return true;
+        }
+
         static int Dimension(ValueKind kind)
         {
             switch (kind)
@@ -140,7 +212,7 @@ namespace xpTURN.Feedback
                 return Refuse(null);
 #endif
             }
-            m_Evaluator = MotionEvaluators.Create(motion, Dimension(traits.ValueKind));
+            m_Evaluator = EvaluatorFor(motion, traits);
             if (m_Evaluator == null)
                 return Refuse("an unknown motion");
             m_Write = m_Evaluator.Write;
@@ -204,8 +276,8 @@ namespace xpTURN.Feedback
                     StartPlay(record, context.Serial);
                 current = ToMotion(m_From[record]);
             }
-            uint seed = Hash32.Tagged(context.ItemSeed, Hash32.Occurrence, Hash32.Fold(context.Occurrence));
-            m_Evaluator.Begin(ref m_States[record], current, new MotionBegin { Seed = seed, Intensity = context.Intensity });
+            uint seed = PlayMath.OccurrenceSeed(context.ItemSeed, context.Occurrence);
+            m_Evaluator.Begin(ref m_States[record], current, new MotionBegin { Seed = seed, Intensity = context.Intensity, Endless = context.Endless });
             if (m_Write == MotionWrite.Persist || m_Slot == null)
                 return;
             if (m_Held[record])
@@ -294,8 +366,8 @@ namespace xpTURN.Feedback
                     m_Slot.WriteValue(Stored(m_Origin));
                 return;
             }
-            uint seed = Hash32.Tagged(context.ItemSeed, Hash32.Occurrence, Hash32.Fold(context.Occurrence));
-            m_Evaluator.Begin(ref m_States[record], ToMotion(m_From[record]), new MotionBegin { Seed = seed, Intensity = context.Intensity });
+            uint seed = PlayMath.OccurrenceSeed(context.ItemSeed, context.Occurrence);
+            m_Evaluator.Begin(ref m_States[record], ToMotion(m_From[record]), new MotionBegin { Seed = seed, Intensity = context.Intensity, Endless = context.Endless });
             var time = new MotionTime(0f, 0.0);
             if (!TryPersist(in m_States[record], in time, out T value))
             {

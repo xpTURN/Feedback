@@ -258,7 +258,7 @@ namespace xpTURN.Feedback.Tests.Editor
             foreach ((string name, FeedbackMotion motion) in new (string, FeedbackMotion)[]
                      {
                          ("Set", new SetMotion()), ("Tween", new TweenMotion()), ("Punch", new PunchMotion()), ("Curve", new CurveMotion()), ("Flash", new FlashMotion()),
-                         ("Gradient", new GradientMotion()), ("Spring", Spring()), ("null", null),
+                         ("Gradient", new GradientMotion()), ("Spring", Spring()), ("Bounce", new BounceMotion()), ("null", null),
                      })
             {
                 int w = s_Warnings.Count;
@@ -843,6 +843,25 @@ namespace xpTURN.Feedback.Tests.Editor
                     positive++;
             }
             Check(hits < 5 && positive == 5, "the tick of five drivers allocates 5/5 · positive 5/5 — " + hits + "/" + positive);
+            End();
+        }
+
+        // Loop is endless whatever the item's timing says, so a Fade In does nothing — a Square from phase 0 is at its amplitude
+        // from the first value, the item's infinite flag off (the driver's T is always 0: taken as finite it would stay 0)
+        [Test]
+        public void RE18_ALoopTakesNoFade()
+        {
+            FeedbackScheduler s = Sched();
+            var a = Go("driver");
+            var item = Item<PositionItem>(new OscillateMotion { m_Params = new OscillateParams { m_Amplitude = new Vector4(2f, 0f, 0f, 0f), m_Frequency = 1f, m_Waveform = Waveform.Square, m_FadeIn = 0.5f } });
+            Check(!item.m_Timing.m_Infinite, "the item's infinite flag off");
+            Driver(a, item, MotionDriverMode.Loop, s);
+            // the slot is written from the next frame — a zero step keeps the driver at 0 s
+            s.Tick(0f);
+            float first = a.transform.localPosition.x;
+            Tick(s, 3);
+            float later = a.transform.localPosition.x;
+            Check(first == 2f && later == 2f, "the first value " + R(first) + " · at 0.15 s " + R(later));
             End();
         }
     }

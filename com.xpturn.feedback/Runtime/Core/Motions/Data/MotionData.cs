@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace xpTURN.Feedback
 {
-    // the eleven motion data classes — the type names are the saved format. Defaults come from the parameters' Default (a new
+    // the twelve motion data classes — the type names are the saved format. Defaults come from the parameters' Default (a new
     // one per object)
     [Serializable]
     public sealed class SetMotion : FeedbackMotion
@@ -97,5 +97,13 @@ namespace xpTURN.Feedback
 
         internal override MotionKind Kind => MotionKind.Spring;
         internal override float NaturalDuration => m_Params.SettleTime();
+    }
+
+    [Serializable]
+    public sealed class BounceMotion : FeedbackMotion
+    {
+        [SerializeField] internal BounceParams m_Params = BounceParams.Default;
+
+        internal override MotionKind Kind => MotionKind.Bounce;
     }
 }

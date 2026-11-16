@@ -141,7 +141,7 @@ namespace xpTURN.Feedback.Tests.Editor
             Button item = inspector.Query<Button>().ToList().FirstOrDefault(b => b.text == "(none)");
             Assert.That(item, Is.Not.Null, "the item's button");
             List<CatalogLeaf> leaves = MotionDriverEditor.Leaves(FeedbackCatalog.All);
-            Assert.That(leaves.Count(l => !l.Custom), Is.EqualTo(361));
+            Assert.That(leaves.Count(l => !l.Custom), Is.EqualTo(467));
             Assert.That(leaves.All(l => typeof(TargetItem).IsAssignableFrom(l.Type)), Is.True);
             MotionDriverEditor.SetItem(new SerializedObject(driver), leaves.First(l => l.Type == typeof(PositionItem) && l.Motion == (int)MotionKind.Oscillate));
             Assert.That(driver.m_Item, Is.InstanceOf<PositionItem>());
@@ -159,6 +159,29 @@ namespace xpTURN.Feedback.Tests.Editor
             Assert.That(item.text, Is.EqualTo("(none)"));
             Assert.That(body.childCount, Is.EqualTo(0));
             Assert.That(m_Errors, Is.Empty);
+        }
+
+        // the driver's inspector built again on the same editor — a domain reload keeps the editor and its fields — has the
+        // item's body again
+        [Test]
+        public void IX15c_TheDriversBodyBuiltAgain()
+        {
+            var driver = new GameObject("Driver").AddComponent<MotionDriver>();
+            driver.m_Item = new PositionItem { m_Motion = new OscillateMotion() };
+            var editor = (MotionDriverEditor)UnityEditor.Editor.CreateEditor(driver);
+            try
+            {
+                editor.CreateInspectorGUI();
+                int fields = editor.Body.childCount;
+                Assert.That(fields, Is.GreaterThan(0));
+                editor.CreateInspectorGUI();
+                Assert.That(editor.Body.childCount, Is.EqualTo(fields), "the second build's body");
+            }
+            finally
+            {
+                Object.DestroyImmediate(editor);
+                Object.DestroyImmediate(driver.gameObject);
+            }
         }
 
         // the receivers — the channel field and the other fields; no registration line in edit mode
@@ -196,6 +219,8 @@ namespace xpTURN.Feedback.Tests.Editor
             so.FindProperty("m_ShakeReceiversPerPlay").intValue = -1;
             so.FindProperty("m_ReceiverContributions").intValue = 0;
             so.FindProperty("m_MaximumUnscaledDelta").floatValue = float.NaN;
+            so.FindProperty("m_MaximumShakeOffset").floatValue = -0.5f;
+            so.FindProperty("m_MaximumShakeAngle").floatValue = float.PositiveInfinity;
             SerializedProperty categories = so.FindProperty("m_Categories");
             categories.arraySize = 2;
             categories.GetArrayElementAtIndex(0).FindPropertyRelative("m_Scale").floatValue = -1f;
@@ -204,6 +229,7 @@ namespace xpTURN.Feedback.Tests.Editor
             Assert.That(FeedbackSettingsEditor.Clamp(so), Is.True);
             Assert.That((settings.m_FlashLimit, settings.m_TimeScaleCapacity, settings.m_ShakeReceiversPerPlay, settings.m_ReceiverContributions), Is.EqualTo((0, 1, 1, 1)));
             Assert.That(settings.m_MaximumUnscaledDelta, Is.EqualTo(0f));
+            Assert.That((settings.m_MaximumShakeOffset, settings.m_MaximumShakeAngle), Is.EqualTo((0f, 0f)), "the shake caps — negative · +∞ to 0");
             Assert.That(settings.m_Categories.Select(c => c.m_Scale), Is.EqualTo(new[] { 0f, 1f }));
             Assert.That(FeedbackSettingsEditor.Clamp(so), Is.False, "in range — nothing cut");
             InspectorElement inspector = InspectorTesting.Inspector(m_Window, settings);

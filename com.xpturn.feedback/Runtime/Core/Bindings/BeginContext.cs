@@ -4,7 +4,7 @@ namespace xpTURN.Feedback
     internal readonly struct BeginContext
     {
         internal readonly float Intensity;      // the play's intensity × this item's random output (IntensityResponse.Ignore: the output alone)
-        internal readonly uint ItemSeed;        // Hash32(the play's seed, the list index)
+        internal readonly uint ItemSeed;        // Hash32(the play's seed, the item's managed reference id — else its list index)
         internal readonly long Occurrence;      // the event's — fixed by ν
         internal readonly long Serial;          // the play's number in its player: a binding resets its per-play cells when it changes
         internal readonly bool Reverse;         // the event's direction — a backward Started begins on the T = 1 side, a backward instant undoes
@@ -14,15 +14,17 @@ namespace xpTURN.Feedback
         internal readonly bool HasPosition;
         internal readonly UnityEngine.Vector3 Position;
         internal readonly bool Swept;           // a Seek's or a Skip's sweep reached the event, not a frame
+        internal readonly bool Endless;         // the item has no end (its resolved duration, or a Motion Driver's Loop)
 
         internal BeginContext(float intensity, uint itemSeed, long occurrence, long serial, bool reverse)
             : this(intensity, itemSeed, occurrence, serial, reverse, 0.0, false, default)
         {
         }
 
-        internal BeginContext(float intensity, uint itemSeed, long occurrence, long serial, bool reverse, double seconds, bool hasPosition, UnityEngine.Vector3 position, bool swept = false)
+        internal BeginContext(float intensity, uint itemSeed, long occurrence, long serial, bool reverse, double seconds, bool hasPosition, UnityEngine.Vector3 position, bool swept = false, bool endless = false)
         {
             Swept = swept;
+            Endless = endless;
             Intensity = intensity;
             ItemSeed = itemSeed;
             Occurrence = occurrence;

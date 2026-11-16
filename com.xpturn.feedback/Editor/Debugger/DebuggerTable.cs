@@ -127,7 +127,7 @@ namespace xpTURN.Feedback.Editor
         {
             switch (r.Kind)
             {
-                case RunnerKind.Player: return NameOf(r.Owner);
+                case RunnerKind.Player: return ReferenceEquals(r.List, null) ? NameOf(r.Owner) : NameOf(r.Owner) + " · " + NameOf(r.List);
                 case RunnerKind.Driver: return NameOf(r.Owner) + " (driver)";
                 default: return r.Owner != null ? r.Owner.GetType().Name : "runner";
             }

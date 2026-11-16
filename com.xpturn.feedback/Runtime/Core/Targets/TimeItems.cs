@@ -3,6 +3,13 @@ using UnityEngine;
 
 namespace xpTURN.Feedback
 {
+    // saved — the values are the saved format, add members at the end only
+    public enum HitStopOverlap
+    {
+        Skip = 0,
+        Extend = 1,
+    }
+
     // requests a time scale for its own length on the unscaled clock
     [FeedbackTarget("Time/Hit Stop", PreviewGrade.DisplayOnly, Aliases = "hitstop freeze")]
     [Serializable]
@@ -11,6 +18,7 @@ namespace xpTURN.Feedback
         [SerializeField] internal float m_FreezeDuration = 0.1f;       // seconds, unscaled — the item's length (0 = instant, no request)
         [SerializeField] internal float m_MinimumTimeScale = 0.1f;     // skipped while Time.timeScale is below this
         [SerializeField] internal float m_TimeScale;                   // the scale while frozen, 0 = stopped
+        [SerializeField] internal HitStopOverlap m_Overlap;            // Skip: the minimum counts other hit stops · Extend: it does not
 
         internal override FeedbackCategory DeclaredCategory => FeedbackCategory.Time;
         internal override float NaturalDuration => m_FreezeDuration;

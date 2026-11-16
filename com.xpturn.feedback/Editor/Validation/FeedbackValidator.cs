@@ -74,7 +74,40 @@ namespace xpTURN.Feedback.Editor
                 if (r.Scope == RuleScope.Host && r.Applies(host))
                     r.Check(r.ListOnly ? empty : c, results);
             }
+            if (player != null)
+                RunVariants(player, c, results);
             return results;
+        }
+
+        // each Variant's list on the player's anchors — a link's way: its list rules are the preset's own; a rule of the first
+        // frame or of the player's slots does not run. A player's line (no item) said already is not said again
+        static void RunVariants(FeedbackPlayer player, RuleContext c, List<RuleResult> results)
+        {
+            List<FeedbackPreset> variants = VariantShow.Usables(player);
+            if (variants.Count == 0)
+                return;
+            var said = new HashSet<(string, string)>();
+            foreach (RuleResult r in results)
+            {
+                if (r.Item < 0)
+                    said.Add((r.Id, r.Message));
+            }
+            var found = new List<RuleResult>();
+            foreach (FeedbackPreset preset in variants)
+            {
+                var v = new RuleContext { Host = c.Host, Player = player, Owner = preset, Variant = preset, Items = preset.m_Items, ListPath = c.ListPath, Prepare = c.Prepare, InPrefabAsset = c.InPrefabAsset };
+                found.Clear();
+                foreach (FeedbackRule r in Rules)
+                {
+                    if (r.Scope == RuleScope.Host && !r.ListOnly && r.OnVariants && r.Applies(c.Host))
+                        r.Check(v, found);
+                }
+                foreach (RuleResult r in found)
+                {
+                    if (r.Item >= 0 || said.Add((r.Id, r.Message)))
+                        results.Add(r);
+                }
+            }
         }
 
         internal static List<RuleResult> RunProject()

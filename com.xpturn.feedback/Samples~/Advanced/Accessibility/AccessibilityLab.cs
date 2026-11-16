@@ -8,16 +8,18 @@ using xpTURN.Feedback.Samples;
 namespace xpTURN.Feedback.Samples.Advanced
 {
     // S12 Accessibility: a settings menu over a small fight — screen shake (the Camera category's scale), motion (Motion's scale),
-    // flashes (the per-second limit, or the Flash category off), hit stop (Time on · off), rumble (Haptics on · off). The kit is the
+    // flashes (the per-second limit, or the Flash category off), hit stop (Time on · off), rumble (Haptics on · off), sound (Audio's
+    // scale, or off — a sound takes the scale when it starts; a tier's sound player plays with its preset). The kit is the
     // one writer: SampleState composes these with the HUD's Before and intensity, and puts the scene's values back when the sample
     // closes (session only). The settings are written from Start — the scene marker's Awake restores the kit first. The panel under
     // the menu reads the effective values back from FeedbackCategories (the HUD's line shows the project's values only)
     public sealed class AccessibilityLab : MonoBehaviour
     {
-        public const int Shake = 0, Motion = 1, Flashes = 2, HitStop = 3, Rumble = 4, Rows = 5;
+        public const int Shake = 0, Motion = 1, Flashes = 2, HitStop = 3, Rumble = 4, Sound = 5, Rows = 6;
         public const int Light = 0, Heavy = 1, Critical = 2;
         static readonly float[] s_Shake = { 0f, 0.25f, 0.5f, 0.75f, 1f };
         static readonly float[] s_Motion = { 0f, 0.5f, 1f };
+        static readonly float[] s_Sound = { 0f, 0.25f, 0.5f, 1f };
         static readonly string[][] s_Labels =
         {
             new[] { "0 %", "25 %", "50 %", "75 %", "100 %" },
@@ -25,6 +27,7 @@ namespace xpTURN.Feedback.Samples.Advanced
             new[] { "Normal", "Reduced (1 / s)", "Off" },
             new[] { "On", "Off" },
             new[] { "On", "Off" },
+            new[] { "Off", "25 %", "50 %", "100 %" },
         };
         static readonly string[] s_Scale = Scales();
         static readonly string[] s_Limit = { "0 / s", "1 / s", "2 / s", "3 / s", "4 / s", "5 / s", "6 / s", "7 / s", "8 / s", "9 / s", "10+ / s" };
@@ -32,6 +35,9 @@ namespace xpTURN.Feedback.Samples.Advanced
         [SerializeField] FeedbackPlayer m_Light;
         [SerializeField] FeedbackPlayer m_Heavy;
         [SerializeField] FeedbackPlayer m_Critical;
+        [SerializeField] FeedbackPlayer m_LightSound;
+        [SerializeField] FeedbackPlayer m_HeavySound;
+        [SerializeField] FeedbackPlayer m_CriticalSound;
         [SerializeField] FeedbackPlayer m_Rumble;
         [SerializeField] Transform m_Dummy;
         [SerializeField] Transform m_Witness;
@@ -43,8 +49,9 @@ namespace xpTURN.Feedback.Samples.Advanced
         [SerializeField] Text m_FlashLimit;
         [SerializeField] Text m_TimeOn;
         [SerializeField] Text m_HapticsOn;
+        [SerializeField] Text m_SoundScale;
 
-        readonly int[] m_Choice = { 4, 2, 0, 0, 0 };
+        readonly int[] m_Choice = { 4, 2, 0, 0, 0, 3 };
         [NonSerialized] InputAction[] m_Attacks;
         [NonSerialized] InputAction m_Up, m_Down, m_Less, m_More;
         int m_Row;
@@ -107,6 +114,9 @@ namespace xpTURN.Feedback.Samples.Advanced
             Vector3 at = m_Dummy != null ? m_Dummy.position : Vector3.zero;
             if (hit != null)
                 hit.Play(new PlayArgs().WithPosition(at));
+            FeedbackPlayer sound = tier == Light ? m_LightSound : tier == Heavy ? m_HeavySound : m_CriticalSound;
+            if (sound != null)
+                sound.Play(new PlayArgs().WithPosition(at));
             if (tier != Light && m_Rumble != null)
                 m_Rumble.Play(new PlayArgs().WithIntensity(tier == Critical ? 1f : 0.6f));
         }
@@ -143,6 +153,8 @@ namespace xpTURN.Feedback.Samples.Advanced
             SampleState.SetFlashLimit(flashes == 1 ? Mathf.Min(1, m_BaseLimit) : m_BaseLimit);
             SampleState.SetCategory(FeedbackCategory.Time, m_Choice[HitStop] == 0, 1f);
             SampleState.SetCategory(FeedbackCategory.Haptics, m_Choice[Rumble] == 0, 1f);
+            float sound = s_Sound[m_Choice[Sound]];
+            SampleState.SetCategory(FeedbackCategory.Audio, sound > 0f, sound);
             ShowEffective();
         }
 
@@ -164,6 +176,7 @@ namespace xpTURN.Feedback.Samples.Advanced
             Set(m_FlashLimit, FeedbackCategories.IsEnabled(FeedbackCategory.Flash) ? s_Limit[Mathf.Clamp(FeedbackCategories.FlashLimit, 0, s_Limit.Length - 1)] : "Off");
             Set(m_TimeOn, FeedbackCategories.IsEnabled(FeedbackCategory.Time) ? "On" : "Off");
             Set(m_HapticsOn, FeedbackCategories.IsEnabled(FeedbackCategory.Haptics) ? "On" : "Off");
+            Set(m_SoundScale, Scale(FeedbackCategory.Audio));
         }
 
         static string Scale(FeedbackCategory c) => FeedbackCategories.IsEnabled(c) ? s_Scale[Mathf.Clamp(Mathf.RoundToInt(FeedbackCategories.GetScale(c) * 100f), 0, s_Scale.Length - 1)] : "Off";

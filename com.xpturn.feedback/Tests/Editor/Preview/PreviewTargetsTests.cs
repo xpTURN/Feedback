@@ -305,8 +305,9 @@ namespace xpTURN.Feedback.Tests.Editor
                 + (OptionalAssemblyTests.Implemented(typeof(Light2DIntensityItem)) ? 4 : 0) + (OptionalAssemblyTests.Implemented(typeof(GraphicColorItem)) ? 15 : 0)
                 + (OptionalAssemblyTests.Implemented(typeof(VideoPlayerControlItem)) ? 1 : 0) + (OptionalAssemblyTests.Implemented(typeof(TMPFontSizeItem)) ? 14 : 0)
                 + (OptionalAssemblyTests.Implemented(typeof(ScreenFlashItem)) ? 2 : 0) + (OptionalAssemblyTests.Implemented(typeof(PostFXBloomItem)) ? 2 : 0)
-                + (OptionalAssemblyTests.Implemented(typeof(CinemachineLensFieldOfViewItem)) ? 7 : 0) + (OptionalAssemblyTests.Implemented(typeof(GamepadRumbleItem)) ? 1 : 0)),
-                "the particles' three, the animators' six, the 2D lights' four, uGUI's fifteen, the video's one, TMP's fourteen where their modules · packages are on");
+                + (OptionalAssemblyTests.Implemented(typeof(CinemachineLensFieldOfViewItem)) ? 7 : 0) + (OptionalAssemblyTests.Implemented(typeof(GamepadRumbleItem)) ? 1 : 0)
+                + (OptionalAssemblyTests.Implemented(typeof(AudioVolumeItem)) ? 10 : 0)),
+                "the particles' three, the animators' six, the 2D lights' four, uGUI's fifteen, the video's one, TMP's fourteen, the audio's ten where their modules · packages are on");
         }
 
         [Test]
@@ -351,6 +352,8 @@ namespace xpTURN.Feedback.Tests.Editor
             TrailRenderer trail = new GameObject("Trail").AddComponent<TrailRenderer>();
             BoxCollider collider = new GameObject("Collider").AddComponent<BoxCollider>();
             ParticleSystem particles = new GameObject("Particles").AddComponent<ParticleSystem>();
+            // a filter needs its source first
+            var sound = new GameObject("Sound", typeof(AudioSource));
             var failed = new List<string>();
             foreach (Type slot in Table.RowTypes)
             {
@@ -405,6 +408,11 @@ namespace xpTURN.Feedback.Tests.Editor
                     owners.Add(new GameObject("CanvasGroup").AddComponent<CanvasGroup>());
                 else if (rows.Owner == typeof(RectTransform))
                     owners.Add(new GameObject("Rect", typeof(RectTransform)).transform);
+                // an Audio Source · its filters
+                else if (rows.Owner == typeof(AudioSource))
+                    owners.Add(sound.GetComponent<AudioSource>());
+                else if (rows.Owner == typeof(AudioHighPassFilter) || rows.Owner == typeof(AudioEchoFilter) || rows.Owner == typeof(AudioDistortionFilter) || rows.Owner == typeof(AudioReverbFilter))
+                    owners.Add(sound.AddComponent(rows.Owner));
                 Assert.That(owners, Is.Not.Empty, slot.Name + " has a fixture");
                 foreach (Object owner in owners)
                 {

@@ -278,6 +278,20 @@ namespace xpTURN.Feedback.Tests.Editor
                 Is.EqualTo((2, true, 1, true, true)), $"{seed} · {copy} · {pasted}");
         }
 
+        // ---- the audio items that play on the editor's clock (Source Control · Play Clip — simulated) tell a clip they play as
+        // Triggered in the Timeline window's preview; a value item does not
+        [Test]
+        public void TC14_AnAudioPlayItemIsSimulated()
+        {
+            FeedbackPlayer control = Player("Control", new AudioSourceControlItem { m_Motion = new SetMotion() });
+            FeedbackPlayer clip = Player("Clip", new AudioPlayClipItem { m_Motion = new SetMotion() });
+            FeedbackPlayer volume = Player("Volume", new AudioVolumeItem { m_Motion = new SetMotion() });
+            Assert.That((TimelinePlayerInfo.Of(control).Simulated, TimelinePlayerInfo.Of(clip).Simulated, TimelinePlayerInfo.Of(volume).Simulated), Is.EqualTo((true, true, false)));
+            Object.DestroyImmediate(control.gameObject);
+            Object.DestroyImmediate(clip.gameObject);
+            Object.DestroyImmediate(volume.gameObject);
+        }
+
         // ---- EV-13 — the asset's clip in the window's timeline
 
         [Test]
@@ -511,5 +525,185 @@ namespace xpTURN.Feedback.Tests.Editor
         }
 
         static string Shown(PreviewBar bar) => bar.Notice.style.display == DisplayStyle.Flex ? bar.Notice.text : "";
+
+        // ---- a clip's Preset — the length, the texts and the Inspector's fix
+
+        static FeedbackPreset VariantAsset(float seconds)
+        {
+            var preset = ScriptableObject.CreateInstance<FeedbackPreset>();
+            preset.m_Items.Add(Line(seconds));
+            AssetDatabase.CreateAsset(preset, PresetPath);
+            return preset;
+        }
+
+        // Box's settings (× 2 · 0.5 s delay) on the variant's list: 0.75 s → 2 s, edited to 1.25 s → 3 s
+        [Test]
+        public void VS17_AClipsPresetGivesItsLength()
+        {
+            PlayableDirector d = Scene(out _, out FeedbackTrack box, out _, out _, out FeedbackPlayer player);
+            FeedbackPreset variant = VariantAsset(0.75f);
+            player.m_Variants.Add(variant);
+            Open(d);
+            TimelineClip a = Create(box);
+            TimelineClip v = Create(box, 5.0);
+            var fv = (FeedbackClip)v.asset;
+            fv.m_Preset = variant;
+            var rects = new List<TimelinePlayerInfo.StripRect>();
+            TestDelegate ask = () =>
+            {
+                s_Length = TimelinePlayerInfo.Length(fv);
+                TimelinePlayerInfo.Texts(v, out _, out _);
+                TimelinePlayerInfo.Strip(v, new Rect(0f, 0f, 200f, 20f), 0.0, 3.0, rects);
+            };
+            ask();
+            string list = F(((FeedbackClip)a.asset).duration);
+            string first = F(fv.duration);
+            bool allocates = Allocates(ask);
+            Edit(variant, Duration, p => p.floatValue = 1.25f);
+            string edited = F(fv.duration);
+            Assert.That((list, first, edited, allocates), Is.EqualTo(("3.000", "2.000", "3.000", false)));
+        }
+
+        [Test]
+        public void VS18_AClipSaysItsPresetIsNotListed()
+        {
+            PlayableDirector d = Scene(out _, out FeedbackTrack box, out _, out _, out FeedbackPlayer player);
+            FeedbackPreset variant = VariantAsset(0.75f);
+            var stranger = ScriptableObject.CreateInstance<FeedbackPreset>();
+            stranger.name = "Stranger";
+            stranger.m_Items.Add(Line(1f));
+            player.m_Variants.Add(variant);
+            TimelineClip list = Clip(box, 0.0, 3.0, FeedbackClipTiming.Auto);
+            TimelineClip heavy = Clip(box, 2.0, 3.0, FeedbackClipTiming.Auto);
+            TimelineClip strange = Clip(box, 8.0, 1.0, FeedbackClipTiming.Auto);
+            ((FeedbackClip)heavy.asset).m_Preset = variant;
+            ((FeedbackClip)strange.asset).m_Preset = stranger;
+            Open(d);
+            var editor = new FeedbackClipEditor();
+            string[] errors = { editor.GetClipOptions(list).errorText, editor.GetClipOptions(heavy).errorText, editor.GetClipOptions(strange).errorText };
+            string tooltip = editor.GetClipOptions(heavy).tooltip;
+            player.m_Variants.Add(stranger);
+            string listed = editor.GetClipOptions(strange).errorText;
+            Object.DestroyImmediate(stranger);
+            Assert.That(errors, Is.EqualTo(new[] { TimelinePlayerInfo.RestartText, TimelinePlayerInfo.RestartText, TimelinePlayerInfo.NotVariantText }), "the overlap is the player's across its lists");
+            Assert.That(tooltip.Contains("Preset " + variant.name) && tooltip.Contains("List 2 s"), Is.True, tooltip);
+            Assert.That(listed, Is.EqualTo(""), "listed, the clip plays");
+        }
+
+        [Test]
+        public void VS19_TheClipsInspectorAddsThePresetToTheVariants()
+        {
+            PlayableDirector d = Scene(out _, out FeedbackTrack box, out _, out _, out FeedbackPlayer player);
+            FeedbackPreset stranger = VariantAsset(1f);
+            Open(d);
+            TimelineClip c = Create(box);
+            TimelineClip plain = Create(box, 5.0);
+            var fc = (FeedbackClip)c.asset;
+            fc.m_Preset = stranger;
+            var inspector = (FeedbackClipInspector)UnityEditor.Editor.CreateEditor(fc);
+            var other = (FeedbackClipInspector)UnityEditor.Editor.CreateEditor(plain.asset);
+            try
+            {
+                inspector.CreateInspectorGUI();
+                other.CreateInspectorGUI();
+                bool shown = inspector.Notice.style.display == DisplayStyle.Flex;
+                bool plainHidden = other.Notice.style.display == DisplayStyle.None;
+                Undo.IncrementCurrentGroup();
+                inspector.Add();
+                Undo.IncrementCurrentGroup();
+                bool added = player.m_Variants.Count == 1 && player.m_Variants[0] == stranger;
+                bool hidden = inspector.Notice.style.display == DisplayStyle.None;
+                Undo.PerformUndo();
+                bool undone = player.m_Variants.Count == 0;
+                Assert.That((shown, plainHidden, added, hidden, undone), Is.EqualTo((true, true, true, true, true)));
+            }
+            finally
+            {
+                Object.DestroyImmediate(inspector);
+                Object.DestroyImmediate(other);
+            }
+        }
+
+        // T23 — a clip's Hit Key: the inspector's field (the default fields) and a line of the clip's tooltip
+        [Test]
+        public void PV17_TheClipsHitKey()
+        {
+            PlayableDirector d = Scene(out _, out FeedbackTrack box, out _, out _, out _);
+            TimelineClip c = Clip(box, 0.0, 1.0, FeedbackClipTiming.Driven);
+            var fc = (FeedbackClip)c.asset;
+            Open(d);
+            var editor = new FeedbackClipEditor();
+            string none = editor.GetClipOptions(c).tooltip;
+            fc.m_HitKey = "finisher";
+            string keyed = editor.GetClipOptions(c).tooltip;
+            var inspector = (FeedbackClipInspector)UnityEditor.Editor.CreateEditor(fc);
+            try
+            {
+                VisualElement root = inspector.CreateInspectorGUI();
+                bool field = root.Query<UnityEditor.UIElements.PropertyField>().ToList().Any(f => f.bindingPath == "m_HitKey");
+                var so = new SerializedObject(fc);
+                Undo.IncrementCurrentGroup();
+                so.FindProperty("m_HitKey").stringValue = "hit2";
+                so.ApplyModifiedProperties();
+                Undo.IncrementCurrentGroup();
+                string edited = fc.m_HitKey;
+                Undo.PerformUndo();
+                Assert.That((none.Contains("Hit Key"), keyed.Contains("Hit Key finisher"), field, edited, fc.m_HitKey), Is.EqualTo((false, true, true, "hit2", "finisher")), keyed);
+            }
+            finally
+            {
+                Object.DestroyImmediate(inspector);
+            }
+        }
+
+        // T22 · T27 — the options: a director's, one per object, its menu · SetHit replaces a row or adds one · values out of range
+        // are ignored with one warning · the first row of a key is read · the inspector's + adds a row of intensity 1
+        [Test]
+        public void PV18_TheOptionsTable()
+        {
+            var go = new GameObject("PV18");
+            FeedbackTimelineOptionsEditor inspector = null;
+            try
+            {
+                FeedbackTimelineOptions options = go.AddComponent<FeedbackTimelineOptions>();
+                Type type = typeof(FeedbackTimelineOptions);
+                bool placed = go.GetComponent<PlayableDirector>() != null && type.GetCustomAttribute<DisallowMultipleComponent>() != null
+                    && type.GetCustomAttribute<AddComponentMenu>()?.componentMenu == "xpTURN/Feedback/Feedback Timeline Options";
+                options.SetHit("hit2", 0.6f);
+                options.SetHit("finisher", 1.5f, "heavy");
+                options.SetHit("hit2", 0.7f);
+                bool replaced = options.m_Hits.Count == 2 && options.TryGetHit("hit2", out float i2, out string k2) && Math.Abs(i2 - 0.7f) < 1e-6f && k2 == "";
+                bool read = options.TryGetHit("finisher", out float fi, out string fk) && Math.Abs(fi - 1.5f) < 1e-6f && fk == "heavy";
+                bool exact = !options.TryGetHit("Finisher", out _, out _) && !options.TryGetHit("", out _, out _) && !options.TryGetHit(null, out _, out _);
+                LogAssert.Expect(LogType.Warning, FeedbackTimelineOptions.ValueWarning);
+                options.SetHit("", 1f);
+                options.SetHit("x", -1f);
+                options.Intensity = float.NaN;
+                options.Intensity = float.PositiveInfinity;
+                bool ignored = options.m_Hits.Count == 2 && Math.Abs(options.Intensity - 1f) < 1e-6f;
+                options.VariantKey = null;
+                bool emptyKey = options.VariantKey == "";
+                bool removed = options.RemoveHit("hit2") && !options.RemoveHit("hit2") && options.m_Hits.Count == 1;
+                options.ClearHits();
+                bool cleared = options.m_Hits.Count == 0;
+                options.m_Hits.Add(new FeedbackTimelineHit { m_HitKey = "a", m_Intensity = 0.2f, m_VariantKey = "" });
+                options.m_Hits.Add(new FeedbackTimelineHit { m_HitKey = "a", m_Intensity = 0.9f, m_VariantKey = "" });
+                bool first = options.TryGetHit("a", out float a1, out _) && Math.Abs(a1 - 0.2f) < 1e-6f;
+                options.SetHit("a", 0.5f);
+                bool firstSet = Math.Abs(options.m_Hits[0].m_Intensity - 0.5f) < 1e-6f && Math.Abs(options.m_Hits[1].m_Intensity - 0.9f) < 1e-6f;
+                options.ClearHits();
+                inspector = (FeedbackTimelineOptionsEditor)UnityEditor.Editor.CreateEditor(options);
+                inspector.CreateInspectorGUI();
+                inspector.Hits.onAdd(inspector.Hits);
+                bool added = options.m_Hits.Count == 1 && Math.Abs(options.m_Hits[0].m_Intensity - 1f) < 1e-6f && options.m_Hits[0].m_HitKey == "";
+                Assert.That((placed, replaced, read, exact, ignored, emptyKey, removed, cleared, first, firstSet, added), Is.EqualTo((true, true, true, true, true, true, true, true, true, true, true)));
+            }
+            finally
+            {
+                if (inspector != null)
+                    Object.DestroyImmediate(inspector);
+                Object.DestroyImmediate(go);
+            }
+        }
     }
 }

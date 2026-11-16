@@ -15,8 +15,8 @@ namespace xpTURN.Feedback.Tests.Editor.Docs
     // reference: (the [FeedbackTarget] types — static metadata only) · api: (a public type's members, described by its ///
     // comments) · rules: (the validator's rules) · motions: (the motions — their evaluators and the targets taking them) ·
     // samples: (the sample catalogs, the cards' READMEs and the samples' assemblies) · presets: (the package's presets and
-    // their items). A kind not in the table throws; every kind in the table is used by some document. A table's
-    // hand-written last cell is kept by the row's first cell
+    // their items) · params: (a motion's saved parameters) · eases: (the ease types). A kind not in the table throws; every
+    // kind in the table is used by some document. A table's hand-written last cell is kept by the row's first cell
     internal static class DocSources
     {
         internal static readonly Dictionary<string, Func<string, string, string>> Kinds = new Dictionary<string, Func<string, string, string>>
@@ -30,6 +30,8 @@ namespace xpTURN.Feedback.Tests.Editor.Docs
             { "motions", (arg, body) => Motions(body) },
             { "samples", (arg, body) => Samples(body) },
             { "presets", (arg, body) => Presets(body) },
+            { "params", (arg, body) => Params(arg, body) },
+            { "eases", (arg, body) => Eases(body) },
         };
 
         internal static string Produce(string key, string body)
@@ -114,7 +116,8 @@ namespace xpTURN.Feedback.Tests.Editor.Docs
                 .OrderBy(n => n, StringComparer.Ordinal)
                 .Select(Assembly.Load);
 
-        // ---- tables whose last cell is written by hand: the cell is kept by the row's first cell
+        // ---- tables whose last cell is written by hand: the cell is kept by the row's first cell — by a link's text when the
+        // first cell is a link
         internal static Dictionary<string, string> Descriptions(string body)
         {
             var kept = new Dictionary<string, string>();
@@ -123,11 +126,14 @@ namespace xpTURN.Feedback.Tests.Editor.Docs
                 if (!line.StartsWith("| ", StringComparison.Ordinal) || line.StartsWith("|---", StringComparison.Ordinal))
                     continue;
                 string[] cells = Cells(line);
-                if (cells.Length >= 2 && !kept.ContainsKey(cells[0]))
-                    kept[cells[0]] = cells[cells.Length - 1];
+                string key = cells.Length > 0 ? LinkText.Replace(cells[0], "${text}") : "";
+                if (cells.Length >= 2 && !kept.ContainsKey(key))
+                    kept[key] = cells[cells.Length - 1];
             }
             return kept;
         }
+
+        static readonly Regex LinkText = new Regex(@"^\[(?<text>[^\]]*)\]\([^)\s]*\)$");
 
         internal static string[] Cells(string line)
             => Regex.Split(line.Trim().Trim('|'), @"(?<!\\)\|").Select(c => c.Trim()).ToArray();
@@ -158,6 +164,7 @@ namespace xpTURN.Feedback.Tests.Editor.Docs
             { "xpTURN.Feedback.Physics", "Physics module" },
             { "xpTURN.Feedback.Physics2D", "Physics 2D module" },
             { "xpTURN.Feedback.Video", "Video module" },
+            { "xpTURN.Feedback.Audio", "Audio module" },
             { "xpTURN.Feedback.Timeline", "Timeline" },
         };
 
@@ -205,13 +212,19 @@ namespace xpTURN.Feedback.Tests.Editor.Docs
             return Table(new[] { "Rules", "Severity", "Checks", "Description" }, rows);
         }
 
-        // ---- the motions: motions:<anything> — one row per motion: timed or instant, its writes, the targets taking it
+        // ---- the motions: motions:<anything> — one row per motion: timed or instant, its writes, the targets taking it. The
+        // name links to the motion's section in the motion reference
+        internal const string MotionReference = "Motions.md";
+
+        internal static Dictionary<MotionKind, FeedbackMotion> MotionData()
+            => typeof(FeedbackMotion).Assembly.GetTypes()
+                .Where(t => !t.IsAbstract && typeof(FeedbackMotion).IsAssignableFrom(t))
+                .Select(t => (FeedbackMotion)Activator.CreateInstance(t)).ToDictionary(m => m.Kind);
+
         static string Motions(string body)
         {
             Dictionary<string, string> kept = Descriptions(body);
-            Dictionary<MotionKind, FeedbackMotion> data = typeof(FeedbackMotion).Assembly.GetTypes()
-                .Where(t => !t.IsAbstract && typeof(FeedbackMotion).IsAssignableFrom(t))
-                .Select(t => (FeedbackMotion)Activator.CreateInstance(t)).ToDictionary(m => m.Kind);
+            Dictionary<MotionKind, FeedbackMotion> data = MotionData();
             List<TargetTraits> targets = FeedbackTypes().Where(t => typeof(TargetItem).IsAssignableFrom(t)).Select(t => ((TargetItem)Activator.CreateInstance(t)).Traits).ToList();
             var rows = new List<string[]>();
             foreach (MotionKind kind in Enum.GetValues(typeof(MotionKind)))
@@ -219,9 +232,131 @@ namespace xpTURN.Feedback.Tests.Editor.Docs
                 MotionEvaluator e = data.TryGetValue(kind, out FeedbackMotion m) ? MotionEvaluators.Create(m, 1) : throw new InvalidOperationException("no motion data for " + kind);
                 string key = "`" + kind + "`";
                 kept.TryGetValue(key, out string description);
-                rows.Add(new[] { key, e.IsInstant ? "Instant" : "Timed", Writes(m, e.Write), targets.Count(t => t.Supports(kind)).ToString(), description ?? "" });
+                rows.Add(new[] { "[" + key + "](" + MotionReference + "#" + kind.ToString().ToLowerInvariant() + ")", e.IsInstant ? "Instant" : "Timed", Writes(m, e.Write), targets.Count(t => t.Supports(kind)).ToString(), description ?? "" });
             }
             return Table(new[] { "Motion", "Kind", "Writes", "Targets", "Description" }, rows);
+        }
+
+        // ---- a motion's parameters: params:<motion> — one row per saved field of its parameters, in the inspector's order:
+        // the name the inspector shows, the values the field takes, a new motion's value (a Vector4 is the Add menu's, set
+        // per target — but a per-component one's numbers are the motion's)
+        static string Params(string arg, string body)
+        {
+            Dictionary<string, string> kept = Descriptions(body);
+            if (!Enum.GetNames(typeof(MotionKind)).Contains(arg))
+                throw new InvalidOperationException("no motion '" + arg + "'");
+            FeedbackMotion m = MotionData()[(MotionKind)Enum.Parse(typeof(MotionKind), arg)];
+            FieldInfo pf = m.GetType().GetField("m_Params", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public) ?? throw new InvalidOperationException("no parameters on " + m.GetType().Name);
+            object p = pf.GetValue(m);
+            var rows = new List<string[]>();
+            foreach (FieldInfo f in ParamFields(pf.FieldType))
+            {
+                string key = ObjectNames.NicifyVariableName(f.Name);
+                kept.TryGetValue(key, out string description);
+                rows.Add(new[] { key, ParamValues(f), ParamDefault(f, f.GetValue(p)), description ?? "" });
+            }
+            if (rows.Count == 0)
+                throw new InvalidOperationException("no saved parameters on " + pf.FieldType.Name);
+            return Table(new[] { "Parameter", "Values", "Default", "Description" }, rows);
+        }
+
+        // the saved fields the inspector draws, in their declared order
+        internal static List<FieldInfo> ParamFields(Type parameters)
+            => parameters.GetFields(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)
+                .Where(f => (f.IsPublic && !f.IsNotSerialized) || f.GetCustomAttribute<SerializeField>() != null)
+                .Where(f => f.GetCustomAttribute<HideInInspector>() == null)
+                .OrderBy(f => f.MetadataToken).ToList();
+
+        static string Number(float v) => v.ToString("0.######", System.Globalization.CultureInfo.InvariantCulture);
+
+        static string ParamValues(FieldInfo f)
+        {
+            Type t = f.FieldType;
+            if (ItemRules.PerComponent(f.Name))
+                return (f.GetCustomAttribute<MinAttribute>() is MinAttribute least ? "≥ " + Number(least.min) : "a number") + " per component";
+            if (f.GetCustomAttribute<UnityEngine.RangeAttribute>() is UnityEngine.RangeAttribute range)
+                return Number(range.min) + " – " + Number(range.max);
+            if (f.GetCustomAttribute<MinAttribute>() is MinAttribute min)
+                return "≥ " + Number(min.min);
+            if (t.IsEnum)
+                return string.Join(" · ", Enum.GetNames(t).Select(ObjectNames.NicifyVariableName));
+            if (t == typeof(Vector4))
+                return "the target's value";
+            if (t == typeof(Ease))
+                return "an ease";
+            if (t == typeof(AnimationCurve))
+                return "a curve";
+            if (t == typeof(Gradient))
+                return "a gradient";
+            if (t == typeof(bool))
+                return "on · off";
+            throw new InvalidOperationException("no values for " + f.DeclaringType.Name + "." + f.Name + " (" + t.Name + ") — give it a Range or a Min");
+        }
+
+        static string ParamDefault(FieldInfo f, object v)
+        {
+            switch (v)
+            {
+                case Vector4 each when ItemRules.PerComponent(f.Name):
+                    if (each.x == each.y && each.y == each.z && each.z == each.w)
+                        return Number(each.x) + " each";
+                    throw new InvalidOperationException("no words for the default of " + f.DeclaringType.Name + "." + f.Name);
+                case Vector4 _:
+                    return "per target";
+                case bool b:
+                    return b ? "on" : "off";
+                case Enum e:
+                    return ObjectNames.NicifyVariableName(e.ToString());
+                case Ease ease:
+                    return ease.m_Type.ToString();
+                case AnimationCurve c:
+                    return string.Join(" → ", c.keys.Select(k => Number(k.value)));
+                case Gradient g:
+                    if (g.colorKeys.All(k => k.color == Color.white) && g.alphaKeys.All(k => k.alpha == 1f))
+                        return "white";
+                    throw new InvalidOperationException("no words for the default gradient of " + f.DeclaringType.Name + "." + f.Name);
+                case float x:
+                    return Number(x);
+                case int i:
+                    return i.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                default:
+                    throw new InvalidOperationException("no default for " + f.DeclaringType.Name + "." + f.Name);
+            }
+        }
+
+        // ---- the eases: eases:<anything> — one row per family (its In · Out · In Out types, by the In type's name) and one
+        // per other type, in value order: the names the ease field shows and the parameters a new ease of the type takes
+        static string Eases(string body)
+        {
+            Dictionary<string, string> kept = Descriptions(body);
+            List<EaseType> all = Enum.GetValues(typeof(EaseType)).Cast<EaseType>().OrderBy(t => (int)t).ToList();
+            var rows = new List<string[]>();
+            for (int i = 0; i < all.Count; i++)
+            {
+                string name = all[i].ToString();
+                string family = name.EndsWith("In", StringComparison.Ordinal) ? name.Substring(0, name.Length - 2) : null;
+                bool three = family != null && i + 2 < all.Count && all[i + 1].ToString() == family + "Out" && all[i + 2].ToString() == family + "InOut";
+                string key = three ? family : name;
+                string types = three ? "`" + name + "` · `" + family + "Out` · `" + family + "InOut`" : "`" + name + "`";
+                kept.TryGetValue(key, out string description);
+                rows.Add(new[] { key, types, EaseParameters(all[i]), description ?? "" });
+                if (three)
+                    i += 2;
+            }
+            return Table(new[] { "Ease", "Types", "Parameters", "Description" }, rows);
+        }
+
+        // the ease field's names for P1 · P2 (EaseField) with a new ease's values
+        static string EaseParameters(EaseType type)
+        {
+            if (type == EaseType.Custom)
+                return "Curve";
+            if (type == EaseType.Steps)
+                return "Steps " + Number(Ease.Of(type).m_P1);
+            if (!EaseField.Parametric(type))
+                return "—";
+            Ease e = Ease.Of(type);
+            return type >= EaseType.ElasticIn && type <= EaseType.ElasticInOut ? "Amplitude " + Number(e.m_P1) + " · Period " + Number(e.m_P2) : "Overshoot " + Number(e.m_P1);
         }
 
         // the default write, then each other write a value of one of the parameters' enum fields gives: "Offset · Persist (Mode: Move To)"

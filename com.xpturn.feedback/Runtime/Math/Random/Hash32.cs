@@ -13,6 +13,10 @@ namespace xpTURN.Feedback
         internal const uint Output = 0x700;
         // a weighted pick of an occurrence
         internal const uint Pick = 0x800;
+        // a pooled audio voice's pitch of an occurrence
+        internal const uint Pitch = 0x900;
+        // an item's seed by its managed reference id
+        internal const uint Item = 0xA00;
 
         internal static uint Mix(uint x)
         {

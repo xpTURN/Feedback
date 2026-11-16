@@ -15,13 +15,13 @@ namespace xpTURN.Feedback
 
         // a shape motion weighs toward the item's fields (WeightTowardTarget) — Bloom · Color Adjustments change the brightness
         internal static readonly TargetTraits Weighted = new TargetTraits(valueKind: ValueKind.Float,
-            supportedMotions: MotionMask.Tween | MotionMask.Flash | MotionMask.Punch | MotionMask.Oscillate | MotionMask.Curve,
+            supportedMotions: MotionMask.Tween | MotionMask.Flash | MotionMask.Punch | MotionMask.Bounce | MotionMask.Oscillate | MotionMask.Curve,
             category: FeedbackCategory.PostFX, flashSensitive: false, applyMode: ApplyMode.WeightTowardTarget);
         internal static readonly TargetTraits WeightedBright = new TargetTraits(valueKind: ValueKind.Float,
-            supportedMotions: MotionMask.Tween | MotionMask.Flash | MotionMask.Punch | MotionMask.Oscillate | MotionMask.Curve,
+            supportedMotions: MotionMask.Tween | MotionMask.Flash | MotionMask.Punch | MotionMask.Bounce | MotionMask.Oscillate | MotionMask.Curve,
             category: FeedbackCategory.PostFX, flashSensitive: true, applyMode: ApplyMode.WeightTowardTarget);
         internal static readonly TargetTraits WeightedFour = new TargetTraits(valueKind: ValueKind.Float,
-            supportedMotions: MotionMask.Tween | MotionMask.Flash | MotionMask.Punch | MotionMask.Oscillate,
+            supportedMotions: MotionMask.Tween | MotionMask.Flash | MotionMask.Punch | MotionMask.Bounce | MotionMask.Oscillate,
             category: FeedbackCategory.PostFX, flashSensitive: false, applyMode: ApplyMode.WeightTowardTarget);
         internal static readonly TargetTraits WeightedTwo = new TargetTraits(valueKind: ValueKind.Float,
             supportedMotions: MotionMask.Tween | MotionMask.Flash,

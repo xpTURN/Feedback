@@ -57,6 +57,8 @@ PREFIX="$(git -C "${REPO_ROOT}" rev-parse --show-prefix)"
 state() {
   git -C "${REPO_ROOT}" status --porcelain --untracked-files=all -- "${PKG}" tests/FeedbackTests.6000.3 README.md 'README.*.md' | while IFS= read -r line; do
     path="${line:3}"
+    # git quotes a path with a space or another special character — the file's name is inside the quotes
+    path="${path#\"}"; path="${path%\"}"
     digest="$( [ -f "${GIT_TOP}/${path}" ] && shasum "${GIT_TOP}/${path}" | cut -c1-16 || echo gone)"
     echo "${line:0:2} ${digest} ${path}"
   done | sort

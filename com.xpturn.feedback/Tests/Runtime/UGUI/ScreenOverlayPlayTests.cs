@@ -607,5 +607,89 @@ namespace xpTURN.Feedback.Tests
                     test.Shutdown();
             }
         }
+
+        // ---- a text's seed — the play's seed and the event's occurrence give its lifetime, angle, scatter, scale start and
+        // alpha start: the same seed the same text, another seed another
+
+        [UnityTest]
+        public IEnumerator OT25a_ASeedRepeatsTheText()
+        {
+            NeedTMP();
+            LogAssert.ignoreFailingMessages = true;
+            Time.captureDeltaTime = 1f / 60f;
+            MainCamera(false);
+            FloatingTextStyle style = Style(0.5f);
+            style.m_Lifetime = new Vector2(0.3f, 0.6f);
+            style.m_Spread = 90f;
+            style.m_Scatter = 40f;
+            FeedbackPlayer p = Player(Text(style));
+            ScreenOverlayService svc = ScreenOverlayService.Of(FeedbackScheduler.Default.Context);
+            var seeds = new List<uint>();
+            foreach (uint seed in new uint[] { 7u, 7u, 8u })
+            {
+                int live = svc.LiveCount;
+                p.Play(PlayArgs.Default.WithSeed(seed));
+                yield return null;
+                Assert.That(svc.LiveCount - live, Is.EqualTo(1), "one text a play");
+                seeds.Add(svc.SeedAt(live));
+            }
+            Assert.That((seeds[0] == seeds[1], seeds[0] != seeds[2]), Is.EqualTo((true, true)), "the seeds " + string.Join(" ", seeds.Select(x => x.ToString("X8"))));
+        }
+
+        // the occurrences of one play differ · a seek back over the text takes it back, forward again makes the same text ·
+        // a backward play makes none
+        [UnityTest]
+        public IEnumerator OT25b_TheOccurrencesTheSeekAndBackward()
+        {
+            NeedTMP();
+            LogAssert.ignoreFailingMessages = true;
+            Time.captureDeltaTime = 1f / 60f;
+            MainCamera(false);
+            FloatingTextStyle style = Style(2f);
+            style.m_Lifetime = new Vector2(1f, 2f);
+            style.m_Spread = 90f;
+            style.m_Scatter = 40f;
+            ScreenOverlayService svc = ScreenOverlayService.Of(FeedbackScheduler.Default.Context);
+            FloatingTextItem twice = Text(style);
+            twice.m_Timing.m_RepeatCount = 1;
+            twice.m_Timing.m_RepeatGap = 0.05f;
+            FeedbackPlayer p = Player(twice);
+            int live = svc.LiveCount;
+            p.Play(PlayArgs.Default.WithSeed(7u));
+            for (int f = 0; f < 12 && svc.LiveCount - live < 2; f++)
+                yield return null;
+            Assert.That(svc.LiveCount - live, Is.EqualTo(2), "two occurrences, two texts");
+            Assert.That(svc.SeedAt(live), Is.Not.EqualTo(svc.SeedAt(live + 1)), "the occurrences differ");
+
+            FloatingTextItem late = Text(style);
+            late.m_Timing.m_Delay = 0.1f;
+            FeedbackPlayer q = Player(late, Keeper(1f));
+            int before = svc.LiveCount;
+            q.Play(PlayArgs.Default.WithSeed(7u));
+            Assert.That(q.Seek(0.2f), Is.True, "the seek past the text");
+            yield return null;
+            Assert.That(svc.LiveCount - before, Is.EqualTo(1), "crossed forward — a text");
+            uint first = svc.SeedAt(before);
+            Assert.That(q.Seek(0.05f), Is.True, "the seek back");
+            yield return null;
+            Assert.That(svc.LiveCount - before, Is.EqualTo(0), "crossed back — taken back");
+            Assert.That(q.Seek(0.2f), Is.True, "the seek forward again");
+            yield return null;
+            Assert.That(svc.LiveCount - before, Is.EqualTo(1), "crossed forward again — a text");
+            Assert.That(svc.SeedAt(before).ToString("X8"), Is.EqualTo(first.ToString("X8")), "the same occurrence, the same text");
+            q.Stop(StopMode.Revert);
+            yield return null;
+
+            int last = svc.LiveCount;
+            bool grew = false;
+            q.Play(PlayArgs.Default.WithSeed(7u).WithDirection(PlayerDirection.Backward));
+            for (int f = 0; f < 75; f++)
+            {
+                yield return null;
+                grew |= svc.LiveCount > last;
+                last = svc.LiveCount;
+            }
+            Assert.That(grew, Is.False, "a backward play makes no text");
+        }
     }
 }

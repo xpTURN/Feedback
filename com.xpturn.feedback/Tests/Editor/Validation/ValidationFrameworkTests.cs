@@ -28,7 +28,7 @@ namespace xpTURN.Feedback.Tests.Editor
         static readonly string[] EditorRules =
         {
             "FB-A01", "FB-A02", "FB-A03", "FB-A04", "FB-A05", "FB-A06", "FB-A07", "FB-A08", "FB-A09", "FB-A10",
-            "FB-B01", "FB-B02", "FB-B03", "FB-B04", "FB-B05", "FB-B06", "FB-B07", "FB-B08", "FB-B09",
+            "FB-B01", "FB-B02", "FB-B03", "FB-B04", "FB-B05", "FB-B06", "FB-B07", "FB-B08", "FB-B09", "FB-B10", "FB-B11",
             "FB-C01", "FB-C02", "FB-C03", "FB-C04", "FB-C05", "FB-C06", "FB-C07",
             "FB-D01", "FB-D02", "FB-D03", "FB-D04", "FB-D05", "FB-D06", "FB-D07", "FB-D08",
             "FB-E01", "FB-E02", "FB-E03", "FB-E04", "FB-E05", "FB-E06", "FB-E07", "FB-E08", "FB-E09", "FB-E10",
@@ -46,6 +46,7 @@ namespace xpTURN.Feedback.Tests.Editor
             "FB-Q01", "FB-Q02", "FB-Q03", "FB-Q04",
             "FB-R01", "FB-R02", "FB-R03", "FB-R04",
             "FB-S01",
+            "FB-T01", "FB-T02", "FB-T03", "FB-T04", "FB-T05", "FB-T06", "FB-T07", "FB-T08", "FB-T09",
         };
 
         [Test]
@@ -307,6 +308,12 @@ namespace xpTURN.Feedback.Tests.Editor
                 FeedbackPlayer p = fx.Player("SwB08", F.Position());
                 p.m_Preset = preset;
                 AssetDatabase.DeleteAsset(F.Dir + "/SwB08.asset");
+                return p;
+            }),
+            ("FB-B10", fx =>
+            {
+                FeedbackPlayer p = fx.Player("SwB10", F.Position());
+                p.m_Variants = new List<FeedbackPreset> { null };
                 return p;
             }),
             ("FB-A01", fx =>
@@ -596,12 +603,62 @@ namespace xpTURN.Feedback.Tests.Editor
                 t.m_DirectWrite = true;
                 return fx.Player("SwG05", t);
             }),
+            // a parameter's name in another case · Unity's audio off (the seam's settings) · a snapshot's clock against a Normal
+            // mixer (a copy — the fixes write it) · an endless container without Stop After
+            ("FB-T02", fx => fx.Player("SwT02", new AudioMixerParameterItem { m_Motion = F.Tween, m_Mixer = AssetDatabase.LoadAssetAtPath<UnityEngine.Audio.AudioMixer>(TestMixer), m_Parameter = "feedbacktestvolume" })),
+            ("FB-T04", fx =>
+            {
+                var off = ScriptableObject.CreateInstance<AudioSettingsDouble>();
+                fx.Made.Add(off);
+                off.m_DisableAudio = true;
+                Func<Object> was = AudioRuleReads.AudioManager;
+                AudioRuleReads.AudioManager = () => off;
+                fx.Restore.Add(() => AudioRuleReads.AudioManager = was);
+                GameObject c = Cube(fx, "SwT04");
+                return fx.Player("SwT04", On(new AudioPlayClipItem { m_Motion = new SetMotion(), m_Clip = SilentClip(fx) }, c.AddComponent<AudioSource>()));
+            }),
+            ("FB-T08", fx =>
+            {
+                string copy = F.Dir + "/SwT08.mixer";
+                AssetDatabase.CopyAsset(TestMixer, copy);
+                var mixer = AssetDatabase.LoadAssetAtPath<UnityEngine.Audio.AudioMixer>(copy);
+                return fx.Player("SwT08", new AudioMixerSnapshotItem { m_Motion = new SetMotion(), m_Snapshot = mixer.FindSnapshot("A") });
+            }),
+            ("FB-T09", fx => fx.Player("SwT09", On(new AudioPlayAtPointItem { m_Motion = new SetMotion(), m_Resource = EndlessContainer(fx) }, Cube(fx, "SwT09").transform))),
         };
+
+        const string TestMixer = "Packages/com.xpturn.feedback/Tests/Editor/Audio/FeedbackTestMixer.mixer";
+
+        static AudioClip SilentClip(F fx)
+        {
+            var clip = AudioClip.Create("SwSilent", 441, 1, 44100, false);
+            fx.Made.Add(clip);
+            return clip;
+        }
+
+        // an Audio Random Container made in code (the type is internal) — one element, endless
+        static UnityEngine.Audio.AudioResource EndlessContainer(F fx)
+        {
+            const System.Reflection.BindingFlags all = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
+            Type t = typeof(UnityEngine.Audio.AudioResource).Assembly.GetType("UnityEngine.Audio.AudioRandomContainer");
+            Type e = typeof(UnityEngine.Audio.AudioResource).Assembly.GetType("UnityEngine.Audio.AudioContainerElement");
+            var arc = (UnityEngine.Audio.AudioResource)Activator.CreateInstance(t, true);
+            var el = (Object)Activator.CreateInstance(e, true);
+            e.GetProperty("audioClip", all).SetValue(el, SilentClip(fx));
+            Array list = Array.CreateInstance(e, 1);
+            list.SetValue(el, 0);
+            t.GetProperty("elements", all).SetValue(arc, list);
+            System.Reflection.PropertyInfo loop = t.GetProperty("loopMode", all);
+            loop.SetValue(arc, Enum.Parse(loop.PropertyType, "Infinite"));
+            fx.Made.Add(el);
+            fx.Made.Add(arc);
+            return arc;
+        }
 
         // the rules without a fix — with the sweep's, every editor rule (a new rule must join one of the two)
         static readonly string[] Fixless =
         {
-            "FB-A04", "FB-A08", "FB-B07", "FB-C01", "FB-C03", "FB-C04", "FB-D02", "FB-D03", "FB-D05", "FB-D08",
+            "FB-A04", "FB-A08", "FB-B07", "FB-B11", "FB-C01", "FB-C03", "FB-C04", "FB-D02", "FB-D03", "FB-D05", "FB-D08",
             "FB-E03", "FB-E04", "FB-E05", "FB-E08", "FB-F03", "FB-F05", "FB-G06", "FB-G07", "FB-G08", "FB-G09", "FB-G10",
             "FB-H01", "FB-H02", "FB-H03", "FB-H04", "FB-H05", "FB-H06",
             "FB-A10", "FB-G11", "FB-G12", "FB-G13", "FB-G14",
@@ -619,6 +676,7 @@ namespace xpTURN.Feedback.Tests.Editor
             "FB-Q03", "FB-Q04",
             "FB-R02", "FB-R03", "FB-R04",
             "FB-S01",
+            "FB-T01", "FB-T03", "FB-T05", "FB-T06", "FB-T07",
         };
 
         static readonly string[] NotUndoable =
@@ -644,6 +702,9 @@ namespace xpTURN.Feedback.Tests.Editor
                     continue;
                 // the Cinemachine rules are quiet without the package
                 if (rule.StartsWith("FB-R", StringComparison.Ordinal) && Type.GetType(CinemachineNames.ShakeExtension) == null)
+                    continue;
+                // the audio rules are quiet without the audio module (the items' implementation)
+                if (rule.StartsWith("FB-T", StringComparison.Ordinal) && !FeedbackImplementations.IsImplemented(typeof(AudioPlayClipItem)))
                     continue;
                 swept++;
                 int count;

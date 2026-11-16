@@ -4,6 +4,7 @@
     "com.unity.render-pipelines.universal": "17.3.0",
     "com.unity.ugui": "2.0.0",
     "com.xpturn.feedback": "https://github.com/xpTURN/Feedback.git?path=/com.xpturn.feedback#v0.1.0",
-    "com.unity.modules.physics": "1.0.0"
+    "com.unity.modules.physics": "1.0.0",
+    "com.unity.modules.audio": "1.0.0"
   }
 }

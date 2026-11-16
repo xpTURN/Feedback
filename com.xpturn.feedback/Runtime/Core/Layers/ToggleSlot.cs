@@ -22,6 +22,9 @@ namespace xpTURN.Feedback
         bool m_Seen;
         // inside our own write — a Close there waits for the registry's Close after the write
         bool m_Writing;
+        // a dry registry's state (the editor's graph): the property read once, then the state the slot would have written
+        bool m_Dry;
+        bool m_HasDry;
 
         protected ToggleSlot()
             : base(ConsumptionStage.Update)
@@ -31,6 +34,29 @@ namespace xpTURN.Feedback
         protected abstract bool Read();
 
         protected abstract void Write(bool value);
+
+        bool Current()
+        {
+            if (Registry == null || !Registry.Dry)
+                return Read();
+            if (!m_HasDry)
+            {
+                m_Dry = Read();
+                m_HasDry = true;
+            }
+            return m_Dry;
+        }
+
+        void Put(bool value)
+        {
+            if (Registry != null && Registry.Dry)
+            {
+                m_Dry = value;
+                m_HasDry = true;
+                return;
+            }
+            Write(value);
+        }
 
         // the episode is open — Revert keeps the slot until the apply that handles the end
         internal override bool Pending => m_Open;
@@ -45,9 +71,30 @@ namespace xpTURN.Feedback
         internal override Vector4 BaseVector => new Vector4(Base ? 1f : 0f, 0f, 0f, 0f);
 
         // the before while a captured episode is open — a Set's snapshot is not the state a blink holds
-        internal bool Base => (Detached || (m_Open && m_Captured)) ? m_Before : Read();
+        internal bool Base => (Detached || (m_Open && m_Captured)) ? m_Before : Current();
 
-        internal bool ReadValue() => Read();
+        internal bool ReadValue() => Current();
+
+        internal override Vector4 GraphValue => new Vector4(Current() ? 1f : 0f, 0f, 0f, 0f);
+
+        internal override bool SeedFrom(LayerSlot live)
+        {
+            if (!(live is ToggleSlot other) || Registry == null || !Registry.Dry)
+                return false;
+            m_Dry = other.Base;
+            m_HasDry = true;
+            return true;
+        }
+
+        // a dry slot's state set to a given start (a play's Set start)
+        internal bool SeedValue(bool value)
+        {
+            if (Registry == null || !Registry.Dry)
+                return false;
+            m_Dry = value;
+            m_HasDry = true;
+            return true;
+        }
 
         // Persist. In a captured episode only the before moves and the next apply writes — no pair of callbacks for the
         // opposite state, no nested SetActive from a callback. Otherwise written at once
@@ -59,7 +106,7 @@ namespace xpTURN.Feedback
                 return;
             }
             RecordOnce();
-            Write(value);
+            Put(value);
         }
 
         // the preparation path (allocation allowed): the ledger takes slots ≥ twice the sum, the side arrays follow it
@@ -136,7 +183,7 @@ namespace xpTURN.Feedback
         {
             if (!m_Open)
                 return;
-            bool actual = Read();
+            bool actual = Current();
             if (!m_Captured)
             {
                 m_Before = actual;
@@ -176,13 +223,13 @@ namespace xpTURN.Feedback
             m_Writing = true;
             try
             {
-                Write(wanted);
+                Put(wanted);
             }
             finally
             {
                 m_Writing = false;
             }
-            m_Seen = Read();
+            m_Seen = Current();
         }
 
         // the end's rule: the before goes back unless another wrote. Inside our own write nothing — the registry calls it
@@ -195,11 +242,11 @@ namespace xpTURN.Feedback
             if (!m_Captured)
                 return;
             m_Captured = false;
-            bool actual = Read();
+            bool actual = Current();
             if (actual == m_Seen && actual != m_Before)
             {
                 RecordOnce();
-                Write(m_Before);
+                Put(m_Before);
             }
         }
     }

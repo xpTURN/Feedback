@@ -324,8 +324,8 @@ namespace xpTURN.Feedback.Tests.Editor
             FeedbackPlayer u = PlayerOn(s, Act("u", 0.1f));
             u.m_Direction = (PlayerDirection)9;
             Check(Dir(u, u.Play()) == "F", "an unknown saved value");
-            // the listener cell makes PlayArgs 32 B
-            Check(UnsafeUtility.SizeOf<PlayArgs>() == 32, "PlayArgs is " + UnsafeUtility.SizeOf<PlayArgs>() + " B");
+            // the listener, the preset and the Variant key cells make PlayArgs 48 B
+            Check(UnsafeUtility.SizeOf<PlayArgs>() == 48, "PlayArgs is " + UnsafeUtility.SizeOf<PlayArgs>() + " B");
             // a play that faulted at t = 0 was accepted: it turned the cell and set the cooldown
             FeedbackPlayer z = PlayerOn(s, Act("z", 0.1f));
             z.m_Direction = PlayerDirection.Toggle;

@@ -105,7 +105,7 @@ namespace xpTURN.Feedback
     internal static class ExtensionTraits
     {
         // the motions without a slot — a Custom Float Event's
-        internal const MotionMask Motions = MotionMask.Tween | MotionMask.Punch | MotionMask.Shake | MotionMask.Curve | MotionMask.Oscillate;
+        internal const MotionMask Motions = MotionMask.Tween | MotionMask.Punch | MotionMask.Bounce | MotionMask.Shake | MotionMask.Curve | MotionMask.Oscillate;
 
         static readonly Dictionary<Type, TargetTraits> s_Effects = new Dictionary<Type, TargetTraits>();
         static readonly Dictionary<Type, FeedbackCategory> s_Actions = new Dictionary<Type, FeedbackCategory>();

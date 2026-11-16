@@ -146,6 +146,8 @@ namespace xpTURN.Feedback
 
         protected override float FromMotion(in Vector4 value) => Zoomed(Reference, Factor(value.x), m_Orthographic);
 
+        protected override string GraphUnit => "zoom stops";
+
         protected override float MapOffset(in float offset)
         {
             float b = Slot.Base;

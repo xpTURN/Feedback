@@ -21,10 +21,10 @@ namespace xpTURN.Feedback.Editor
 
         public bool Owns(FeedbackPlayer player) => PreviewSession.Current != null && PreviewSession.Current.HoldsTrackPlayer(player);
 
-        public SeekRefusal Scrub(FeedbackPlayer player, PlaybackHandle handle)
-            => PreviewSession.Current != null && PreviewSession.Current.IsTrack ? PreviewSession.Current.TrackScrub(player, handle) : SeekRefusal.NotLive;
+        public SeekRefusal Scrub(FeedbackPlayer player, PlaybackHandle handle, FeedbackPreset preset)
+            => PreviewSession.Current != null && PreviewSession.Current.IsTrack ? PreviewSession.Current.TrackScrub(player, handle, preset) : SeekRefusal.NotLive;
 
-        public bool Drives(FeedbackPlayer player) => PreviewSession.Current != null && PreviewSession.Current.IsTrack && PreviewSession.Current.TrackDrives(player);
+        public bool Drives(FeedbackPlayer player, FeedbackPreset preset) => PreviewSession.Current != null && PreviewSession.Current.IsTrack && PreviewSession.Current.TrackDrives(player, preset);
 
         public void Seeked() => PreviewSession.Current?.TrackSeeked();
 

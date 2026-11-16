@@ -115,7 +115,7 @@ namespace xpTURN.Feedback.Editor
         {
             HeadsShown = TimelineModel.HeadsShown(m_Host);
             int before = m_Heads.Count;
-            TimelineModel.Heads(HeadsShown ? m_Host : null, m_Heads);
+            TimelineModel.Heads(HeadsShown ? m_Host : null, m_So.targetObject, m_Heads);
             if (before > 0 || m_Heads.Count > 0)
                 Canvas.MarkDirtyRepaint();
         }

@@ -607,6 +607,63 @@ namespace xpTURN.Feedback.Tests
             Assert.That((without, noBrain), Is.EqualTo(("LocalPositionSlot", "LocalPositionSlot")), "without an extension · a brain the transform's slot");
         }
 
+        // two jolts of 1 along the camera's x through the extension under the settings' cap of 1 — the camera moves the capped
+        // sum (0.5 + 0.5 · tanh 3), not 2
+        [UnityTest]
+        public IEnumerator CI14b_TheShakeCapThroughTheExtension()
+        {
+            m_Test.Context.UseSettings(new SettingsValues { MaximumShakeOffset = 1f });
+            Camera cam = MainRig(out _);
+            CinemachineCamera vcam = Vcam("CI vcam", At);
+            vcam.gameObject.AddComponent<CinemachineShakeExtension>();
+            yield return null;
+            Vector3 rest = cam.transform.position;
+            FeedbackPlayer[] jolts = new FeedbackPlayer[2];
+            for (int i = 0; i < 2; i++)
+            {
+                var jolt = new CameraShakeItem { m_Motion = new CurveMotion { m_Params = new CurveParams { m_Curve = AnimationCurve.Constant(0f, 1f, 1f), m_RemapZero = Vector4.zero, m_RemapOne = new Vector4(1f, 0f, 0f, 0f) } } };
+                jolt.m_Timing.m_Duration = 0.3f;
+                jolt.m_Target = new TargetRef { m_Mode = TargetRefMode.MainCamera, m_Path = "", m_Anchor = "" };
+                jolts[i] = Player(jolt);
+            }
+            float max = 0f;
+            Recorder(f => max = Mathf.Max(max, (cam.transform.position - rest).magnitude));
+            jolts[0].Play();
+            jolts[1].Play();
+            for (int i = 0; i < 10; i++)
+                yield return null;
+            string slot = ((CameraShakeBinding)jolts[0].Runtime.Binding(0)).AnyPositionSlot?.GetType().Name;
+            float expected = 0.5f + 0.5f * (float)Math.Tanh(3.0);
+            Debug.Log($"CI14b shake cap · slot {slot} · moved {max} · expected {expected}");
+            Assert.That(slot, Is.EqualTo("CinemachineShakePositionSlot"), "the extension's path");
+            Assert.That(max, Is.EqualTo(expected).Within(1e-3f), "two jolts of 1 under a cap of 1");
+        }
+
+        // a camera's trauma through the extension — the trauma's cell takes the brain's extension pair (the Camera category) and
+        // the camera moves
+        [UnityTest]
+        public IEnumerator CI14c_TheTraumaThroughTheExtension()
+        {
+            Camera cam = MainRig(out _);
+            CinemachineCamera vcam = Vcam("CI vcam", At);
+            vcam.gameObject.AddComponent<CinemachineShakeExtension>();
+            yield return null;
+            Vector3 rest = cam.transform.position;
+            var trauma = new CameraTraumaItem { m_Motion = new SetMotion(), m_Amount = 1f };
+            trauma.m_Target = new TargetRef { m_Mode = TargetRefMode.MainCamera, m_Path = "", m_Anchor = "" };
+            FeedbackPlayer p = Player(trauma);
+            float max = 0f;
+            Recorder(f => max = Mathf.Max(max, (cam.transform.position - rest).magnitude));
+            p.Play();
+            for (int i = 0; i < 20; i++)
+                yield return null;
+            TraumaService t = m_Test.Context.Trauma;
+            int at = t.IndexOf(cam.transform);
+            string slot = at >= 0 ? t.PositionSlotAt(at)?.GetType().Name : null;
+            Debug.Log($"CI14c trauma · slot {slot} · moved {max}");
+            Assert.That((slot, at >= 0 && t.CameraAt(at), max > 0.01f), Is.EqualTo(("CinemachineShakePositionSlot", true, true)), "the extension's pair, the Camera category, moved");
+        }
+
         [UnityTest]
         public IEnumerator CI15a_TheExtensionsStageAndAxes()
         {

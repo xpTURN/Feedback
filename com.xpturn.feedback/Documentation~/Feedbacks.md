@@ -1,9 +1,9 @@
 # Feedback reference
 
-Every feedback in the Add menu, by group: <!-- gen:count:feedbacks -->157<!-- /gen:count:feedbacks --> feedbacks —
-<!-- gen:count:targets -->141<!-- /gen:count:targets --> targets that take motions, in
-<!-- gen:count:combinations -->361<!-- /gen:count:combinations --> combinations, and the actions and flow items that act
-once when they are reached. The Add menu lists them as <!-- gen:count:leaves -->377<!-- /gen:count:leaves --> entries,
+Every feedback in the Add menu, by group: <!-- gen:count:feedbacks -->173<!-- /gen:count:feedbacks --> feedbacks —
+<!-- gen:count:targets -->157<!-- /gen:count:targets --> targets that take motions, in
+<!-- gen:count:combinations -->467<!-- /gen:count:combinations --> combinations, and the actions and flow items that act
+once when they are reached. The Add menu lists them as <!-- gen:count:leaves -->483<!-- /gen:count:leaves --> entries,
 one for each target and motion and one for each action. Each group's table is made from the package itself; the notes
 under it say what to know before you use the group.
 
@@ -11,7 +11,8 @@ under it say what to know before you use the group.
 
 - **Feedback** — its path in the Add menu.
 - **Motions** — the motions the target takes. An action or a flow item has none (—): it acts once. See
-  [Targets and motions](Concepts.md#targets-and-motions).
+  [Targets and motions](Concepts.md#targets-and-motions), and the [motion reference](Motions.md) for each motion's
+  parameters.
 - **Value** — the kind of value the target writes.
 - **Category** — the feedback's own effect category, the one `FeedbackCategories` turns off or scales (— for none). An
   effect counts in its item's category override when one is set, else in Flash for a flash or blink of a flash-sensitive
@@ -35,7 +36,7 @@ under it say what to know before you use the group.
 | `Animation/Layer Weight` | Tween | Float | — | Simulated | Animation module | Fades an Animator layer's weight in or out. |
 | `Animation/Parameter` | Set | Bool | — | Simulated | Animation module | Sets an Animator parameter. |
 | `Animation/Play State` | Set | Bool | — | Simulated | Animation module | Plays an Animator state with a transition. |
-| `Animation/Speed` | Tween · Punch · Spring | Float | — | Simulated | Animation module | Speeds the Animator up and down. |
+| `Animation/Speed` | Tween · Punch · Spring · Bounce | Float | — | Simulated | Animation module | Speeds the Animator up and down. |
 <!-- /gen:reference:Animation -->
 
 **Notes**
@@ -46,13 +47,88 @@ under it say what to know before you use the group.
   plays once it is active; in a built player the inactive Animator lists no parameters, so a parameter it lacks is found
   at that first play and the item writes nothing. `Animation/Layer Weight` is skipped instead: prepare its player after
   the Animator is active (a **Lazy** player's first play, or **Rebuild**).
-- On an Animator that updates in Animate Physics mode, an `Animation/Speed` Punch or a spring's kick shows only with
-  **Direct Write**; a Tween shows either way. FB-L05 offers the fix.
+- On an Animator that updates in Animate Physics mode, an `Animation/Speed` Punch, Bounce or a spring's kick shows only
+  with **Direct Write**; a Tween shows either way. FB-L05 offers the fix.
 - FB-L06 reports an Animator set to cull completely. The inspector's preview drives its parameters whatever the culling
   and never changes the culling mode.
 - The inspector's preview logs the controller's state machine behaviours once — FB-L08. After the preview the pose comes
   back, and so do a generic rig's root position and rotation; a preview that a script reload cuts off before it can end
   brings the pose back but leaves the speed, parameters and event firing as it left them.
+
+## Audio
+
+<!-- gen:reference:Audio -->
+| Feedback | Motions | Value | Category | Preview | Needs | Description |
+|---|---|---|---|---|---|---|
+| `Audio/Distortion Level` | Tween · Punch · Curve · Oscillate · Spring · Bounce | Float | Audio | Full | Audio module | Drives an Audio Distortion Filter's level. |
+| `Audio/Echo Wet Mix` | Tween · Punch · Curve · Oscillate · Spring · Bounce | Float | Audio | Full | Audio module | Mixes more or less of an Audio Echo Filter's echo in. |
+| `Audio/High Pass Cutoff` | Tween · Punch · Curve · Oscillate · Spring · Bounce | Float | Audio | Full | Audio module | Moves an Audio High Pass Filter's cutoff — a higher one thins the sound. |
+| `Audio/Listener Volume` | Tween · Punch · Curve · Spring · Bounce | Float | Audio | None | Audio module | Turns every sound of the game up or down. |
+| `Audio/Low Pass Cutoff` | Tween · Punch · Curve · Oscillate · Spring · Bounce | Float | Audio | Full | Audio module | Moves an Audio Low Pass Filter's cutoff — a lower one muffles the sound. |
+| `Audio/Mixer Parameter` | Tween · Punch · Curve · Oscillate · Spring · Bounce | Float | Audio | None | Audio module | Moves an Audio Mixer's exposed parameter — a group's volume, an effect's value. |
+| `Audio/Mixer Snapshot` | Set | Bool | Audio | None | Audio module | Moves an Audio Mixer to a snapshot over a transition time. |
+| `Audio/Pitch` | Tween · Punch · Shake · Curve · Oscillate · Spring · Bounce | Float | Audio | Full | Audio module | Raises or lowers an Audio Source's pitch. |
+| `Audio/Play At Point` | Set | Bool | Audio | Display only | Audio module | Plays a sound at a point from a pool of voices — no Audio Source needed. |
+| `Audio/Play Clip` | Set | Bool | Audio | Simulated | Audio module | Plays a clip once on an Audio Source — a stronger play plays it louder. |
+| `Audio/Reverb Level` | Tween · Punch · Curve · Oscillate · Spring · Bounce | Float | Audio | Full | Audio module | Raises or lowers an Audio Reverb Filter's reverb. |
+| `Audio/Source Control` | Set | Bool | Audio | Simulated | Audio module | Plays, stops, pauses or unpauses an Audio Source. |
+| `Audio/Stereo Pan` | Tween · Punch · Shake · Curve · Oscillate · Spring · Bounce | Float | Audio | Full | Audio module | Pans an Audio Source left or right. |
+| `Audio/Volume` | Tween · Punch · Shake · Curve · Oscillate · Spring · Bounce | Float | Audio | Full | Audio module | Fades, ducks or swells an Audio Source. |
+<!-- /gen:reference:Audio -->
+
+**Notes**
+
+- A value past its target's range is kept to the range while the item plays — pitch −3 to 3, a cutoff 10 to 22000 Hz,
+  a wet mix and a distortion level 0 to 1, a reverb level −10000 to 2000 mB, the listener's volume 0 to 1. A value set
+  outside the range comes back as it was at the end.
+- `Audio/Low Pass Cutoff` puts the cutoff back itself — the filter stores it in a curve the preview cannot record. A
+  filter that follows a distance curve (its source's 3D Low-Pass curve) is skipped: a cutoff write would replace the
+  curve.
+- `Audio/Reverb Level` turns a preset other than User to User while it plays and back at the end, with the preset's own
+  values; a Tween keeps User.
+- `Audio/Listener Volume` plays in Play mode only — in Edit mode it is the editor's whole sound.
+- The audio items start on the unscaled clock, so a pause menu at time scale 0 does not hold a fade; an item's
+  **Clock** changes it. The Audio category's scale multiplies the offsets; a Tween reaches its value whatever the scale.
+- `Audio/Source Control`'s Play goes on from a pause and starts a playing source over; its Stop stops the source's
+  one-shots too. `Audio/Play Clip` plays at its volume × the play's intensity × the Audio category's scale, so a
+  stronger play is louder.
+- The player's Pause pauses the sound its `Audio/Source Control` started, and the one-shots on that source with it. A
+  one-shot can't be stopped alone: one on another source plays on.
+- At a play's end a Revert puts the source back as it was; the other ends leave the sound playing, but a sound paused with
+  the player stops, and so does one whose player is destroyed. A Seek or Skip that passes these items, and a play going
+  backward, starts no sound.
+- An Audio Source that is stopped but holds a place set by script (`time` or `timeSamples` — it keeps that place even
+  after its clip ends) is taken as paused, so a Revert puts it back paused, not stopped.
+- `Audio/Mixer Parameter` moves an exposed parameter by its name. While it plays, a snapshot transition does not move
+  that parameter; at the end the snapshot has it again, at the snapshot's value of that moment, so after a transition
+  the parameter jumps there. A Tween keeps its value until a Revert or `Restore()` lets it go.
+- `Audio/Mixer Snapshot` goes back only to **Back To** — with none the mix stays — and a transition the Audio category
+  skipped goes back nowhere. A Seek or Skip that passes it transitions too. The transition runs on the mixer's
+  **Update Mode** clock: Normal holds at time scale 0, except for a transition time of 0.
+- The mixer items play in Play mode only — in Edit mode a mixer takes no write and runs no transition.
+- `Audio/Play At Point` plays from the package's pool of voices at the play's place, else at its target with **Offset**
+  in the target's space, and stays there. Its output is the item's **Output**, else the player's **Audio Output**, else
+  the project's **Default Audio Output**; with none the sound bypasses every mixer. Its volume × the play's intensity ×
+  the Audio category's scale stops at full volume, and its pitch is **Pitch** ± **Pitch Random**, 0.1 to 3.
+- A Play At Point sound plays to its end, or for **Stop After** seconds of sound and then fades out over **Fade Out**;
+  a pause does not count. A Revert, an aborted play and a play going backward stop it; it rings on when its player is
+  destroyed. The player's Pause pauses it while its play runs; the game's `AudioListener.pause` holds it unless
+  **Ignore Listener Pause**. An endless Audio Random Container ends only by Stop After, a Revert or `Restore()`.
+- In Edit mode the preview plays Play At Point from hidden voices; it does not read the project's Default Audio Output.
+- `Audio/Source Control`, `Audio/Play Clip`, `Audio/Mixer Snapshot` and `Audio/Play At Point` are instant: the sound or
+  the transition goes on after them, so an item after one starts at once, even with **After Previous**. Give it a
+  **Delay** to wait.
+- The Play At Point items of a play session share one pool of voices, as large as the largest **Pool Size** among them.
+  More sounds at once make one more voice — an allocation, with a warning once in the Editor and development builds —
+  so give one item the number that sounds together.
+- A Play At Point sound sits in the active scene while it plays, as a spawned object does: unloading that scene cuts it,
+  and the next sound makes its voice again, which counts as the pool growing.
+- While `Audio/Mixer Parameter` plays it moves on from the parameter's value, a value your code set with `SetFloat`
+  included; at its end it hands the parameter back to the snapshots, and your value is let go too.
+- With **Disable Unity Audio** on (Project Settings > Audio) the audio items make no sound, and the validator names each
+  of them.
+- In the debugger, an `Audio/Source Control` or `Audio/Play At Point` row's **Note** reads `sounding` while the sound its
+  play started plays, and `paused with the player` or `paused` while the player's Pause holds it.
 
 ## Camera
 
@@ -61,10 +137,11 @@ under it say what to know before you use the group.
 |---|---|---|---|---|---|---|
 | `Camera/Background Color` | Tween · Flash | Color | Camera | Full | — | Tints the camera's background color. |
 | `Camera/Clipping Planes` | Tween | Vector2 | Camera | Full | — | Moves the camera's near and far planes. |
-| `Camera/Field of View` | Tween · Punch · Shake · Spring | Float | Camera | Full | — | Kicks the camera's field of view. |
-| `Camera/Orthographic Size` | Tween · Punch · Shake · Spring | Float | Camera | Full | — | Changes an orthographic camera's size. |
-| `Camera/Shake` | Punch · Shake · Curve · Wiggle | Vector3 | Camera | Full | — | Shakes the camera's position — and its rotation, given a rotation amplitude. |
-| `Camera/Zoom` | Tween · Punch | Float | Camera | Full | — | Zooms the camera in or out; a Punch comes back, a Tween stays. |
+| `Camera/Field of View` | Tween · Punch · Shake · Spring · Bounce | Float | Camera | Full | — | Kicks the camera's field of view. |
+| `Camera/Orthographic Size` | Tween · Punch · Shake · Spring · Bounce | Float | Camera | Full | — | Changes an orthographic camera's size. |
+| `Camera/Shake` | Punch · Shake · Curve · Wiggle · Bounce | Vector3 | Camera | Full | — | Shakes the camera's position — and its rotation, given a rotation amplitude. |
+| `Camera/Trauma` | Set | Bool | Camera | Full | — | Adds to the camera's trauma — hits stack up to a ceiling and fade. |
+| `Camera/Zoom` | Tween · Punch · Bounce | Float | Camera | Full | — | Zooms the camera in or out; a Punch comes back, a Tween stays. |
 <!-- /gen:reference:Camera -->
 
 **Notes**
@@ -80,6 +157,12 @@ under it say what to know before you use the group.
 - `Camera/Background Color` is for a camera that clears to a color — FB-H04 reports one that draws a skybox.
 - A Motion Driver on the main camera keeps the camera it found until it is enabled again; without a main camera at its
   enable it warns and does not start.
+- Camera shakes on one camera add up. The settings' **Maximum Shake Offset** and **Maximum Shake Angle** softly cap
+  their sum: a sum up to half the cap is unchanged, and above that it bends toward the cap and never passes it. The
+  caps follow the Camera category's scale, and other feedbacks that move the camera are not capped.
+- `Camera/Trauma` adds **Amount** × the play's intensity to the camera's [trauma](ScriptingAPI.md#feedbacktrauma): hits
+  stack up to 1 and fade on their own, and the camera shakes by the trauma without a jump on a new hit. Sent to a
+  channel, it adds to each camera shake receiver it reaches.
 
 ## Cinemachine
 
@@ -89,11 +172,11 @@ under it say what to know before you use the group.
 | `Cinemachine/Activate Camera` | Set | Bool | — | Display only | Cinemachine | Makes a Cinemachine camera the live one, blending to it. |
 | `Cinemachine/Impulse` | — | — | Camera | Full | Cinemachine | Sends an impulse to Cinemachine's listeners, scaled by the play's intensity. |
 | `Cinemachine/Impulse Clear` | — | — | — | Full | Cinemachine | Clears every Cinemachine impulse. |
-| `Cinemachine/Lens Dutch` | Tween · Punch · Spring | Float | Camera | Full | Cinemachine | Tilts a Cinemachine camera's lens (its Dutch angle). |
-| `Cinemachine/Lens FOV` | Tween · Punch · Spring | Float | Camera | Full | Cinemachine | Kicks a Cinemachine camera's field of view. |
-| `Cinemachine/Lens Orthographic Size` | Tween · Punch · Spring | Float | Camera | Full | Cinemachine | Changes a Cinemachine camera's orthographic size. |
-| `Cinemachine/Noise Amplitude Gain` | Tween · Punch · Flash | Float | Camera | Simulated | Cinemachine | Raises or lowers a Cinemachine camera's noise amplitude. |
-| `Cinemachine/Noise Frequency Gain` | Tween · Punch · Flash | Float | Camera | Simulated | Cinemachine | Speeds up or slows down a Cinemachine camera's noise. |
+| `Cinemachine/Lens Dutch` | Tween · Punch · Spring · Bounce | Float | Camera | Full | Cinemachine | Tilts a Cinemachine camera's lens (its Dutch angle). |
+| `Cinemachine/Lens FOV` | Tween · Punch · Spring · Bounce | Float | Camera | Full | Cinemachine | Kicks a Cinemachine camera's field of view. |
+| `Cinemachine/Lens Orthographic Size` | Tween · Punch · Spring · Bounce | Float | Camera | Full | Cinemachine | Changes a Cinemachine camera's orthographic size. |
+| `Cinemachine/Noise Amplitude Gain` | Tween · Punch · Flash · Bounce | Float | Camera | Simulated | Cinemachine | Raises or lowers a Cinemachine camera's noise amplitude. |
+| `Cinemachine/Noise Frequency Gain` | Tween · Punch · Flash · Bounce | Float | Camera | Simulated | Cinemachine | Speeds up or slows down a Cinemachine camera's noise. |
 <!-- /gen:reference:Cinemachine -->
 
 **Notes**
@@ -115,9 +198,9 @@ under it say what to know before you use the group.
 | Feedback | Motions | Value | Category | Preview | Needs | Description |
 |---|---|---|---|---|---|---|
 | `Custom/Color Value` | Tween · Flash · Gradient · Spring | Color | — | Full | — | Drives a color of your own component through IFeedbackTarget<Color>. |
-| `Custom/Float Event` | Tween · Punch · Shake · Curve · Oscillate | Float | — | Full | — | Sends a float to a UnityEvent<float> over time. |
-| `Custom/Float Value` | Set · Tween · Punch · Shake · Curve · Flash · Oscillate · Wiggle · Spring | Float | — | Full | — | Drives a float of your own component through IFeedbackTarget<float>. |
-| `Custom/Vector3 Value` | Tween · Punch · Shake · Curve · Oscillate · Wiggle · Spring | Vector3 | — | Full | — | Drives a Vector3 of your own component through IFeedbackTarget<Vector3>. |
+| `Custom/Float Event` | Tween · Punch · Shake · Curve · Oscillate · Bounce | Float | — | Full | — | Sends a float to a UnityEvent<float> over time. |
+| `Custom/Float Value` | Set · Tween · Punch · Shake · Curve · Flash · Oscillate · Wiggle · Spring · Bounce | Float | — | Full | — | Drives a float of your own component through IFeedbackTarget<float>. |
+| `Custom/Vector3 Value` | Tween · Punch · Shake · Curve · Oscillate · Wiggle · Spring · Bounce | Vector3 | — | Full | — | Drives a Vector3 of your own component through IFeedbackTarget<Vector3>. |
 <!-- /gen:reference:Custom -->
 
 **Notes**
@@ -211,8 +294,8 @@ under it say what to know before you use the group.
 | Feedback | Motions | Value | Category | Preview | Needs | Description |
 |---|---|---|---|---|---|---|
 | `Light/Color` | Tween · Flash · Gradient · Spring | Color | — | Full | — | Tints the light. |
-| `Light/Intensity` | Tween · Punch · Shake · Flash · Oscillate · Blink · Spring | Float | — | Full | — | Flashes the light's intensity. |
-| `Light/Range` | Tween · Punch · Oscillate · Spring | Float | — | Full | — | Changes the light's range. |
+| `Light/Intensity` | Tween · Punch · Shake · Flash · Oscillate · Blink · Spring · Bounce | Float | — | Full | — | Flashes the light's intensity. |
+| `Light/Range` | Tween · Punch · Oscillate · Spring · Bounce | Float | — | Full | — | Changes the light's range. |
 | `Light/Shadow Strength` | Tween | Float | — | Full | — | Changes the light's shadow strength. |
 | `Light/Spot Angle` | Tween | Float | — | Full | — | Changes a spot light's angle. |
 <!-- /gen:reference:Light -->
@@ -293,19 +376,19 @@ under it say what to know before you use the group.
 <!-- gen:reference:PostFX -->
 | Feedback | Motions | Value | Category | Preview | Needs | Description |
 |---|---|---|---|---|---|---|
-| `PostFX/Bloom` | Tween · Punch · Curve · Flash · Oscillate | Float | PostFX | Full | Universal RP | Blooms the screen (URP volume). |
+| `PostFX/Bloom` | Tween · Punch · Curve · Flash · Oscillate · Bounce | Float | PostFX | Full | Universal RP | Blooms the screen (URP volume). |
 | `PostFX/Channel Mixer` | Tween · Flash | Float | PostFX | Full | Universal RP | Mixes the color channels (URP volume). |
-| `PostFX/Chromatic Aberration` | Tween · Punch · Curve · Flash · Oscillate | Float | PostFX | Full | Universal RP | Splits the colors at the edges (URP volume). |
-| `PostFX/Color Adjustments` | Tween · Punch · Curve · Flash · Oscillate | Float | PostFX | Full | Universal RP | Adjusts exposure, contrast and saturation (URP volume). |
+| `PostFX/Chromatic Aberration` | Tween · Punch · Curve · Flash · Oscillate · Bounce | Float | PostFX | Full | Universal RP | Splits the colors at the edges (URP volume). |
+| `PostFX/Color Adjustments` | Tween · Punch · Curve · Flash · Oscillate · Bounce | Float | PostFX | Full | Universal RP | Adjusts exposure, contrast and saturation (URP volume). |
 | `PostFX/Depth of Field` | Tween · Flash | Float | PostFX | Full | Universal RP | Blurs by distance (URP volume). |
 | `PostFX/Film Grain` | Tween · Flash | Float | PostFX | Full | Universal RP | Adds film grain (URP volume). |
-| `PostFX/Lens Distortion` | Tween · Punch · Flash · Oscillate | Float | PostFX | Full | Universal RP | Bends the image like a lens (URP volume). |
+| `PostFX/Lens Distortion` | Tween · Punch · Flash · Oscillate · Bounce | Float | PostFX | Full | Universal RP | Bends the image like a lens (URP volume). |
 | `PostFX/Lift Gamma Gain` | Tween · Flash | Float | PostFX | Full | Universal RP | Grades shadows, midtones and highlights (URP volume). |
 | `PostFX/Motion Blur` | Tween · Flash | Float | PostFX | None | Universal RP | Blurs with the camera's motion (URP volume). |
 | `PostFX/Panini Projection` | Tween · Flash | Float | PostFX | Full | Universal RP | Projects a wide view (URP volume). |
 | `PostFX/Shadows Midtones Highlights` | Tween · Flash | Float | PostFX | Full | Universal RP | Tints shadows, midtones and highlights (URP volume). |
 | `PostFX/Split Toning` | Tween · Flash | Float | PostFX | Full | Universal RP | Tones the shadows and highlights apart (URP volume). |
-| `PostFX/Vignette` | Tween · Punch · Flash · Oscillate | Float | PostFX | Full | Universal RP | Darkens the screen's edges (URP volume). |
+| `PostFX/Vignette` | Tween · Punch · Flash · Oscillate · Bounce | Float | PostFX | Full | Universal RP | Darkens the screen's edges (URP volume). |
 | `PostFX/Volume Blend` | Tween · Flash | Float | PostFX | Full | Universal RP | Blends in a volume profile of your own. |
 | `PostFX/Volume Weight` | Tween · Flash | Float | PostFX | Full | Universal RP | Fades a volume's weight. |
 | `PostFX/White Balance` | Tween · Flash | Float | PostFX | Full | Universal RP | Warms or cools the image (URP volume). |
@@ -331,7 +414,7 @@ under it say what to know before you use the group.
 | `Rect Transform/Anchors` | Tween | Vector4 | Motion | Full | — | Moves a UI element's anchors. |
 | `Rect Transform/Offsets` | Tween | Vector4 | Motion | Full | — | Moves a UI element's edges. |
 | `Rect Transform/Pivot` | Tween | Vector2 | Motion | Full | — | Moves a UI element's pivot. |
-| `Rect Transform/Size Delta` | Tween · Punch · Spring | Vector2 | Motion | Full | — | Resizes a UI element. |
+| `Rect Transform/Size Delta` | Tween · Punch · Spring · Bounce | Vector2 | Motion | Full | — | Resizes a UI element. |
 <!-- /gen:reference:Rect Transform -->
 
 ## Renderer
@@ -344,10 +427,10 @@ under it say what to know before you use the group.
 | `Renderer/Emission` | Tween · Flash · Oscillate · Blink | Color | — | Full | — | Makes the material glow — its emission keyword must be on. |
 | `Renderer/Fog Color` | Tween · Flash | Color | — | Full | — | Tints the scene's fog. |
 | `Renderer/Fog Density` | Tween · Flash | Float | — | Full | — | Thickens the scene's fog. |
-| `Renderer/Line Color` | Tween · Punch | Color | — | Full | — | Tints one end of a Line Renderer — its start or its end color. |
-| `Renderer/Line Width` | Tween · Punch | Float | — | Full | — | Widens a Line Renderer. |
-| `Renderer/Material Color` | Tween · Punch · Flash · Gradient · Oscillate · Blink · Spring | Color | — | Full | — | Flashes the material's color. |
-| `Renderer/Material Float` | Tween · Punch · Shake · Curve · Flash · Oscillate · Spring | Float | — | Full | — | Drives a float property of the material. |
+| `Renderer/Line Color` | Tween · Punch · Bounce | Color | — | Full | — | Tints one end of a Line Renderer — its start or its end color. |
+| `Renderer/Line Width` | Tween · Punch · Bounce | Float | — | Full | — | Widens a Line Renderer. |
+| `Renderer/Material Color` | Tween · Punch · Flash · Gradient · Oscillate · Blink · Spring · Bounce | Color | — | Full | — | Flashes the material's color. |
+| `Renderer/Material Float` | Tween · Punch · Shake · Curve · Flash · Oscillate · Spring · Bounce | Float | — | Full | — | Drives a float property of the material. |
 | `Renderer/Material Swap` | Set | Bool | — | Full | — | Swaps the material for another. |
 | `Renderer/Material Vector` | Tween · Curve · Oscillate | Vector4 | — | Full | — | Drives a vector property of the material's shader. |
 | `Renderer/Shader Global Color` | Set · Tween · Curve | Color | — | Full | — | Sets a global shader color (for shaders that read it). |
@@ -422,20 +505,20 @@ under it say what to know before you use the group.
 | `TMP/Character Alpha` | Tween · Oscillate | Float | — | Full | uGUI | Fades a text's characters one by one. |
 | `TMP/Character Offset` | Tween · Oscillate · Wiggle | Vector2 | Motion | Full | uGUI | Moves a text's characters one by one. |
 | `TMP/Character Scale` | Tween · Oscillate · Wiggle | Float | Motion | Full | uGUI | Scales a text's characters one by one. |
-| `TMP/Character Spacing` | Tween · Punch · Oscillate · Spring | Float | — | Full | uGUI | Spreads a text's characters. |
+| `TMP/Character Spacing` | Tween · Punch · Oscillate · Spring · Bounce | Float | — | Full | uGUI | Spreads a text's characters. |
 | `TMP/Count To` | Tween | Float | — | Full | uGUI | Counts a number in a text from one value to another. |
 | `TMP/Dilate` | Tween · Flash · Oscillate · Spring | Float | — | Full | uGUI | Thickens a text's face. |
-| `TMP/Font Size` | Tween · Punch · Spring | Float | — | Full | uGUI | Changes a text's size. |
-| `TMP/Line Spacing` | Tween · Punch · Oscillate · Spring | Float | — | Full | uGUI | Spreads a text's lines. |
+| `TMP/Font Size` | Tween · Punch · Spring · Bounce | Float | — | Full | uGUI | Changes a text's size. |
+| `TMP/Line Spacing` | Tween · Punch · Oscillate · Spring · Bounce | Float | — | Full | uGUI | Spreads a text's lines. |
 | `TMP/Outline Color` | Tween · Flash · Oscillate · Spring | Color | — | Full | uGUI | Tints a text's outline. |
 | `TMP/Outline Width` | Tween · Flash · Oscillate · Spring | Float | — | Full | uGUI | Widens a text's outline. |
-| `TMP/Paragraph Spacing` | Tween · Punch · Oscillate · Spring | Float | — | Full | uGUI | Spreads a text's paragraphs. |
+| `TMP/Paragraph Spacing` | Tween · Punch · Oscillate · Spring · Bounce | Float | — | Full | uGUI | Spreads a text's paragraphs. |
 | `TMP/Reveal` | Tween | Float | — | Full | uGUI | Reveals a text by characters, words or lines. |
 | `TMP/Set Text` | Set | Bool | — | Full | uGUI | Sets a text's string. |
 | `TMP/Softness` | Tween · Flash · Oscillate · Spring | Float | — | Full | uGUI | Softens a text's edges. |
 | `TMP/Underlay Color` | Tween · Flash · Oscillate · Spring | Color | — | Full | uGUI | Tints a text's underlay. |
 | `TMP/Underlay Offset` | Tween · Flash · Oscillate · Spring | Vector2 | — | Full | uGUI | Moves a text's underlay. |
-| `TMP/Word Spacing` | Tween · Punch · Oscillate · Spring | Float | — | Full | uGUI | Spreads a text's words. |
+| `TMP/Word Spacing` | Tween · Punch · Oscillate · Spring · Bounce | Float | — | Full | uGUI | Spreads a text's words. |
 <!-- /gen:reference:TMP -->
 
 **Notes**
@@ -471,9 +554,13 @@ under it say what to know before you use the group.
   writes to `Time.timeScale` while a time feedback runs becomes the new base, and releasing a pause there lets a running
   slow motion go on.
 - While the game already runs slower than its **Minimum Time Scale**, a hit stop makes none and its item keeps its
-  place — with the defaults, that is a second hit stop in one frame. A hit stop lasts in real time — the player's
-  **Speed** divides it, and **Speed** 0 makes none (a warning in development builds). After the item before it, a hit
-  stop starts a frame late at its own length, and time comes back after the next item starts.
+  place — with the defaults, that is while another hit stop holds time at 0, or a second one in the same frame. A
+  player played again under **Restart** keeps the freeze: the new play's hit stop takes over. With **Overlap** set to
+  **Extend**, a hit stop also runs over other hit stops — the minimum then counts only your own pause and slow motion
+  and the Time Scale feedbacks. Of several hit stops at once, the slowest holds time, and time comes back when the
+  last one ends — so a heavy hit right after a light one freezes for the heavy one's length. A hit stop lasts in real
+  time — the player's **Speed** divides it, and **Speed** 0 makes none (a warning in development builds). After the
+  item before it, a hit stop starts a frame late at its own length, and time comes back after the next item starts.
 - Pausing the player during a hit stop does not end it; `Skip()` withdraws it; a backward play passes without one.
 - Of several Time Scale feedbacks, the later wins. The Time category's scale weighs a Flash of `Time/Time Scale`, not a
   Tween.
@@ -485,12 +572,13 @@ under it say what to know before you use the group.
 |---|---|---|---|---|---|---|
 | `Transform/Look At` | Set · Tween | Float | Motion | Full | — | Turns the target to look at another object. |
 | `Transform/Match Transform` | Tween | Float | Motion | Full | — | Moves the target onto another object. |
-| `Transform/Position` | Tween · Punch · Shake · Curve · Oscillate · Wiggle · Spring | Vector3 | Motion | Full | — | Moves the target. |
+| `Transform/Position` | Tween · Punch · Shake · Curve · Oscillate · Wiggle · Spring · Bounce | Vector3 | Motion | Full | — | Moves the target. |
 | `Transform/Rotate Around` | Tween · Oscillate | Float | Motion | Full | — | Turns the target around a pivot. |
-| `Transform/Rotation` | Tween · Punch · Shake · Curve · Oscillate · Wiggle · Spring | Vector3 | Motion | Full | — | Turns the target. |
-| `Transform/Scale` | Tween · Punch · Shake · Curve · Oscillate · Wiggle · Spring | Vector3 | Motion | Full | — | Scales the target. |
+| `Transform/Rotation` | Tween · Punch · Shake · Curve · Oscillate · Wiggle · Spring · Bounce | Vector3 | Motion | Full | — | Turns the target. |
+| `Transform/Scale` | Tween · Punch · Shake · Curve · Oscillate · Wiggle · Spring · Bounce | Vector3 | Motion | Full | — | Scales the target. |
 | `Transform/Set Parent` | Set | Bool | Motion | Full | — | Puts the target under another parent. |
-| `Transform/Squash & Stretch` | Tween · Punch · Curve · Spring | Float | Motion | Full | — | Squashes and stretches the target, keeping its volume. |
+| `Transform/Squash & Stretch` | Tween · Punch · Curve · Spring · Bounce | Float | Motion | Full | — | Squashes and stretches the target, keeping its volume. |
+| `Transform/Trauma` | Set | Bool | Motion | Full | — | Adds to the target's trauma — hits stack up to a ceiling and fade. |
 <!-- /gen:reference:Transform -->
 
 **Notes**
@@ -509,20 +597,23 @@ under it say what to know before you use the group.
   index and transform. A parent in another scene moves the target into that scene; Restore brings it back.
 - FB-A03 checks the anchors set in the inspector; one that `SetAnchor` points into another scene at run time is not
   checked.
+- `Transform/Trauma` adds **Amount** × the play's intensity to the target's [trauma](ScriptingAPI.md#feedbacktrauma) —
+  an enemy hit again and again shakes harder, up to its maximum, and settles on its own. On a camera it adds to the
+  camera's trauma and follows the Camera category; FB-G08 reports one on a RectTransform a layout drives.
 
 ## UI
 
 <!-- gen:reference:UI -->
 | Feedback | Motions | Value | Category | Preview | Needs | Description |
 |---|---|---|---|---|---|---|
-| `UI/Alpha` | Tween · Punch · Flash · Blink · Spring | Float | — | Full | uGUI | Fades a UI graphic. |
+| `UI/Alpha` | Tween · Punch · Flash · Blink · Spring · Bounce | Float | — | Full | uGUI | Fades a UI graphic. |
 | `UI/Canvas Group Alpha` | Tween · Flash · Blink | Float | — | Full | uGUI | Fades a canvas group. |
 | `UI/Canvas Group Blocks Raycasts` | Set | Bool | — | Full | uGUI | Turns a canvas group's raycast blocking on and off. |
 | `UI/Canvas Group Interactable` | Set | Bool | — | Full | uGUI | Turns a canvas group's interactable on and off. |
-| `UI/Color` | Tween · Punch · Flash · Gradient · Blink · Spring | Color | — | Full | uGUI | Tints a UI graphic. |
+| `UI/Color` | Tween · Punch · Flash · Gradient · Blink · Spring · Bounce | Color | — | Full | uGUI | Tints a UI graphic. |
 | `UI/Cross Fade` | Tween | Color | — | Full | uGUI | Cross-fades a UI graphic's color. |
-| `UI/Font Size` | Tween · Punch | Float | — | Full | uGUI | Changes a UI text's size. |
-| `UI/Image Fill` | Tween · Punch · Spring | Float | — | Full | uGUI | Fills a UI image. |
+| `UI/Font Size` | Tween · Punch · Bounce | Float | — | Full | uGUI | Changes a UI text's size. |
+| `UI/Image Fill` | Tween · Punch · Spring · Bounce | Float | — | Full | uGUI | Fills a UI image. |
 | `UI/Image Sprite` | Set | Bool | — | Full | uGUI | Swaps a UI image's sprite. |
 | `UI/Image Sprite Sheet` | Tween | Float | — | Full | uGUI | Plays frames on a UI image. |
 | `UI/Interactable` | Set | Bool | — | Full | uGUI | Turns a UI control's interactable on and off. |
@@ -575,7 +666,7 @@ by letter; the editor's message says what each one saw.
 | Rules | Severity | Checks | Description |
 |---|---|---|---|
 | `FB-A01` – `FB-A10` | Error 3 · Warning 7 | objects · the project | The target: one that does not resolve, an asset, another scene, anchors, a preset's direct reference and a transform item's second target. |
-| `FB-B01` – `FB-B09` | Error 2 · Warning 6 · Info 1 | objects | The list: missing item types, a prefab instance's or variant's overrides, a missing optional package, a deleted linked preset and a custom feedback whose assembly builds do not have. |
+| `FB-B01` – `FB-B11` | Error 2 · Warning 8 · Info 1 | objects | The list: missing item types, a prefab instance's or variant's overrides, a missing optional package, a deleted linked preset, a custom feedback whose assembly builds do not have, a Variants slot that plays nothing and two lists of one alias. |
 | `FB-C01` – `FB-C07` | Warning 5 · Info 2 | objects | The timeline: compile issues, a backward play over a list that cannot play backward, endless repeats, clocks, and values outside their contract. |
 | `FB-D01` – `FB-D08` | Warning 4 · Info 4 | objects · the project | Settings and playback: the first-frame write, play on enable, a spring under Restart or Ignore, motion parameters out of range, Euler rotations and the project's settings assets. |
 | `FB-E01` – `FB-E10` | Warning 7 · Info 3 | objects | Toggles, blinks and the Motion Driver: a toggle or Component Enabled that turns off its own player, an Animator under a blinking object that restarts from its default state, blinks over the flash limit. |
@@ -593,6 +684,7 @@ by letter; the editor's message says what each one saw.
 | `FB-Q01` – `FB-Q04` | Warning 3 · Info 1 | objects | Post-processing volumes. |
 | `FB-R01` – `FB-R04` | Warning 1 · Info 3 | objects | Cinemachine set-ups that hide an effect. |
 | `FB-S01` | Warning 1 | objects | A rumble item while the project uses only the old Input Manager. |
+| `FB-T01` – `FB-T09` | Warning 7 · Info 2 | objects | Audio items: a missing or wrong asset, a parameter the mixer does not expose, the output, Unity's audio turned off, a low pass on a distance curve, a source that is off or has nothing to play, a snapshot's clock and an endless container. |
 <!-- /gen:rules:all -->
 
 **Notes**

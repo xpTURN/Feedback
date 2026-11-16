@@ -11,7 +11,7 @@ namespace xpTURN.Feedback
                 : mode == PhysicsForceMode.Acceleration ? ForceMode.Acceleration
                 : mode == PhysicsForceMode.Impulse ? ForceMode.Impulse : ForceMode.VelocityChange;
 
-        internal static uint Seed(in BeginContext context) => Hash32.Tagged(context.ItemSeed, Hash32.Occurrence, Hash32.Fold(context.Occurrence));
+        internal static uint Seed(in BeginContext context) => PlayMath.OccurrenceSeed(context.ItemSeed, context.Occurrence);
 
         internal static float Unit(uint seed, uint axis) => Hash32.ToUnit(Hash32.Of(seed, axis));
 

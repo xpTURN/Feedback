@@ -47,6 +47,7 @@ namespace xpTURN.Feedback.Editor
                 root.Add(row);
                 Body = new ItemBody();
                 root.Add(Body);
+                m_ItemId = long.MinValue;
                 RebuildItem();
                 root.TrackSerializedObjectValue(serializedObject, _ => RebuildItem());
                 Validation = new ValidationView(driver, serializedObject, null, null);

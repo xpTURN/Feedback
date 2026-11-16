@@ -27,6 +27,7 @@ namespace xpTURN.Feedback.Tests.Editor
         const string ScenePath = "Assets/TimelinePreviewTests.unity";
         const string PrefabPath = "Assets/TimelinePreviewTests.prefab";
         const string TimelinePath = "Assets/TimelinePreviewTests.playable";
+        const string VariantPath = "Assets/TimelinePreviewTestsVariant.asset";
         static readonly List<string> s_Logs = new List<string>();
 
         TimelineEditorWindow m_Window;
@@ -70,6 +71,7 @@ namespace xpTURN.Feedback.Tests.Editor
             AssetDatabase.DeleteAsset(ScenePath);
             AssetDatabase.DeleteAsset(PrefabPath);
             AssetDatabase.DeleteAsset(TimelinePath);
+            AssetDatabase.DeleteAsset(VariantPath);
             RenderSettings.fogDensity = m_Fog;
             RenderSettings.fog = m_FogOn;
             if (m_Global != null)
@@ -643,6 +645,104 @@ namespace xpTURN.Feedback.Tests.Editor
                 => a.Item1 == b.Item1 && a.Item2 == b.Item2 && a.Item3 == b.Item3 && Mathf.Abs(a.Item4 - b.Item4) < 1e-4f;
 
             public int GetHashCode((PreviewRefusal, PreviewRefusal, bool, float) v) => 0;
+        }
+
+        // ---- a clip's Preset in the preview
+
+        static PositionItem LineTo(Vector4 to) => Timed(new PositionItem { m_Target = Self, m_Motion = Tween(to) }, 1f);
+
+        // the player's list moves x to 1 · y to 2 · z to 3, its variant x to 4 — a driven clip of each
+        FeedbackPlayer VariantScene(out PlayableDirector d, out FeedbackPreset variant, out FeedbackClip listClip, out FeedbackClip variantClip)
+        {
+            Scene scene = Fresh();
+            FeedbackPlayer box = Player(new GameObject("Box"), Line());
+            variant = ScriptableObject.CreateInstance<FeedbackPreset>();
+            variant.m_Items.Add(LineTo(new Vector4(4f, 0f, 0f, 0f)));
+            AssetDatabase.CreateAsset(variant, VariantPath);
+            box.m_Variants.Add(variant);
+            d = Director("Director", out TimelineAsset asset);
+            listClip = Track(d, asset, box, 0.5, 1.0, FeedbackClipTiming.Driven);
+            TimelineClip clip = asset.GetOutputTrack(0).CreateClip<FeedbackClip>();
+            clip.start = 3.0;
+            clip.duration = 1.0;
+            variantClip = (FeedbackClip)clip.asset;
+            variantClip.m_Timing = FeedbackClipTiming.Driven;
+            variantClip.m_Preset = variant;
+            Assert.That(EditorSceneManager.SaveScene(scene), Is.True);
+            return box;
+        }
+
+        [UnityTest]
+        public IEnumerator VS16_AVariantClipScrubsInThePreview()
+        {
+            FeedbackPlayer box = VariantScene(out PlayableDirector d, out _, out _, out _);
+            Open(d);
+            Preview = true;
+            Scrub(1.0);
+            string list = $"{box.transform.localPosition:F2}";
+            Scrub(3.5);
+            string variant = $"{box.transform.localPosition:F2} track={(PreviewSession.Current != null && PreviewSession.Current.IsTrack)}";
+            Scrub(3.75);
+            string later = $"{box.transform.localPosition:F2}";
+            Preview = false;
+            string off = $"{box.transform.localPosition:F2}";
+            yield return null;
+            Assert.That((list, variant, later, off), Is.EqualTo(("(0.50, 1.00, 1.50)", "(2.00, 0.00, 0.00) track=True", "(3.00, 0.00, 0.00)", "(0.00, 0.00, 0.00)")), string.Join(" | ", s_Logs));
+        }
+
+        // T13 — the preview plays what the clips hold: the director's options (its key, its Hits row) wait for Play mode
+        [UnityTest]
+        public IEnumerator PV19_ThePreviewPlaysWhatTheClipsHold()
+        {
+            FeedbackPlayer box = VariantScene(out PlayableDirector d, out FeedbackPreset variant, out FeedbackClip listClip, out _);
+            variant.m_Alias = "heavy";
+            listClip.m_HitKey = "hit";
+            FeedbackTimelineOptions options = d.gameObject.AddComponent<FeedbackTimelineOptions>();
+            options.VariantKey = "heavy";
+            options.SetHit("hit", 0f, "heavy");
+            Open(d);
+            Preview = true;
+            Scrub(1.0);
+            string list = $"{box.transform.localPosition:F2}";
+            Preview = false;
+            yield return null;
+            Assert.That(list, Is.EqualTo("(0.50, 1.00, 1.50)"), string.Join(" | ", s_Logs));
+        }
+
+        [UnityTest]
+        public IEnumerator VS31_AVariantsEditReachesThePreview()
+        {
+            FeedbackPlayer box = VariantScene(out PlayableDirector d, out FeedbackPreset variant, out _, out _);
+            Open(d);
+            Preview = true;
+            Scrub(3.5);
+            string before = $"{box.transform.localPosition:F2}";
+            Edit(variant, "m_Items.Array.data[0].m_Motion.m_Params.m_To", p => p.vector4Value = new Vector4(8f, 0f, 0f, 0f));
+            yield return null;
+            BuildAsked();
+            Scrub(3.5);
+            string after = $"{box.transform.localPosition:F2}";
+            Preview = false;
+            yield return null;
+            Assert.That((before, after), Is.EqualTo(("(2.00, 0.00, 0.00)", "(4.00, 0.00, 0.00)")), string.Join(" | ", s_Logs));
+        }
+
+        [UnityTest]
+        public IEnumerator VS32_ASimulatedTargetIsTheVariantsOwn()
+        {
+            FeedbackPlayer box = VariantScene(out PlayableDirector d, out FeedbackPreset variant, out _, out _);
+            variant.m_Items.Add(Timed(new ParticleControlItem(), 0.5f));
+            Open(d);
+            Preview = true;
+            Scrub(1.0);
+            yield return null;
+            PreviewSession session = PreviewSession.Current;
+            bool track = session != null && session.IsTrack;
+            bool list = track && session.TrackDrives(box, null);
+            bool viaVariant = track && session.TrackDrives(box, variant);
+            Preview = false;
+            yield return null;
+            Assert.That((track, list, viaVariant), Is.EqualTo((true, true, false)), "the list drives, the variant with a simulated target does not");
         }
     }
 }

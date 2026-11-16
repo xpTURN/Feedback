@@ -30,7 +30,7 @@ namespace xpTURN.Feedback
     public sealed class GraphicColorItem : TargetItem
     {
         static readonly TargetTraits s_Traits = new TargetTraits(valueKind: ValueKind.Color,
-            supportedMotions: MotionMask.Tween | MotionMask.Flash | MotionMask.Gradient | MotionMask.Blink | MotionMask.Punch | MotionMask.Spring,
+            supportedMotions: MotionMask.Tween | MotionMask.Flash | MotionMask.Gradient | MotionMask.Blink | MotionMask.Punch | MotionMask.Bounce | MotionMask.Spring,
             category: FeedbackCategory.None, flashSensitive: true, applyMode: ApplyMode.Offset);
 
         internal override TargetTraits Traits => s_Traits;
@@ -42,7 +42,7 @@ namespace xpTURN.Feedback
     public sealed class GraphicAlphaItem : TargetItem
     {
         static readonly TargetTraits s_Traits = new TargetTraits(valueKind: ValueKind.Float,
-            supportedMotions: MotionMask.Tween | MotionMask.Flash | MotionMask.Blink | MotionMask.Punch | MotionMask.Spring,
+            supportedMotions: MotionMask.Tween | MotionMask.Flash | MotionMask.Blink | MotionMask.Punch | MotionMask.Bounce | MotionMask.Spring,
             category: FeedbackCategory.None, flashSensitive: true, applyMode: ApplyMode.Offset);
 
         internal override TargetTraits Traits => s_Traits;
@@ -106,7 +106,7 @@ namespace xpTURN.Feedback
     [Serializable]
     public sealed class ImageFillItem : TargetItem
     {
-        static readonly TargetTraits s_Traits = new TargetTraits(valueKind: ValueKind.Float, supportedMotions: MotionMask.Tween | MotionMask.Punch | MotionMask.Spring,
+        static readonly TargetTraits s_Traits = new TargetTraits(valueKind: ValueKind.Float, supportedMotions: MotionMask.Tween | MotionMask.Punch | MotionMask.Bounce | MotionMask.Spring,
             category: FeedbackCategory.None, flashSensitive: false, applyMode: ApplyMode.Offset);
 
         internal override TargetTraits Traits => s_Traits;
@@ -185,7 +185,7 @@ namespace xpTURN.Feedback
     [Serializable]
     public sealed class TextFontSizeItem : TargetItem
     {
-        static readonly TargetTraits s_Traits = new TargetTraits(valueKind: ValueKind.Float, supportedMotions: MotionMask.Tween | MotionMask.Punch,
+        static readonly TargetTraits s_Traits = new TargetTraits(valueKind: ValueKind.Float, supportedMotions: MotionMask.Tween | MotionMask.Punch | MotionMask.Bounce,
             category: FeedbackCategory.None, flashSensitive: false, applyMode: ApplyMode.Offset);
 
         internal override TargetTraits Traits => s_Traits;

@@ -48,6 +48,13 @@ namespace xpTURN.Feedback.Editor
         // a user's feedback the preview does not run · one it runs (what its code changes does not come back)
         CustomSkipped,
         CustomUnrecorded,
+        // a Play At Point with no output of its own or of its player — play sends it to the project's Default Audio Output,
+        // the preview (the defaults) to none
+        AudioOutput,
+        // the audio items that play in play mode only (the mixers' · the listener's) · the editor's audio muted while the
+        // preview has a sound item
+        AudioPlayOnly,
+        AudioMuted,
     }
 
     internal readonly struct PreviewNotice
@@ -73,6 +80,9 @@ namespace xpTURN.Feedback.Editor
             return view == null || view.sceneViewState.imageEffectsEnabled && view.cameraMode.drawMode != DrawCameraMode.Wireframe;
         };
 
+        // the editor's audio muted (the Game view's Mute Audio) — a seam
+        internal static Func<bool> EditorMuted = () => EditorUtility.audioMasterMute;
+
         // URP's camera data by name (the editor has no URP reference)
         static readonly Type s_CameraData = Type.GetType(PostFXNames.CameraData);
         static readonly PropertyInfo s_RenderPostProcessing = s_CameraData?.GetProperty("renderPostProcessing", BindingFlags.Public | BindingFlags.Instance);
@@ -89,7 +99,7 @@ namespace xpTURN.Feedback.Editor
             FeedbackContext context = session.Scheduler.Context;
             TimeScaleService timeScale = context.TimeScaleIfMade;
             if (timeScale != null && timeScale.Count > 0)
-                notices.Add(new PreviewNotice(PreviewNoticeKind.HitStop, $"Hit Stop {timeScale.RemainingAt(timeScale.Count - 1):0.00}s — the preview clock is slowed, the scene is not."));
+                notices.Add(new PreviewNotice(PreviewNoticeKind.HitStop, $"Hit Stop {timeScale.LongestRemaining:0.00}s — the preview clock is slowed, the scene is not."));
             // the open request — under a hit stop, which wins
             else if (timeScale != null && timeScale.HasOpen)
                 notices.Add(new PreviewNotice(PreviewNoticeKind.TimeScale, $"Time Scale {timeScale.Effective:0.##} — the preview clock is slowed, the scene is not."));
@@ -107,7 +117,7 @@ namespace xpTURN.Feedback.Editor
                 notices.Add(new PreviewNotice(PreviewNoticeKind.PhysicsMarks, "Physics forces are shown as arrows — the preview does not simulate physics."));
             if (session.Player != null)
             {
-                foreach (FeedbackItem item in session.Player.Items)
+                foreach (FeedbackItem item in session.ShownItems)
                 {
                     if (PreviewMasks.PrefabChild(session.Player, item))
                         notices.Add(new PreviewNotice(PreviewNoticeKind.PrefabChild, "Set Parent of a prefab instance's child is left out — edit mode cannot move it, play does."));
@@ -122,7 +132,7 @@ namespace xpTURN.Feedback.Editor
 
             var items = new List<FeedbackItem>();
             if (session.Player != null)
-                items.AddRange(session.Player.Items);
+                items.AddRange(session.ShownItems);
             else if (session.MotionDriver != null && session.MotionDriver.m_Item != null)
                 items.Add(session.MotionDriver.m_Item);
             bool shake = false;
@@ -136,6 +146,11 @@ namespace xpTURN.Feedback.Editor
             bool noExtension = false;
             bool activate = false;
             bool rumble = false;
+            bool audioOutput = false;
+            bool mixerParameter = false;
+            bool mixerSnapshot = false;
+            bool listenerVolume = false;
+            bool sound = false;
             var categories = new HashSet<FeedbackCategory>();
             foreach (FeedbackItem item in items)
             {
@@ -151,6 +166,11 @@ namespace xpTURN.Feedback.Editor
                 }
                 activate |= item is CinemachineActivateCameraItem;
                 rumble |= item is GamepadRumbleItem;
+                audioOutput |= item is AudioPlayAtPointItem point && point.m_Output == null && (session.Player == null || session.Player.m_AudioOutput == null);
+                mixerParameter |= item is AudioMixerParameterItem;
+                mixerSnapshot |= item is AudioMixerSnapshotItem;
+                listenerVolume |= item is AudioListenerVolumeItem;
+                sound |= item is AudioSourceControlItem || item is AudioPlayClipItem || item is AudioPlayAtPointItem;
                 if (item is EffectItem effect)
                     categories.Add(effect.EffectiveCategory);
                 screen |= item is ScreenFlashItem || item is ScreenFadeItem || item is FloatingTextItem;
@@ -180,6 +200,10 @@ namespace xpTURN.Feedback.Editor
                 notices.Add(new PreviewNotice(PreviewNoticeKind.CinemachinePlayOnly, "Activate Camera changes the live Cinemachine camera in play only."));
             if (rumble)
                 notices.Add(new PreviewNotice(PreviewNoticeKind.RumblePlayOnly, "Gamepad Rumble plays in play mode only."));
+            if (sound && EditorMuted())
+                notices.Add(new PreviewNotice(PreviewNoticeKind.AudioMuted, "The editor's audio is muted (the Game view's Mute Audio) — the preview's sounds are not heard."));
+            if (mixerParameter || mixerSnapshot || listenerVolume)
+                notices.Add(new PreviewNotice(PreviewNoticeKind.AudioPlayOnly, PlayOnly(mixerParameter, mixerSnapshot, listenerVolume)));
             // a Screen Space Overlay canvas draws in the Game view
             if (screen)
                 notices.Add(new PreviewNotice(PreviewNoticeKind.ScreenGameView, "The screen overlay shows in the Game view."));
@@ -214,9 +238,25 @@ namespace xpTURN.Feedback.Editor
                 notices.Add(new PreviewNotice(PreviewNoticeKind.FlashHeld, "The flash limit held back " + held + " flash(es) — play does the same."));
             if (overlay && play.PostFXLayer != preview.PostFXLayer)
                 notices.Add(new PreviewNotice(PreviewNoticeKind.PostFXCamera, "In play the PostFX overlay is on layer " + play.PostFXLayer + " (the preview's on " + preview.PostFXLayer + ")."));
+            if (audioOutput && play.AudioOutput != null && preview.AudioOutput != play.AudioOutput)
+                notices.Add(new PreviewNotice(PreviewNoticeKind.AudioOutput, "In play the Play At Point sounds with no output go to " + play.AudioOutput.name + " (the project's Default Audio Output)."));
             if (shake && play.ShakeReceiversPerPlay != preview.ShakeReceiversPerPlay)
                 notices.Add(new PreviewNotice(PreviewNoticeKind.ShakeReceivers, "In play a shake reaches " + play.ShakeReceiversPerPlay + " receiver(s)."));
             notices.Add(new PreviewNotice(PreviewNoticeKind.ExecuteAlways, "[ExecuteAlways] scripts can write over the preview's values."));
+        }
+
+        // 'Mixer Parameter, Mixer Snapshot and Listener Volume play in play mode only.' — the ones there
+        static string PlayOnly(bool parameter, bool snapshot, bool listener)
+        {
+            var names = new List<string>(3);
+            if (parameter)
+                names.Add("Mixer Parameter");
+            if (snapshot)
+                names.Add("Mixer Snapshot");
+            if (listener)
+                names.Add("Listener Volume");
+            string list = names.Count == 1 ? names[0] : string.Join(", ", names.GetRange(0, names.Count - 1)) + " and " + names[names.Count - 1];
+            return list + (names.Count == 1 ? " plays" : " play") + " in play mode only.";
         }
 
         // the shaken camera's brain drives it and its live Cinemachine camera has no shake extension (Core's hook resolves the live

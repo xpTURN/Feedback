@@ -436,16 +436,17 @@ namespace xpTURN.Feedback.Tests.Editor
             s.RunLateApply();
             Check(ts.Count == 2 && Math.Abs(ts.RemainingAt(1) - 0.15) < 1e-6, "after the Revert — " + (ts.Count > 1 ? F(ts.RemainingAt(1)) : "none"));
             Check(ts.Count == 2 && Math.Abs(ts.RemainingAt(0) - 0.1) < 1e-6, "the lower one ages under the top — " + (ts.Count > 0 ? F(ts.RemainingAt(0)) : "none"));
-            Check(ts.Effective == 0f, "the top wins — " + F(ts.Effective));
+            Check(ts.Effective == 0f, "the slowest wins — " + F(ts.Effective));
             s.Tick(0.1f);
             Check(ts.Count == 1 && Math.Abs(ts.RemainingAt(0) - 0.05) < 1e-6, "the lower one gone, the top ages — count " + ts.Count + " · " + (ts.Count > 0 ? F(ts.RemainingAt(0)) : "none"));
             s.Tick(0.1f);
             Check(ts.Count == 0 && ts.Effective == 1f, "both gone — count " + ts.Count);
-            // the base × the top
+            // the base × the slowest
             ts.SetBaseScale(0.5f);
-            ts.Request(0.2f, 1.0);
-            Check(Math.Abs(ts.Effective - 0.1f) < 1e-6, "base 0.5 × top 0.2 — " + F(ts.Effective));
+            TimeScaleHandle slow = ts.Request(0.2f, 1.0);
+            Check(Math.Abs(ts.Effective - 0.1f) < 1e-6, "base 0.5 × slowest 0.2 — " + F(ts.Effective));
             // the effective scale stays in 0 ~ 100
+            ts.Release(slow);
             ts.SetBaseScale(10f);
             ts.Request(20f, 1.0);
             Check(ts.Effective == 100f, "base 10 × 20 — " + F(ts.Effective));
@@ -690,6 +691,17 @@ namespace xpTURN.Feedback.Tests.Editor
                 for (int k = 0; k < 9; k++)
                     s.Tick(0.1f);
                 Check(Math.Abs(Mathf.DeltaAngle(0f, cc.transform.localEulerAngles.z) - 9f) < 0.2f && Math.Abs(cc.transform.localPosition.x - 0.9f) < 0.02f, "the Curve copy at 0.9 — z " + F(Mathf.DeltaAngle(0f, cc.transform.localEulerAngles.z)) + " · x " + F(cc.transform.localPosition.x));
+                // a Bounce's rotation copy hops with the position — both at their peak in the middle of the first hop
+                var bounce = new BounceMotion { m_Params = new BounceParams { m_Amplitude = new Vector4(0f, 1f, 0f, 0f), m_Count = 3, m_Restitution = 0.5f } };
+                var bi = Item<CameraShakeItem>(bounce, Direct(Go("cam6").transform), 1f);
+                bi.m_RotationAmplitude = new Vector3(0f, 0f, 10f);
+                GameObject bc = ((Transform)bi.m_Target.m_Object).gameObject;
+                FeedbackPlayer pb = PlayerOn(Go("pb"), s, bi);
+                pb.Play();
+                var bb = (CameraShakeBinding)pb.Runtime.Binding(0);
+                s.Tick((float)(0.5 / (1.0 - 0.125) / 2.0));
+                float bz = Mathf.DeltaAngle(0f, bc.transform.localEulerAngles.z);
+                Check(bb.HasRotation && Math.Abs(bc.transform.localPosition.y - 1f) < 0.01f && Math.Abs(bz - 10f) < 0.1f, "the Bounce copy at the first peak — y " + F(bc.transform.localPosition.y) + " · z " + F(bz) + " · copy " + bb.HasRotation);
                 // the Camera category's scale on both
                 GameObject c5 = Go("cam5");
                 var i5 = Item<CameraShakeItem>(Shake(new Vector4(1f, 1f, 1f, 0f)), Direct(c5.transform), 1f);
@@ -1109,8 +1121,16 @@ namespace xpTURN.Feedback.Tests.Editor
                 asset.m_ShakeReceiversPerPlay = 0;
                 asset.m_ReceiverContributions = -1;
                 asset.m_MaximumUnscaledDelta = float.NaN;
+                asset.m_MaximumShakeOffset = float.NaN;
+                asset.m_MaximumShakeAngle = -2f;
                 SettingsValues bad = SettingsValues.From(asset);
                 Check(bad.FlashLimit == 3 && bad.TimeScaleCapacity == 8 && bad.ShakeReceiversPerPlay == 4 && bad.ReceiverContributions == 8 && bad.MaximumUnscaledDelta == 0f, "out of range — " + bad.FlashLimit + "/" + bad.TimeScaleCapacity + "/" + bad.ShakeReceiversPerPlay + "/" + bad.ReceiverContributions + "/" + bad.MaximumUnscaledDelta);
+                Check(bad.MaximumShakeOffset == 0f && bad.MaximumShakeAngle == 0f, "the shake caps out of range — " + bad.MaximumShakeOffset + " · " + bad.MaximumShakeAngle);
+                asset.m_MaximumShakeOffset = 0.5f;
+                asset.m_MaximumShakeAngle = float.PositiveInfinity;
+                SettingsValues caps = SettingsValues.From(asset);
+                Check(caps.MaximumShakeOffset == 0.5f && caps.MaximumShakeAngle == 0f && new SettingsValues().MaximumShakeOffset == 0f && new SettingsValues().MaximumShakeAngle == 0f,
+                    "the shake caps read — " + caps.MaximumShakeOffset + " · " + caps.MaximumShakeAngle);
             }
             finally
             {
@@ -1163,7 +1183,7 @@ namespace xpTURN.Feedback.Tests.Editor
             Check(Values(typeof(DistanceReference)) == "MainCamera=0 Anchor=1 PlayPosition=2 Global=3", Values(typeof(DistanceReference)));
             // the saved fields and the defaults a new component · asset reads
             Check(HasSaved(typeof(FeedbackReceiver), "m_Channel m_Player m_Range") && HasSaved(typeof(CameraShakeReceiver), "m_Channel m_Range"), "the receivers' saved fields");
-            Check(HasSaved(typeof(FeedbackSettings), "m_Categories m_FlashLimit m_TimeScaleCapacity m_AdjustFixedDeltaTime m_ShakeReceiversPerPlay m_ReceiverContributions m_MaximumUnscaledDelta m_OverlaySortingOrder m_PostFXLayer m_PostFXPriority")
+            Check(HasSaved(typeof(FeedbackSettings), "m_Categories m_FlashLimit m_TimeScaleCapacity m_AdjustFixedDeltaTime m_ShakeReceiversPerPlay m_ReceiverContributions m_MaximumShakeOffset m_MaximumShakeAngle m_TraumaCapacity m_MaximumUnscaledDelta m_OverlaySortingOrder m_PostFXLayer m_PostFXPriority m_AudioOutput")
                   && HasSaved(typeof(CategoryDefault), "m_Category m_Enabled m_Scale"), "the settings' saved fields");
             var asset = ScriptableObject.CreateInstance<FeedbackSettings>();
             SettingsValues read = SettingsValues.From(asset);
@@ -1175,11 +1195,278 @@ namespace xpTURN.Feedback.Tests.Editor
             var camera = rg.AddComponent<CameraShakeReceiver>();
             Check(receiver.m_Channel.m_Mode == ChannelRefMode.Int && receiver.m_Channel.m_Id == 0 && receiver.m_Player == null && receiver.m_Range == 0f && camera.m_Range == 0f, "a new receiver's values");
             // the registry: the Core item types with Core's own implementations — an optional assembly's items are Core's data too
-            Check(FeedbackImplementations.RegisteredTypes.Count(t => t.Assembly == typeof(FeedbackPlayer).Assembly && OptionalAssemblyTests.ImplementationOf(t).Length == 0) == 71, "the registered Core types");
+            Check(FeedbackImplementations.RegisteredTypes.Count(t => t.Assembly == typeof(FeedbackPlayer).Assembly && OptionalAssemblyTests.ImplementationOf(t).Length == 0) == 73, "the registered Core types");
             FeedbackScheduler s = Sched();
             FeedbackPlayer p = PlayerOn(Go("p"), s, Item<CameraShakeItem>(Shake(new Vector4(1f, 0f, 0f, 0f)), Direct(Go("c").transform), 1f), Hit(0.1f));
             p.EnsureRuntime();
             Check(p.Runtime.Binding(0) is CameraShakeBinding && p.Runtime.Binding(1) is HitStopBinding, "the two registered");
+            End();
+        }
+
+        // ---- overlapping timed requests: the slowest wins, each on its own lifetime
+        [Test]
+        public void VE15_Slowest()
+        {
+            Begin();
+            {
+                // a longer one after a shorter one holds time to its own end
+                FeedbackScheduler s = Sched();
+                TimeScaleService ts = s.Context.TimeScale;
+                ts.Request(0f, 0.05);
+                s.Tick(0.025f);
+                ts.Request(0f, 0.2);
+                for (int k = 0; k < 4; k++)
+                    s.Tick(0.025f);
+                Check(ts.Count == 1 && ts.Effective == 0f && Math.Abs(ts.LongestRemaining - 0.125) < 1e-6, "the longer one after — count " + ts.Count + " · effective " + F(ts.Effective) + " · longest " + F(ts.LongestRemaining));
+            }
+            {
+                // a weaker one after a stronger one does not lift it
+                FeedbackScheduler s = Sched();
+                TimeScaleService ts = s.Context.TimeScale;
+                ts.Request(0f, 0.3);
+                ts.Request(0.5f, 0.05);
+                Check(ts.Effective == 0f, "a freeze under a later 0.5 — " + F(ts.Effective));
+                ts.Request(0.8f, 0.05);
+                Check(ts.Effective == 0f && Math.Abs(ts.LongestRemaining - 0.3) < 1e-6, "the longest of the three — " + F(ts.LongestRemaining));
+            }
+            {
+                // a weaker slow motion after a stronger one, in either order
+                FeedbackScheduler s = Sched();
+                TimeScaleService ts = s.Context.TimeScale;
+                ts.Request(0.5f, 0.3);
+                ts.Request(0.8f, 0.1);
+                float first = ts.Effective;
+                FeedbackScheduler r = Sched();
+                TimeScaleService tr = r.Context.TimeScale;
+                tr.Request(0.8f, 0.1);
+                tr.Request(0.5f, 0.3);
+                Check(first == 0.5f && tr.Effective == 0.5f, "0.5 · 0.8 in both orders — " + F(first) + " · " + F(tr.Effective));
+            }
+            {
+                // a speed-up and a freeze: the freeze
+                FeedbackScheduler s = Sched();
+                TimeScaleService ts = s.Context.TimeScale;
+                ts.Request(20f, 1.0);
+                ts.Request(0f, 1.0);
+                FeedbackScheduler r = Sched();
+                TimeScaleService tr = r.Context.TimeScale;
+                tr.Request(0f, 1.0);
+                tr.Request(20f, 1.0);
+                Check(ts.Effective == 0f && tr.Effective == 0f, "20 and 0 — " + F(ts.Effective) + " · " + F(tr.Effective));
+            }
+            {
+                // the open request counts only without a timed one; the scale without the timed requests keeps it
+                FeedbackScheduler s = Sched();
+                TimeScaleService ts = s.Context.TimeScale;
+                TimeScaleHandle open = ts.Open();
+                ts.SetScale(open, 0.3f);
+                TimeScaleHandle timed = ts.Request(0.5f, 1.0);
+                float with = ts.Effective;
+                float without = ts.CurrentWithoutTimed;
+                ts.Release(timed);
+                Check(with == 0.5f && Math.Abs(without - 0.3f) < 1e-6f && Math.Abs(ts.Effective - 0.3f) < 1e-6f && ts.LongestRemaining == 0.0,
+                    "open 0.3 under a timed 0.5 — " + F(with) + " · without the timed " + F(without) + " · after " + F(ts.Effective) + " · longest " + F(ts.LongestRemaining));
+                ts.SetBaseScale(0.5f);
+                ts.Request(0f, 1.0);
+                Check(ts.Current == 0f && Math.Abs(ts.CurrentWithoutTimed - 0.15f) < 1e-6f, "the minimum's two scales over a freeze — " + F(ts.Current) + " · " + F(ts.CurrentWithoutTimed));
+            }
+            End();
+        }
+
+        // ---- the soft cap on a camera's shakes summed — a capped run is the uncapped run's sum through the cap, in this
+        // test's own double formula; the camera is turned so a twice-applied Self space shows
+
+        static readonly Quaternion s_Turn = Quaternion.Euler(0f, 40f, 0f);
+        static readonly Vector4 s_Amplitude = new Vector4(2f, 1.2f, 0f, 0f);
+
+        static double Capped(double x, double limit)
+        {
+            double knee = limit / 2.0, room = limit - knee;
+            return x <= knee ? x : knee + room * Math.Tanh((x - knee) / room);
+        }
+
+        static Vector3 CapOffset(Vector3 v, double limit)
+        {
+            double m = v.magnitude;
+            return m > 0.0 ? v * (float)(Capped(m, limit) / m) : v;
+        }
+
+        static double Degrees(Quaternion q)
+        {
+            double s = Math.Sqrt((double)q.x * q.x + (double)q.y * q.y + (double)q.z * q.z);
+            return 2.0 * Math.Atan2(s, Math.Abs((double)q.w)) * 180.0 / Math.PI;
+        }
+
+        static Quaternion CapTurn(Quaternion q, double limit)
+        {
+            double s = Math.Sqrt((double)q.x * q.x + (double)q.y * q.y + (double)q.z * q.z);
+            if (s == 0.0)
+                return q;
+            double sign = q.w < 0f ? -1.0 : 1.0;
+            double angle = 2.0 * Math.Atan2(s, q.w * sign) * 180.0 / Math.PI;
+            double half = Capped(angle, limit) * 0.5 * Math.PI / 180.0;
+            double k = sign * Math.Sin(half) / s;
+            return new Quaternion((float)(q.x * k), (float)(q.y * k), (float)(q.z * k), (float)Math.Cos(half));
+        }
+
+        // n shakes (seeds 11 …) on one turned camera, and an extra item on it when given — the local position and rotation
+        // over twelve ticks
+        (Vector3[] P, Quaternion[] R) CapRun(SettingsValues values, int n, Vector4 amplitude, float turn, float camera = 1f, bool overridden = false, Func<Transform, FeedbackItem> extra = null, uint seed = 11, bool extraFirst = false)
+        {
+            FeedbackScheduler s = Sched(values);
+            s.Context.Categories.SetScale(FeedbackCategory.Camera, camera);
+            GameObject cam = Go("cam");
+            cam.transform.rotation = s_Turn;
+            if (extra != null && extraFirst)
+                PlayerOn(Go("extra"), s, extra(cam.transform)).Play();
+            for (int i = 0; i < n; i++)
+            {
+                var item = Item<CameraShakeItem>(Shake(amplitude), Direct(cam.transform), 1f);
+                item.m_RotationAmplitude = new Vector3(0f, 0f, turn);
+                if (overridden)
+                    item.m_Category = new CategoryOverride { m_Override = true, m_Category = FeedbackCategory.Motion };
+                PlayerOn(Go("shake" + i), s, item).Play(new PlayArgs().WithSeed((uint)(seed + i)));
+            }
+            if (extra != null && !extraFirst)
+                PlayerOn(Go("extra"), s, extra(cam.transform)).Play();
+            var p = new Vector3[12];
+            var r = new Quaternion[12];
+            for (int k = 0; k < 12; k++)
+            {
+                s.Tick(0.037f);
+                p[k] = cam.transform.localPosition;
+                r[k] = cam.transform.localRotation;
+            }
+            return (p, r);
+        }
+
+        [Test]
+        public void VE16_ShakeCap()
+        {
+            Begin();
+            var cap = new SettingsValues { MaximumShakeOffset = 1.2f, MaximumShakeAngle = 8f };
+            Quaternion back = Quaternion.Inverse(s_Turn);
+            (Vector3[] P, Quaternion[] R) free = CapRun(new SettingsValues(), 3, s_Amplitude, 10f);
+            (Vector3[] P, Quaternion[] R) held = CapRun(cap, 3, s_Amplitude, 10f);
+            {
+                // three shakes: the capped camera is the uncapped sum through the cap, never past it
+                double worstP = 0, worstR = 0, sum = 0, angle = 0, heldP = 0, heldR = 0;
+                for (int k = 0; k < 12; k++)
+                {
+                    Vector3 s = back * free.P[k];
+                    Quaternion q = back * free.R[k];
+                    sum = Math.Max(sum, s.magnitude);
+                    angle = Math.Max(angle, Degrees(q));
+                    worstP = Math.Max(worstP, (held.P[k] - s_Turn * CapOffset(s, 1.2)).magnitude);
+                    worstR = Math.Max(worstR, Degrees(Quaternion.Inverse(s_Turn * CapTurn(q, 8.0)) * held.R[k]));
+                    heldP = Math.Max(heldP, held.P[k].magnitude);
+                    heldR = Math.Max(heldR, Degrees(back * held.R[k]));
+                }
+                Check(sum > 1.2 && angle > 8.0, "the uncapped sums pass the caps — " + F(sum) + " · " + F(angle) + "°");
+                Check(worstP < 1e-4 && heldP <= 1.2 + 1e-5, "the position through the cap — worst " + F(worstP) + " · max " + F(heldP));
+                Check(worstR < 1e-3 && heldR <= 8.0 + 1e-3, "the turn through the cap — worst " + F(worstR) + "° · max " + F(heldR) + "°");
+            }
+            {
+                // uncapped, the shakes add one by one as before — the same bits as the single runs summed in their order
+                bool same = true;
+                (Vector3[] P, Quaternion[] R)[] alone = { CapRun(new SettingsValues(), 1, s_Amplitude, 10f, seed: 11), CapRun(new SettingsValues(), 1, s_Amplitude, 10f, seed: 12), CapRun(new SettingsValues(), 1, s_Amplitude, 10f, seed: 13) };
+                for (int k = 0; k < 12; k++)
+                    same &= new Vector3Ops().BitEquals(free.P[k], alone[0].P[k] + alone[1].P[k] + alone[2].P[k]);
+                Check(same, "uncapped — the same bits as the single shakes added in turn");
+            }
+            {
+                // one shake under the knee: the same bits as uncapped
+                (Vector3[] P, Quaternion[] R) one = CapRun(new SettingsValues(), 1, new Vector4(0.4f, 0.2f, 0f, 0f), 2f);
+                (Vector3[] P, Quaternion[] R) oneHeld = CapRun(new SettingsValues { MaximumShakeOffset = 10f, MaximumShakeAngle = 100f }, 1, new Vector4(0.4f, 0.2f, 0f, 0f), 2f);
+                bool same = true;
+                for (int k = 0; k < 12; k++)
+                    same &= new Vector3Ops().BitEquals(one.P[k], oneHeld.P[k]) && new QuaternionOps().BitEquals(one.R[k], oneHeld.R[k]);
+                Check(same, "one shake under the knee — the same bits");
+            }
+            {
+                // a tiny turn: the cap reads a few hundredths of a degree
+                (Vector3[] P, Quaternion[] R) tinyFree = CapRun(new SettingsValues(), 1, new Vector4(0.01f, 0f, 0f, 0f), 0.05f);
+                (Vector3[] P, Quaternion[] R) tiny = CapRun(new SettingsValues { MaximumShakeAngle = 0.02f }, 1, new Vector4(0.01f, 0f, 0f, 0f), 0.05f);
+                double maxFree = 0, maxTiny = 0;
+                for (int k = 0; k < 12; k++)
+                {
+                    maxFree = Math.Max(maxFree, Degrees(back * tinyFree.R[k]));
+                    maxTiny = Math.Max(maxTiny, Degrees(back * tiny.R[k]));
+                }
+                Check(maxFree > 0.02 && maxTiny <= 0.02 + 1e-4, "a 0.05° shake at a 0.02° cap — uncapped " + F(maxFree) + "° · capped " + F(maxTiny) + "°");
+            }
+            {
+                // the Camera category's scale scales the caps too — half the shakes, half the capped camera; an item moved to
+                // another category still meets the Camera category's cap
+                (Vector3[] P, Quaternion[] R) half = CapRun(cap, 3, s_Amplitude, 10f, 0.5f);
+                (Vector3[] P, Quaternion[] R) moved = CapRun(cap, 3, s_Amplitude, 10f, 0.5f, true);
+                double worstP = 0, worstR = 0, worstMoved = 0, maxMoved = 0;
+                for (int k = 0; k < 12; k++)
+                {
+                    worstP = Math.Max(worstP, (half.P[k] - 0.5f * held.P[k]).magnitude);
+                    worstR = Math.Max(worstR, Math.Abs(Degrees(back * half.R[k]) - 0.5 * Degrees(back * held.R[k])));
+                    worstMoved = Math.Max(worstMoved, (moved.P[k] - s_Turn * CapOffset(back * free.P[k], 0.6)).magnitude);
+                    maxMoved = Math.Max(maxMoved, moved.P[k].magnitude);
+                }
+                Check(worstP < 1e-4 && worstR < 1e-3, "Camera at 0.5 — position " + F(worstP) + " · turn " + F(worstR) + "°");
+                Check(worstMoved < 1e-4 && maxMoved <= 0.6 + 1e-5, "a shake moved to Motion under Camera 0.5 — worst " + F(worstMoved) + " · max " + F(maxMoved));
+            }
+            {
+                // another feedback moving the camera is added uncapped — started after the shakes or before them
+                Func<Transform, FeedbackItem> push = t => Item<PositionItem>(new CurveMotion { m_Params = new CurveParams { m_Curve = AnimationCurve.Constant(0f, 1f, 1f), m_RemapZero = Vector4.zero, m_RemapOne = new Vector4(5f, 0f, 0f, 0f) } }, Direct(t), 1f);
+                (Vector3[] P, Quaternion[] R) both = CapRun(cap, 3, s_Amplitude, 10f, 1f, false, push);
+                (Vector3[] P, Quaternion[] R) before = CapRun(cap, 3, s_Amplitude, 10f, 1f, false, push, extraFirst: true);
+                (Vector3[] P, Quaternion[] R) alone = CapRun(cap, 0, s_Amplitude, 10f, 1f, false, push);
+                double worst = 0, worstBefore = 0;
+                for (int k = 0; k < 12; k++)
+                {
+                    worst = Math.Max(worst, ((both.P[k] - held.P[k]) - alone.P[k]).magnitude);
+                    worstBefore = Math.Max(worstBefore, ((before.P[k] - held.P[k]) - alone.P[k]).magnitude);
+                }
+                Check(worst < 1e-4 && worstBefore < 1e-4 && alone.P[5].magnitude > 2.4, "a Position feedback beside the shakes — worst after " + F(worst) + " · before " + F(worstBefore) + " · its offset " + F(alone.P[5].magnitude));
+            }
+            {
+                // a receiver's slots take the cap too
+                FeedbackScheduler s = Sched(cap);
+                var receiver = Go("receiver").AddComponent<CameraShakeReceiver>();
+                receiver.transform.rotation = s_Turn;
+                receiver.m_Channel = ChannelRef.Of(3);
+                receiver.Bind(s);
+                for (int i = 0; i < 3; i++)
+                {
+                    var item = Item<CameraShakeItem>(Shake(s_Amplitude), OnChannel(3), 1f);
+                    item.m_RotationAmplitude = new Vector3(0f, 0f, 10f);
+                    PlayerOn(Go("sent" + i), s, item).Play(new PlayArgs().WithSeed((uint)(11 + i)));
+                }
+                double worst = 0;
+                for (int k = 0; k < 12; k++)
+                {
+                    s.Tick(0.037f);
+                    worst = Math.Max(worst, (receiver.transform.localPosition - held.P[k]).magnitude);
+                }
+                Check(worst < 1e-4, "a receiver — worst against the direct cap " + F(worst));
+                receiver.Bind(null);
+            }
+            {
+                // capped, a frame allocates nothing
+                FeedbackScheduler s = Sched(cap);
+                GameObject cam = Go("alloc");
+                for (int i = 0; i < 3; i++)
+                {
+                    var item = Item<CameraShakeItem>(Shake(s_Amplitude), Direct(cam.transform), 5f);
+                    item.m_RotationAmplitude = new Vector3(0f, 0f, 10f);
+                    PlayerOn(Go("a" + i), s, item).Play();
+                }
+                s.Tick(0.016f);
+                s.Tick(0.016f);
+                int hits = 0;
+                for (int i = 0; i < 5; i++)
+                {
+                    if (UnityEngine.TestTools.Constraints.Is.AllocatingGCMemory().ApplyTo(new TestDelegate(() => s.Tick(0.016f))).IsSuccess)
+                        hits++;
+                }
+                Check(hits < 5, "a capped frame allocates — " + hits + "/5");
+            }
             End();
         }
     }

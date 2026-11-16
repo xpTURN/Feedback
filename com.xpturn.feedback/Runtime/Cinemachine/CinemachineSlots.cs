@@ -177,6 +177,8 @@ namespace xpTURN.Feedback
         protected override Vector3 Read() => CinemachineShakeExtension.PositionOf(m_Brain);
 
         protected override void Write(in Vector3 value) => CinemachineShakeExtension.SetPosition(m_Brain, value);
+
+        protected override Vector3 Limit(in Vector3 sum, float limit) => Vector3Ops.SoftLimit(in sum, limit);
     }
 
     [NotRecorded("the shake extension's value — no field of the scene")]
@@ -199,5 +201,7 @@ namespace xpTURN.Feedback
         protected override Quaternion Read() => CinemachineShakeExtension.RotationOf(m_Brain);
 
         protected override void Write(in Quaternion value) => CinemachineShakeExtension.SetRotation(m_Brain, value);
+
+        protected override Quaternion Limit(in Quaternion sum, float limit) => QuaternionOps.SoftLimit(in sum, limit);
     }
 }

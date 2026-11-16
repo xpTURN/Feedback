@@ -406,6 +406,8 @@ namespace xpTURN.Feedback.Tests
             { typeof(PositionItem), Leaf.LightCamera }, { typeof(RotationItem), Leaf.LightCamera }, { typeof(ScaleItem), Leaf.LightCamera },
             { typeof(LightIntensityItem), Leaf.LightCamera }, { typeof(SetActiveItem), Leaf.LightCamera }, { typeof(MaterialColorItem), Leaf.Cube },
             { typeof(CameraShakeItem), Leaf.LightCamera },
+            // a trauma add on the leaf's camera and transform
+            { typeof(CameraTraumaItem), Leaf.LightCamera }, { typeof(TransformTraumaItem), Leaf.LightCamera },
             // the leaf carries a light and a camera
             { typeof(LightRangeItem), Leaf.LightCamera }, { typeof(LightColorItem), Leaf.LightCamera }, { typeof(LightSpotAngleItem), Leaf.LightCamera }, { typeof(LightShadowStrengthItem), Leaf.LightCamera },
             { typeof(CameraFieldOfViewItem), Leaf.LightCamera }, { typeof(CameraOrthographicSizeItem), Leaf.LightCamera }, { typeof(CameraZoomItem), Leaf.LightCamera },
@@ -799,6 +801,129 @@ namespace xpTURN.Feedback.Tests
             Check(seek < 5, "the seek cycle allocates 5/5");
             Check(listener < 5, "the listener cycle allocates 5/5");
             Debug.Log("GATE " + Where + " linked first runs seek " + seek + "/5 listener " + listener + "/5");
+            End();
+        }
+
+        // ---- a player with Variants — the first runs of five fresh fixtures whose list (a position tween) has two Variants (a
+        // color flash · a position punch on the grandchild): a variant's play, its Stop by handle, the other variant cut by a play of
+        // the list (Restart), a seek, a variant's play with a listener, Restore — the plays pick their runtime without allocating
+        static FeedbackPreset s_VariantA;
+        static FeedbackPreset s_VariantB;
+
+        static readonly TestDelegate s_VariantCycle = () =>
+        {
+            Fixture f = s_Fixture;
+            PlaybackHandle a = f.Player.Play(PlayArgs.Default.WithPreset(s_VariantA));
+            Tick(2);
+            f.Player.Stop(a, StopMode.Revert);
+            Tick(1);
+            f.Player.Play(PlayArgs.Default.WithPreset(s_VariantB));
+            Tick(2);
+            f.Player.Play();
+            Tick(2);
+            f.Player.Pause();
+            f.Player.Seek(0.1f);
+            f.Player.Resume();
+            Tick(1);
+            f.Player.Play(PlayArgs.Default.WithPreset(s_VariantA).WithListener(s_Listener));
+            Tick(2);
+            f.Player.Stop(StopMode.Complete);
+            Tick(1);
+            f.Player.Restore();
+        };
+
+        [UnityTest]
+        public IEnumerator GP21_Variants()
+        {
+            yield return null;
+            Positive();
+            s_VariantA = ScriptableObject.CreateInstance<FeedbackPreset>();
+            s_VariantB = ScriptableObject.CreateInstance<FeedbackPreset>();
+            m_Made.Add(s_VariantA);
+            m_Made.Add(s_VariantB);
+            var flash = new MaterialColorItem { m_Motion = new FlashMotion(), m_Target = Grand() };
+            flash.m_Timing.m_Duration = 0.3f;
+            s_VariantA.m_Items.Add(flash);
+            var punch = new PositionItem { m_Motion = new PunchMotion(), m_Target = Grand() };
+            punch.m_Timing.m_Duration = 0.3f;
+            s_VariantB.m_Items.Add(punch);
+            Func<Fixture> withVariants = () =>
+            {
+                Fixture f = Fresh(() =>
+                {
+                    var tween = new PositionItem { m_Motion = new TweenMotion(), m_Target = Grand() };
+                    tween.m_Timing.m_Duration = 0.3f;
+                    return tween;
+                }, Leaf.Cube);
+                f.Player.m_Variants = new List<FeedbackPreset> { s_VariantA, s_VariantB };
+                f.Player.Rebuild();
+                Check(f.Player.VariantRuntimeCount == 2 && f.Player.VariantRuntime(0) != null && f.Player.VariantRuntime(1) != null, "the Variants prepared");
+                return f;
+            };
+            int ends = s_Listener.Ends;
+            int hits = FirstRuns(withVariants, s_VariantCycle);
+            Check(hits < 5, "the variant cycle allocates 5/5");
+            Check(s_Listener.Ends > ends, "the variant play's listener heard its end");
+            Debug.Log("GATE " + Where + " variants first runs " + hits + "/5");
+            End();
+        }
+
+        // the setters and the Variant keys on the variant fixture: the Intensity setter, a play by the player's key, a play's key,
+        // a play of the player's list, TryGetVariant — a key picks its list by comparing the aliases, without allocating
+        static FeedbackPreset s_KeyA;
+        static FeedbackPreset s_KeyB;
+
+        static readonly TestDelegate s_KeyCycle = () =>
+        {
+            Fixture f = s_Fixture;
+            f.Player.Intensity = 0.8f;
+            f.Player.VariantKey = "b";
+            f.Player.Play();
+            Tick(2);
+            f.Player.Play(PlayArgs.Default.WithVariant("a"));
+            Tick(2);
+            f.Player.Play(PlayArgs.Default.WithPlayerList());
+            Tick(2);
+            f.Player.TryGetVariant("a", out _);
+            f.Player.Intensity = 1f;
+            f.Player.VariantKey = "";
+            f.Player.Stop(StopMode.Revert);
+            Tick(1);
+        };
+
+        [UnityTest]
+        public IEnumerator GP23_PlayerSetters()
+        {
+            yield return null;
+            Positive();
+            s_KeyA = ScriptableObject.CreateInstance<FeedbackPreset>();
+            s_KeyB = ScriptableObject.CreateInstance<FeedbackPreset>();
+            m_Made.Add(s_KeyA);
+            m_Made.Add(s_KeyB);
+            s_KeyA.m_Alias = "a";
+            s_KeyB.m_Alias = "b";
+            var flash = new MaterialColorItem { m_Motion = new FlashMotion(), m_Target = Grand() };
+            flash.m_Timing.m_Duration = 0.3f;
+            s_KeyA.m_Items.Add(flash);
+            var punch = new PositionItem { m_Motion = new PunchMotion(), m_Target = Grand() };
+            punch.m_Timing.m_Duration = 0.3f;
+            s_KeyB.m_Items.Add(punch);
+            Func<Fixture> withKeys = () =>
+            {
+                Fixture f = Fresh(() =>
+                {
+                    var tween = new PositionItem { m_Motion = new TweenMotion(), m_Target = Grand() };
+                    tween.m_Timing.m_Duration = 0.3f;
+                    return tween;
+                }, Leaf.Cube);
+                f.Player.m_Variants = new List<FeedbackPreset> { s_KeyA, s_KeyB };
+                f.Player.Rebuild();
+                Check(f.Player.VariantRuntimeCount == 2 && f.Player.TryGetVariant("b", out FeedbackPreset b) && b == s_KeyB, "the Variants prepared, their aliases found");
+                return f;
+            };
+            int hits = FirstRuns(withKeys, s_KeyCycle);
+            Check(hits < 5, "the key cycle allocates 5/5");
+            Debug.Log("GATE " + Where + " keys first runs " + hits + "/5");
             End();
         }
 

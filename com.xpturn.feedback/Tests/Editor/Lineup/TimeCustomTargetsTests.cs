@@ -582,6 +582,56 @@ namespace xpTURN.Feedback.Tests.Editor
             Assert.That(notices.Select(x => x.Kind).Where(k => k == PreviewNoticeKind.HitStop || k == PreviewNoticeKind.TimeScale), Is.EqualTo(new[] { PreviewNoticeKind.HitStop }), "the hit stop's line while it runs");
         }
 
+        // ---- a trauma in the preview — the object shakes on the preview's clock and comes back bit for bit at the end
+        [Test]
+        public void CQ13c_TheTraumaPreview()
+        {
+            Scene scene = OpenScene("cq13c");
+            SceneManager.SetActiveScene(scene);
+            var shaken = new GameObject("shaken");
+            SceneManager.MoveGameObjectToScene(shaken, scene);
+            shaken.transform.SetPositionAndRotation(new Vector3(1f, 2f, 3f), Quaternion.Euler(0f, 30f, 0f));
+            Vector3 p0 = shaken.transform.localPosition;
+            Quaternion r0 = shaken.transform.localRotation;
+            var trauma = new TransformTraumaItem { m_Motion = new SetMotion(), m_Amount = 1f };
+            trauma.m_Target = new TargetRef { m_Mode = TargetRefMode.Direct, m_Object = shaken.transform, m_Path = "", m_Anchor = "" };
+            FeedbackPlayer player = ScenePlayer(scene, trauma);
+            Assert.That(EditorSceneManager.SaveScene(scene), Is.True);
+            Assert.That(PreviewSession.Start(player, default), Is.EqualTo(PreviewRefusal.None));
+            bool moved = false;
+            for (int i = 0; i < 30; i++)
+            {
+                Pump(1);
+                moved |= shaken.transform.localPosition != p0 || shaken.transform.localRotation != r0;
+            }
+            PreviewSession.Current.Stop();
+            Assert.That(moved, Is.True, "it shook in the preview");
+            Assert.That(new Vector3Ops().BitEquals(shaken.transform.localPosition, p0) && new QuaternionOps().BitEquals(shaken.transform.localRotation, r0), Is.True, "back bit for bit");
+            Assert.That(scene.isDirty, Is.False, "the scene clean");
+        }
+
+        // ---- two hit stops in the preview — the notice tells the time until the last one ends, not the newer one's
+        [Test]
+        public void CQ13b_TheHitStopNotice()
+        {
+            Scene scene = OpenScene("cq13b");
+            SceneManager.SetActiveScene(scene);
+            FeedbackPlayer player = ScenePlayer(scene, new HitStopItem { m_FreezeDuration = 0.5f, m_TimeScale = 0f, m_MinimumTimeScale = 0f },
+                new HitStopItem { m_FreezeDuration = 0.1f, m_TimeScale = 0f, m_MinimumTimeScale = 0f });
+            Assert.That(PreviewSession.Start(player, default), Is.EqualTo(PreviewRefusal.None));
+            Pump(2);
+            TimeScaleService ts = PreviewSession.Current.Scheduler.Context.TimeScale;
+            int count = ts.Count;
+            double longest = Math.Max(ts.RemainingAt(0), count > 1 ? ts.RemainingAt(1) : 0.0);
+            var notices = new List<PreviewNotice>();
+            PreviewNotices.Collect(PreviewSession.Current, notices);
+            PreviewSession.Current.Stop();
+            Assert.That(count, Is.EqualTo(2), "both requested");
+            Assert.That(notices.Single(x => x.Kind == PreviewNoticeKind.HitStop).Text,
+                Is.EqualTo($"Hit Stop {longest:0.00}s — the preview clock is slowed, the scene is not."));
+            Assert.That(longest, Is.GreaterThan(0.3), "the longer one's time");
+        }
+
         // ---- Custom Value in the preview — a Tween's and a punch's end is the base without a save · a save in it writes
         // the base to the file, the preview's value back after · the scene stays clean
         [Test]

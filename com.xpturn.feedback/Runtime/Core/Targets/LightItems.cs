@@ -8,7 +8,7 @@ namespace xpTURN.Feedback
     public sealed class LightIntensityItem : TargetItem
     {
         static readonly TargetTraits s_Traits = new TargetTraits(valueKind: ValueKind.Float,
-            supportedMotions: MotionMask.Tween | MotionMask.Flash | MotionMask.Punch | MotionMask.Shake | MotionMask.Oscillate | MotionMask.Blink | MotionMask.Spring,
+            supportedMotions: MotionMask.Tween | MotionMask.Flash | MotionMask.Punch | MotionMask.Bounce | MotionMask.Shake | MotionMask.Oscillate | MotionMask.Blink | MotionMask.Spring,
             category: FeedbackCategory.None, flashSensitive: true, applyMode: ApplyMode.Offset);
 
         internal override TargetTraits Traits => s_Traits;
@@ -19,7 +19,7 @@ namespace xpTURN.Feedback
     public sealed class LightRangeItem : TargetItem
     {
         static readonly TargetTraits s_Traits = new TargetTraits(valueKind: ValueKind.Float,
-            supportedMotions: MotionMask.Tween | MotionMask.Punch | MotionMask.Oscillate | MotionMask.Spring,
+            supportedMotions: MotionMask.Tween | MotionMask.Punch | MotionMask.Bounce | MotionMask.Oscillate | MotionMask.Spring,
             category: FeedbackCategory.None, flashSensitive: false, applyMode: ApplyMode.Offset);
 
         internal override TargetTraits Traits => s_Traits;

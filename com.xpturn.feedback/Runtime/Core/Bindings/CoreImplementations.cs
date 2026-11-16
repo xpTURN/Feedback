@@ -15,6 +15,8 @@ namespace xpTURN.Feedback
             FeedbackImplementations.Register<UnityEventItem>(item => new UnityEventBinding(item));
             FeedbackImplementations.Register<CameraShakeItem>(item => new CameraShakeBinding(item));
             FeedbackImplementations.Register<HitStopItem>(item => new HitStopBinding(item));
+            FeedbackImplementations.Register<CameraTraumaItem>(item => new TraumaBinding(item));
+            FeedbackImplementations.Register<TransformTraumaItem>(item => new TraumaBinding(item));
             FeedbackImplementations.Register<LightRangeItem>(item => new LightRangeBinding(item));
             FeedbackImplementations.Register<LightColorItem>(item => new LightColorBinding(item));
             FeedbackImplementations.Register<LightSpotAngleItem>(item => new LightSpotAngleBinding(item));

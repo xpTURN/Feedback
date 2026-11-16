@@ -7,10 +7,11 @@ player does allocate — when it prepares, for one — is in [Concepts](Concepts
 
 ## What no allocation covers
 
-In a development player, every combination of a target and a motion the package registers — 361 of them — went
-through two cycles: play, pause, seek, resume, skip, play backward and stop in each stop mode; play with a listener,
-skip and stop with Complete. None allocated. Lists that mix waits, loops and signals went through the same: playing
-forward with a signal, a wait running out, skipping, playing backward, seeking and stopping, and loops of no length.
+In a development player, every combination of a target and a motion the package registers —
+<!-- gen:count:combinations -->467<!-- /gen:count:combinations --> of them — went through two cycles: play, pause, seek,
+resume, skip, play backward and stop in each stop mode; play with a listener, skip and stop with Complete. None
+allocated. Lists that mix waits, loops and signals went through the same: playing forward with a signal, a wait running
+out, skipping, playing backward, seeking and stopping, and loops of no length.
 
 ## Against a coroutine per play
 

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace xpTURN.Feedback
@@ -45,6 +46,44 @@ namespace xpTURN.Feedback
         // finds the target and gets its toggle — false refuses with the reason
         protected abstract bool Acquire(in PrepareContext context, out TSlot slot);
 
+        // Prepare's and Describe's evaluator
+        static MotionEvaluator EvaluatorFor(FeedbackMotion motion) => MotionEvaluators.Create(motion, 1);
+
+        internal override void Describe(List<GraphChannel> into)
+        {
+            FeedbackMotion motion = m_Item.m_Motion;
+            if (motion == null || !m_Item.Traits.Supports(motion.Kind))
+                return;
+            MotionEvaluator evaluator = EvaluatorFor(motion);
+            if (evaluator != null)
+                into.Add(new GraphChannel("", evaluator, LayerSpace.Local, toggle: true));
+        }
+
+        internal override void GraphSlots(List<LayerSlot> into)
+        {
+            if (m_Slot != null)
+                into.Add(m_Slot);
+        }
+
+        internal override bool GraphRecord(int record, int channel, in MotionTime time, out Vector4 value)
+        {
+            value = default;
+            if (m_Slot == null || m_Evaluator == null || m_States == null || record < 0 || record >= m_States.Length)
+                return false;
+            return GraphSample(m_Evaluator, in m_States[record], in time, m_Evaluator.Write, false, true, m_Gate.Scale(m_Category), out value);
+        }
+
+        internal override bool SeedStart(int record, ItemBinding dry)
+        {
+            if (m_HasStart == null || record < 0 || record >= m_HasStart.Length || !m_HasStart[record] || !(dry is ToggleTargetBinding<TSlot> other)
+                || other.m_Slot == null)
+                return false;
+            return other.m_Slot.SeedValue(m_Starts[record]);
+        }
+
+        // observation
+        internal MotionEvaluator PreparedEvaluator => m_Evaluator;
+
         // a Revert's start state not to write (Set Active: turning the disabling player on)
         protected virtual bool HoldsStart(int record) => false;
 
@@ -63,7 +102,7 @@ namespace xpTURN.Feedback
                 return Refuse(null);
 #endif
             }
-            m_Evaluator = MotionEvaluators.Create(motion, 1);
+            m_Evaluator = EvaluatorFor(motion);
             if (m_Evaluator == null)
                 return Refuse("an unknown motion");
             m_Layers = context.Context.Layers;
@@ -102,8 +141,8 @@ namespace xpTURN.Feedback
                 m_HasStart[record] = true;
             }
             var current = new Vector4(m_Starts[record] ? 1f : 0f, 0f, 0f, 0f);
-            uint seed = Hash32.Tagged(context.ItemSeed, Hash32.Occurrence, Hash32.Fold(context.Occurrence));
-            m_Evaluator.Begin(ref m_States[record], current, new MotionBegin { Seed = seed, Intensity = context.Intensity });
+            uint seed = PlayMath.OccurrenceSeed(context.ItemSeed, context.Occurrence);
+            m_Evaluator.Begin(ref m_States[record], current, new MotionBegin { Seed = seed, Intensity = context.Intensity, Endless = context.Endless });
         }
 
         // Set — the value at any time. Relative toggles the play's start state when its value is not 0 — the intensity does

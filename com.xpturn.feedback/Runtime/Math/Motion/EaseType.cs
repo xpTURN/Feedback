@@ -36,5 +36,6 @@ namespace xpTURN.Feedback
         BounceOut = 29,
         BounceInOut = 30,
         Custom = 31,
+        Steps = 32,
     }
 }

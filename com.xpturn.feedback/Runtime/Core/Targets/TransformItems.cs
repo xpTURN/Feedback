@@ -62,7 +62,7 @@ namespace xpTURN.Feedback
     public sealed class PositionItem : TargetItem
     {
         static readonly TargetTraits s_Traits = new TargetTraits(valueKind: ValueKind.Vector3,
-            supportedMotions: MotionMask.Tween | MotionMask.Punch | MotionMask.Shake | MotionMask.Curve | MotionMask.Oscillate | MotionMask.Wiggle | MotionMask.Spring,
+            supportedMotions: MotionMask.Tween | MotionMask.Punch | MotionMask.Bounce | MotionMask.Shake | MotionMask.Curve | MotionMask.Oscillate | MotionMask.Wiggle | MotionMask.Spring,
             category: FeedbackCategory.Motion, flashSensitive: false, applyMode: ApplyMode.Offset);
 
         [SerializeField] internal PositionSpace m_Space;
@@ -75,7 +75,7 @@ namespace xpTURN.Feedback
     public sealed class RotationItem : TargetItem
     {
         static readonly TargetTraits s_Traits = new TargetTraits(valueKind: ValueKind.Vector3,
-            supportedMotions: MotionMask.Tween | MotionMask.Punch | MotionMask.Shake | MotionMask.Curve | MotionMask.Oscillate | MotionMask.Wiggle | MotionMask.Spring,
+            supportedMotions: MotionMask.Tween | MotionMask.Punch | MotionMask.Bounce | MotionMask.Shake | MotionMask.Curve | MotionMask.Oscillate | MotionMask.Wiggle | MotionMask.Spring,
             category: FeedbackCategory.Motion, flashSensitive: false, applyMode: ApplyMode.Offset);
 
         [SerializeField] internal TransformSpace m_Space;
@@ -89,19 +89,33 @@ namespace xpTURN.Feedback
     public sealed class ScaleItem : TargetItem
     {
         static readonly TargetTraits s_Traits = new TargetTraits(valueKind: ValueKind.Vector3,
-            supportedMotions: MotionMask.Tween | MotionMask.Punch | MotionMask.Shake | MotionMask.Curve | MotionMask.Oscillate | MotionMask.Wiggle | MotionMask.Spring,
+            supportedMotions: MotionMask.Tween | MotionMask.Punch | MotionMask.Bounce | MotionMask.Shake | MotionMask.Curve | MotionMask.Oscillate | MotionMask.Wiggle | MotionMask.Spring,
             category: FeedbackCategory.Motion, flashSensitive: false, applyMode: ApplyMode.Offset);
 
         internal override TargetTraits Traits => s_Traits;
     }
 
     // the value is stops — the main axis takes 2^v, the others keep the volume
+    // adds Amount × the play's intensity to the transform's trauma — instant (a Set); the trauma shakes it and fades on its own
+    // (TraumaService) — a camera's follows the Camera category, any other transform's Motion
+    [FeedbackTarget("Transform/Trauma", PreviewGrade.Full, Aliases = "trauma shake stack hit", Requires = typeof(Transform))]
+    [Serializable]
+    public sealed class TransformTraumaItem : TargetItem
+    {
+        static readonly TargetTraits s_Traits = new TargetTraits(valueKind: ValueKind.Bool, supportedMotions: MotionMask.Set,
+            category: FeedbackCategory.Motion, flashSensitive: false, applyMode: ApplyMode.Offset);
+
+        [SerializeField, Range(0f, 1f)] internal float m_Amount = 0.3f;
+
+        internal override TargetTraits Traits => s_Traits;
+    }
+
     [FeedbackTarget("Transform/Squash & Stretch", PreviewGrade.Full, Requires = typeof(Transform))]
     [Serializable]
     public sealed class SquashAndStretchItem : TargetItem
     {
         static readonly TargetTraits s_Traits = new TargetTraits(valueKind: ValueKind.Float,
-            supportedMotions: MotionMask.Tween | MotionMask.Punch | MotionMask.Curve | MotionMask.Spring,
+            supportedMotions: MotionMask.Tween | MotionMask.Punch | MotionMask.Bounce | MotionMask.Curve | MotionMask.Spring,
             category: FeedbackCategory.Motion, flashSensitive: false, applyMode: ApplyMode.Offset);
 
         [SerializeField] internal SquashAxis m_Axis = SquashAxis.YtoXZ;

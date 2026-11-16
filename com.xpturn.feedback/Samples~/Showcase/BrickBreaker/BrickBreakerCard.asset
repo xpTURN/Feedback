@@ -23,7 +23,10 @@ MonoBehaviour:
     Resources. The boss comes down with a tween from above its place, a hit stops
     the game for 0.15 s (a 0.5 s guard keeps the flashes under the limit), its bar
     trails, a red pulse runs while it rages, and its defeat slows time and drains
-    the colour. Before plays the same game with no feedback and no floating scores.'
+    the colour. The paddle and each brick''s crack (quieter) and break sound from
+    the pool on their own players; a lost ball, a boss hit and the defeat play a
+    sound player beside theirs. Before plays the same game with no feedback, no sound
+    and no floating scores.'
   Controls: "\u2190 \u2192 \xB7 A D \xB7 Z X \xB7 Left stick \xB7 D-pad \u2014 paddle
     \xB7 Mouse \u2014 paddle \xB7 click to launch \xB7 Space \xB7 1 \xB7 Gamepad
     South \u2014 launch \xB7 2 \xB7 Gamepad West \u2014 restart \xB7 3 \xB7 Gamepad
@@ -31,5 +34,5 @@ MonoBehaviour:
   SceneGuid: cffdef758879a44fca292250db732551
   SceneName: BrickBreaker
   RequiredType: xpTURN.Feedback.Samples.Showcase.BrickBreakerLab, xpTURN.Feedback.Samples.Showcase.BrickBreaker
-  RequiresText: the Particle System module
+  RequiresText: the Particle System and Audio modules
   OpenInEditor: 0

@@ -605,5 +605,219 @@ namespace xpTURN.Feedback.Tests
             Check(rows.Count == 0 && positive == 5, "first runs allocate — " + string.Join(", ", rows) + " · positive " + positive + "/5");
             End();
         }
+
+        // ---- overlapping hit stops on emulated frames of 1/60
+
+        // frame k's start scale, after `frames` frames — actions[k] runs in frame k's game Update
+        static float[] Frames(FeedbackScheduler s, int frames, Dictionary<int, Action> actions)
+        {
+            var starts = new float[frames];
+            for (int k = 0; k < frames; k++)
+            {
+                actions.TryGetValue(k, out Action a);
+                starts[k] = Time.timeScale;
+                Emu(s, 1f / 60f, a);
+            }
+            return starts;
+        }
+
+        static int LastSlowed(float[] starts)
+        {
+            int last = -1;
+            for (int k = 0; k < starts.Length; k++)
+            {
+                if (starts[k] != 1f)
+                    last = k;
+            }
+            return last;
+        }
+
+        static int Frames60(double seconds) => (int)Math.Round(seconds * 60.0);
+
+        FeedbackPlayer PolicyPlayer(FeedbackScheduler s, PlayPolicy policy, params FeedbackItem[] items)
+        {
+            var p = Go("policy").AddComponent<FeedbackPlayer>();
+            m_Players.Add(p);
+            p.m_Policy = policy;
+            p.m_Items.AddRange(items);
+            p.Bind(s);
+            return p;
+        }
+
+        [UnityTest]
+        public IEnumerator VP05_RestartInFreeze()
+        {
+            yield return null;
+            {
+                // hand frames: a 0.2 freeze from frame 0, played again under Restart at frame 3 — the new play's freeze holds
+                FeedbackScheduler s = Hand();
+                FeedbackPlayer a = HandPlayer(s, Hit(0.2f));
+                int requests = -1;
+                float[] starts = Frames(s, 24, new Dictionary<int, Action>
+                {
+                    [0] = () => a.Play(),
+                    [3] = () =>
+                    {
+                        a.Play();
+                        requests = s.Context.TimeScale.Count;
+                    },
+                });
+                Check(requests == 1 && LastSlowed(starts) == 3 + Frames60(0.2), "Restart in a freeze — requests after the replay " + requests + " · last slowed frame " + LastSlowed(starts) + " (expected " + (3 + Frames60(0.2)) + ")");
+            }
+            {
+                // the real loop
+                FeedbackPlayer p = PlayerOn(Go("real"), Hit(0.2f));
+                p.Play();
+                for (int k = 0; k < 3; k++)
+                    yield return null;
+                float before = Time.timeScale;
+                float started = Time.realtimeSinceStartup;
+                p.Play();
+                int requests = s_Test.Context.TimeScale.Count;
+                float slowed = 0f;
+                while (Time.realtimeSinceStartup - started < 1.5f)
+                {
+                    yield return null;
+                    if (Time.timeScale == 1f)
+                        break;
+                    slowed = Time.realtimeSinceStartup - started;
+                }
+                Check(before == 0f && requests == 1 && slowed >= 0.2f - 1f / 60f, "Restart in a freeze on the real loop — scale before " + F(before) + " · requests " + requests + " · slowed " + F(slowed) + " s after the replay");
+                yield return WaitReal(0.1f);
+            }
+            End();
+        }
+
+        [Test]
+        public void VP06_FreezeRules()
+        {
+            {
+                // two in one game Update: the second is skipped — the first's length
+                FeedbackScheduler s = Hand();
+                FeedbackPlayer a = HandPlayer(s, Hit(0.1f));
+                FeedbackPlayer b = HandPlayer(s, Hit(0.2f));
+                int requests = -1;
+                float[] starts = Frames(s, 16, new Dictionary<int, Action>
+                {
+                    [0] = () =>
+                    {
+                        a.Play();
+                        b.Play();
+                        requests = s.Context.TimeScale.Count;
+                    },
+                });
+                Check(requests == 1 && LastSlowed(starts) == Frames60(0.1), "two in one Update — requests " + requests + " · last slowed frame " + LastSlowed(starts));
+            }
+            {
+                // the game's write in a slow hit stop is the new base, and a freeze under it is skipped
+                FeedbackScheduler s = Hand();
+                FeedbackPlayer slow = HandPlayer(s, Hit(0.3f, 0.5f));
+                FeedbackPlayer next = HandPlayer(s, Hit(0.1f));
+                int requests = -1;
+                float[] starts = Frames(s, 8, new Dictionary<int, Action>
+                {
+                    [0] = () => slow.Play(),
+                    [2] = () =>
+                    {
+                        Time.timeScale = 0.05f;
+                        next.Play();
+                        requests = s.Context.TimeScale.Count;
+                    },
+                });
+                Check(requests == 1 && Math.Abs(starts[3] - 0.025f) < 1e-6f, "the game's 0.05 in a slow hit stop — requests " + requests + " · frame 3 starts at " + F(starts[3]));
+                s.Shutdown();
+                Time.timeScale = 1f;
+            }
+            {
+                // Overlap's second play in a freeze is skipped — time comes back at the first's end
+                FeedbackScheduler s = Hand();
+                FeedbackPlayer a = PolicyPlayer(s, PlayPolicy.Overlap, Hit(0.2f));
+                int requests = -1;
+                float[] starts = Frames(s, 20, new Dictionary<int, Action>
+                {
+                    [0] = () => a.Play(),
+                    [3] = () =>
+                    {
+                        a.Play();
+                        requests = s.Context.TimeScale.Count;
+                    },
+                });
+                Check(requests == 1 && LastSlowed(starts) == Frames60(0.2), "Overlap in a freeze — requests " + requests + " · last slowed frame " + LastSlowed(starts));
+            }
+            End();
+        }
+
+        static HitStopItem Extend(HitStopItem hit)
+        {
+            hit.m_Overlap = HitStopOverlap.Extend;
+            return hit;
+        }
+
+        [Test]
+        public void VP07_Extend()
+        {
+            {
+                // a light one then a heavy one a frame later: Skip keeps the light one's length, Extend holds to the heavy one's end
+                FeedbackScheduler s = Hand();
+                FeedbackPlayer light = HandPlayer(s, Hit(0.05f));
+                FeedbackPlayer heavy = HandPlayer(s, Hit(0.2f));
+                int skip = LastSlowed(Frames(s, 20, new Dictionary<int, Action> { [0] = () => light.Play(), [1] = () => heavy.Play() }));
+                FeedbackScheduler e = Hand();
+                FeedbackPlayer lightE = HandPlayer(e, Extend(Hit(0.05f)));
+                FeedbackPlayer heavyE = HandPlayer(e, Extend(Hit(0.2f)));
+                int extend = LastSlowed(Frames(e, 20, new Dictionary<int, Action> { [0] = () => lightE.Play(), [1] = () => heavyE.Play() }));
+                Check(skip == Frames60(0.05) && extend == 1 + Frames60(0.2), "light then heavy — Skip " + skip + " · Extend " + extend + " (expected " + Frames60(0.05) + " · " + (1 + Frames60(0.2)) + ")");
+            }
+            {
+                // two in one game Update: the longer one
+                FeedbackScheduler s = Hand();
+                FeedbackPlayer a = HandPlayer(s, Extend(Hit(0.1f)));
+                FeedbackPlayer b = HandPlayer(s, Extend(Hit(0.2f)));
+                int requests = -1;
+                int last = LastSlowed(Frames(s, 16, new Dictionary<int, Action> { [0] = () => { a.Play(); b.Play(); requests = s.Context.TimeScale.Count; } }));
+                Check(requests == 2 && last == Frames60(0.2), "two Extend in one Update — requests " + requests + " · last slowed frame " + last);
+            }
+            {
+                // Overlap's second play in a freeze
+                FeedbackScheduler s = Hand();
+                FeedbackPlayer a = PolicyPlayer(s, PlayPolicy.Overlap, Extend(Hit(0.2f)));
+                int requests = -1;
+                int last = LastSlowed(Frames(s, 20, new Dictionary<int, Action> { [0] = () => a.Play(), [3] = () => { a.Play(); requests = s.Context.TimeScale.Count; } }));
+                Check(requests == 2 && last == 3 + Frames60(0.2), "Overlap with Extend — requests " + requests + " · last slowed frame " + last);
+            }
+            {
+                // the game's own slow motion below the minimum still skips an Extend one
+                FeedbackScheduler s = Hand();
+                FeedbackPlayer slow = HandPlayer(s, Hit(0.3f, 0.5f));
+                FeedbackPlayer next = HandPlayer(s, Extend(Hit(0.1f)));
+                int requests = -1;
+                Frames(s, 4, new Dictionary<int, Action> { [0] = () => slow.Play(), [2] = () => { Time.timeScale = 0.05f; next.Play(); requests = s.Context.TimeScale.Count; } });
+                Check(requests == 1, "Extend under the game's 0.05 — requests " + requests);
+                s.Shutdown();
+                Time.timeScale = 1f;
+            }
+            {
+                // and so does a Time Scale item's open request below it
+                FeedbackScheduler s = Hand();
+                TimeScaleService ts = s.Context.TimeScale;
+                FeedbackPlayer next = HandPlayer(s, Extend(Hit(0.1f)));
+                TimeScaleHandle open = default;
+                int requests = -1;
+                Frames(s, 4, new Dictionary<int, Action> { [0] = () => { open = ts.Open(); ts.SetScale(open, 0.05f); }, [2] = () => { next.Play(); requests = ts.Count; } });
+                Check(requests == 0, "Extend under an open 0.05 — requests " + requests);
+                ts.Release(open);
+                s.Shutdown();
+                Time.timeScale = 1f;
+            }
+            {
+                // a weaker one after a stronger one does not lift the freeze
+                FeedbackScheduler s = Hand();
+                FeedbackPlayer strong = HandPlayer(s, Hit(0.3f, 0f, false, 0f));
+                FeedbackPlayer weak = HandPlayer(s, Hit(0.05f, 0.5f, false, 0f));
+                float[] starts = Frames(s, 24, new Dictionary<int, Action> { [0] = () => strong.Play(), [2] = () => weak.Play() });
+                Check(starts[3] == 0f && starts[4] == 0f && starts[5] == 0f && LastSlowed(starts) == Frames60(0.3), "a 0.5 over a freeze — frames 3 ~ 5 start at " + F(starts[3]) + " · " + F(starts[4]) + " · " + F(starts[5]) + " · last slowed " + LastSlowed(starts));
+            }
+            End();
+        }
     }
 }

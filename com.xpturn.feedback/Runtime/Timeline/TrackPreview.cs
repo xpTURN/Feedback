@@ -12,11 +12,12 @@ namespace xpTURN.Feedback
         // the player is bound to the open track session — else a clip writes nothing in edit mode
         bool Owns(FeedbackPlayer player);
 
-        // the session's refusal for a driven play — a simulated target refuses
-        SeekRefusal Scrub(FeedbackPlayer player, PlaybackHandle handle);
+        // the session's refusal for a driven play of the list the preset picks — a simulated target refuses
+        SeekRefusal Scrub(FeedbackPlayer player, PlaybackHandle handle, FeedbackPreset preset);
 
-        // the session lets a driven play of the player scrub — asked before the play: a simulated target refuses
-        bool Drives(FeedbackPlayer player);
+        // the session lets a driven play of the player's list the preset picks scrub — asked before the play: a simulated
+        // target refuses
+        bool Drives(FeedbackPlayer player, FeedbackPreset preset);
 
         // after a clip's seek: the session's zero tick shows the values in that evaluation
         void Seeked();

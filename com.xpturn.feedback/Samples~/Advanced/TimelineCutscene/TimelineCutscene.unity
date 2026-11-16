@@ -811,6 +811,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1081317363}
   - component: {fileID: 1081317362}
+  - component: {fileID: 1081317364}
   m_Layer: 0
   m_Name: Cutscene
   m_TagString: Untagged
@@ -843,6 +844,21 @@ PlayableDirector:
     value: {fileID: 2018361639}
   m_ExposedReferences:
     m_References: []
+--- !u!114 &1081317364
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1081317361}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c4fc42fc27e4ce5abb515d70539f112, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: xpTURN.Feedback.Timeline::xpTURN.Feedback.FeedbackTimelineOptions
+  m_VariantKey: 
+  m_Intensity: 1
+  m_Hits: []
 --- !u!4 &1081317363
 Transform:
   m_ObjectHideFlags: 0
@@ -2578,6 +2594,10 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_Variants:
+  - {fileID: 11400000, guid: 856dfd71ae8df46a8b5248f50dde508d, type: 2}
+  - {fileID: 11400000, guid: 91febf5482d1b481e830b8277a329a6a, type: 2}
+  m_ListAlias: normal
   references:
     version: 2
     RefIds:

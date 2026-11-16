@@ -276,16 +276,11 @@ namespace xpTURN.Feedback
         bool BeginLoop(FeedbackScheduler s)
         {
             TargetItem item = m_Item;
-            float intensity = item.m_Intensity == IntensityResponse.Ignore ? 1f : PlayerRuntime.Factor(m_Intensity);
-            if (item.m_Random.m_RandomizeOutput)
-            {
-                Vector2 r = item.m_Random.m_OutputRange;
-                intensity *= PlayerRuntime.Factor(Mathf.Lerp(r.x, r.y, Hash32.ToUnit(Hash32.Tagged(m_Seed, Hash32.Output, 0u))));
-            }
+            float intensity = PlayMath.DriverIntensity(item, m_Intensity, m_Seed);
             try
             {
                 // the place: the driver's at the start — a binding without a player has no transform of its own to read
-                m_Binding.Begin(0, new BeginContext(intensity, m_Seed, 0, m_Serial, false, double.PositiveInfinity, true, transform.position));
+                m_Binding.Begin(0, new BeginContext(intensity, m_Seed, 0, m_Serial, false, double.PositiveInfinity, true, transform.position, endless: true));
             }
             catch (Exception e)
             {

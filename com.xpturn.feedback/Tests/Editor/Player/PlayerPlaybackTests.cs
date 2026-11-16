@@ -1475,7 +1475,7 @@ namespace xpTURN.Feedback.Tests.Editor
         [Test]
         public void BE18_GoldenAndSurface()
         {
-            Check(SavedFields(typeof(FeedbackPlayer)).Length == 29, "FeedbackPlayer's saved fields: " + SavedFields(typeof(FeedbackPlayer)).Length);
+            Check(SavedFields(typeof(FeedbackPlayer)).Length == 32, "FeedbackPlayer's saved fields: " + SavedFields(typeof(FeedbackPlayer)).Length);
             Check(string.Join(" ", SavedFields(typeof(PlayerUnityEvent)).Select(f => f.Name)) == "m_Kind m_Event", "PlayerUnityEvent's saved fields");
             string names = string.Join(" ", SavedFields(typeof(FeedbackPlayer)).Select(f => f.Name));
             Check(names.Contains("m_GateReference m_GateAnchor m_GateDistance"), "the anchor's name field: " + names);
@@ -1497,6 +1497,33 @@ namespace xpTURN.Feedback.Tests.Editor
                   && !p.m_UseGateFalloff && Keys(p.m_GateFalloff) == "(0,1) (1,0)" && p.m_UnityEvents != null && p.m_UnityEvents.Count == 0,
                 "a new component's defaults: '" + p.m_GateAnchor + "' · " + p.m_GateDistance);
             Check(!typeof(FeedbackDiagnostics).IsPublic && !typeof(BeginContext).IsPublic && !typeof(PlayerUnityEvent).IsPublic, "FeedbackDiagnostics · BeginContext · PlayerUnityEvent are internal");
+            End();
+        }
+
+        // ---- the begin's Endless
+
+        // the item has no end when its resolved duration is infinite — the infinite flag, a +∞ duration or length, one past the
+        // timeline's range (10¹³ s) — and has one at Speed 0, where the occurrence's seconds are +∞ and its T stands
+        [Test]
+        public void BE19_TheBeginSaysWhetherTheItemEnds()
+        {
+            FeedbackScheduler s = Scheduler();
+            PlayerTestTarget Target(string label, float duration, bool infinite)
+            {
+                var t = new PlayerTestTarget { m_Label = label, m_Motion = new TweenMotion(), m_Target = new TargetRef { m_Mode = TargetRefMode.Self, m_Path = "", m_Anchor = "" } };
+                t.m_Timing.m_Duration = duration;
+                t.m_Timing.m_Infinite = infinite;
+                return t;
+            }
+            Player(s, Target("flag", 1f, true), Target("duration", float.PositiveInfinity, false), Target("past", 1e13f, false), Target("finite", 1f, false),
+                Act("length", float.PositiveInfinity), Act("long", 1e13f), Act("short", 1f)).Play();
+            string said = string.Join(" ", new[] { "flag", "duration", "past", "finite", "length", "long", "short" }.Select(l => l + " " + (B(l)?.LastBegin.Endless.ToString() ?? "-")));
+            Check(said == "flag True duration True past True finite False length True long True short False", "endless: " + said);
+            FeedbackPlayer frozen = Player(s, Act("frozen", 1f), Act("frozen endless", float.PositiveInfinity));
+            frozen.m_Speed = 0f;
+            frozen.Play();
+            Check(double.IsPositiveInfinity(B("frozen").LastBegin.Seconds) && !B("frozen").LastBegin.Endless && B("frozen endless").LastBegin.Endless,
+                "Speed 0 — seconds " + B("frozen").LastBegin.Seconds + " · endless " + B("frozen").LastBegin.Endless + " · " + B("frozen endless").LastBegin.Endless);
             End();
         }
     }

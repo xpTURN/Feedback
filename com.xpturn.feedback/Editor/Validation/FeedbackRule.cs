@@ -53,8 +53,10 @@ namespace xpTURN.Feedback.Editor
         internal int Item = -1;
         internal string Message;
         internal readonly List<RuleFix> Fixes = new List<RuleFix>();
+        // the Variant whose item or list the result is on — null for the player's list (its own or the linked preset's)
+        internal FeedbackPreset List;
 
-        public override string ToString() => "[" + Id + "] " + Message;
+        public override string ToString() => "[" + Id + "] " + Message + (List != null ? " (variant " + List.name + ")" : "");
     }
 
     // one host's check: the host, its player (null for another host), its list and the list's path, the target resolution's
@@ -65,10 +67,13 @@ namespace xpTURN.Feedback.Editor
         internal FeedbackPlayer Player;
         // the list's owner — the host, or the linked preset, or the preset host
         internal Object Owner;
+        // a Variant's check — its list on the player's anchors; null for the player's list
+        internal FeedbackPreset Variant;
         internal const string LinkedWords = " — changes the linked preset";
+        internal const string VariantWords = " — changes the variant preset";
         internal bool Linked => Host != null && Owner != null && !ReferenceEquals(Owner, Host);
         internal Object For(string path) => path != null && path.StartsWith(ListPath, StringComparison.Ordinal) ? Owner : Host;
-        internal string Words(string name, string path) => Linked && path != null && path.StartsWith(ListPath, StringComparison.Ordinal) ? name + LinkedWords : name;
+        internal string Words(string name, string path) => Linked && path != null && path.StartsWith(ListPath, StringComparison.Ordinal) ? name + (Variant != null ? VariantWords : LinkedWords) : name;
         internal RuleFix ItemFix(string name, string path, Action<SerializedProperty> write, bool undoable = true)
         {
             Object to = For(path);
@@ -210,6 +215,9 @@ namespace xpTURN.Feedback.Editor
         internal virtual bool Applies(Component host) => host is FeedbackPlayer;
         // sees the list alone — runs on a preset host; a linked player gives it an empty list
         internal virtual bool ListOnly => false;
+        // runs on a player's Variants too (their lists on the player's anchors) — not a rule of the first frame (the player's list
+        // alone writes it) or of the player's own slots
+        internal virtual bool OnVariants => true;
 
         // a rule on one item each — a player's and a MotionDriver's
         protected static bool OnItems(Component host) => host is FeedbackPlayer || host is MotionDriver;
@@ -223,7 +231,7 @@ namespace xpTURN.Feedback.Editor
         }
 
         protected RuleResult Result(RuleContext c, int item, string message)
-            => new RuleResult { Rule = this, Id = Id, Severity = Severity, Host = c.Host != null ? c.Host : c.Owner, Item = item, Message = message };
+            => new RuleResult { Rule = this, Id = Id, Severity = Severity, Host = c.Host != null ? c.Host : c.Owner, Item = item, Message = message, List = c.Variant };
 
         protected RuleResult Result(Object host, string message)
             => new RuleResult { Rule = this, Id = Id, Severity = Severity, Host = host, Item = -1, Message = message };

@@ -65,7 +65,7 @@ namespace xpTURN.Feedback.Editor
             for (int i = 0; i < c.Items.Count; i++)
             {
                 if (!(c.Items[i] is PositionItem || c.Items[i] is ScaleItem || c.Items[i] is RectSizeDeltaItem || c.Items[i] is RectPivotItem || c.Items[i] is RectAnchorsItem
-                    || c.Items[i] is RectOffsetsItem) || !((TargetItem)c.Items[i]).m_Active)
+                    || c.Items[i] is RectOffsetsItem || c.Items[i] is TransformTraumaItem) || !((TargetItem)c.Items[i]).m_Active)
                     continue;
                 if (c.Target(i) is RectTransform rt && rt.drivenByObject != null)
                     into.Add(Result(c, i, "A layout drives this RectTransform — it writes over the effect"));

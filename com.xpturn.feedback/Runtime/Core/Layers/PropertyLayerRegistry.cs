@@ -86,6 +86,9 @@ namespace xpTURN.Feedback
 
         internal bool IsClosed => m_Closed;
 
+        // the editor's graph: the slots keep the values they would write and never write the scene. Set before the first slot
+        internal bool Dry;
+
         // what a slot does at a preview's end and with its copies
         internal bool IsPreview => m_Context.Kind == ContextKind.Preview;
 

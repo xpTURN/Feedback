@@ -173,6 +173,11 @@ namespace xpTURN.Feedback.Editor
 
         // null in a MotionDriver's session
         internal FeedbackPlayer Player => m_Player;
+
+        // the list the session plays and its owner — the player's, or the Variant its arguments pick
+        internal UnityEngine.Object ShownOwner => PreviewMasks.ListOwner(m_Player, m_Args.HasPreset ? m_Args.Preset : null);
+
+        internal List<FeedbackItem> ShownItems => PreviewMasks.ItemsOf(m_Player, ShownOwner);
         // null in a player's session
         internal MotionDriver MotionDriver => m_MotionDriver;
         internal Component Subject => m_Subject;
@@ -367,19 +372,25 @@ namespace xpTURN.Feedback.Editor
         internal bool HoldsTrackPlayer(FeedbackPlayer player) => m_Track && player != null && m_TrackPlayers.Contains(player);
 
         // a driven play's refusal: a simulated target (particles · animators) plays on the editor's clock — no scrub
-        internal SeekRefusal TrackScrub(FeedbackPlayer player, PlaybackHandle handle)
+        internal SeekRefusal TrackScrub(FeedbackPlayer player, PlaybackHandle handle, FeedbackPreset preset)
         {
-            if (!TrackDrives(player))
+            if (!TrackDrives(player, preset))
                 return SeekRefusal.Simulated;
             return player.SeekRange(handle, out _, out _);
         }
 
-        // the same refusal before a play
-        internal bool TrackDrives(FeedbackPlayer player) => !(m_Simulation.Any || Simulates(player));
+        // the same refusal before a play — of the list the preset picks
+        internal bool TrackDrives(FeedbackPlayer player, FeedbackPreset preset) => !(m_Simulation.Any || Simulates(ListOf(player, preset)));
 
-        internal static bool Simulates(FeedbackPlayer player)
+        // the list a preset picks of a player — the player's own for none or the linked one, else the preset's
+        internal static List<FeedbackItem> ListOf(FeedbackPlayer player, FeedbackPreset preset)
+            => preset == null || ReferenceEquals(preset, player.m_Preset) ? player.Items : preset.m_Items;
+
+        internal static bool Simulates(FeedbackPlayer player) => Simulates(player.Items);
+
+        internal static bool Simulates(List<FeedbackItem> items)
         {
-            foreach (FeedbackItem item in player.Items)
+            foreach (FeedbackItem item in items)
             {
                 if (item != null && Attribute.GetCustomAttribute(item.GetType(), typeof(FeedbackTargetAttribute)) is FeedbackTargetAttribute target && target.Preview == PreviewGrade.Simulated)
                     return true;
@@ -410,6 +421,12 @@ namespace xpTURN.Feedback.Editor
         {
             var found = new List<FeedbackPlayer>();
             FlowPlayers.Collect(subject.Items, found);
+            // the Variants' flow items reach players too
+            for (int k = 0; subject.m_Variants != null && k < subject.m_Variants.Count; k++)
+            {
+                if (subject.m_Variants[k] != null)
+                    FlowPlayers.Collect(subject.m_Variants[k].m_Items, found);
+            }
             for (int i = 0; i < found.Count; i++)
             {
                 FeedbackPlayer p = found[i];
@@ -485,7 +502,7 @@ namespace xpTURN.Feedback.Editor
                 m_Request = PreviewEndReason.None;
             m_RepeatAt = -1;
             m_Player.Restore();
-            PreviewMasks.Apply(m_Player);
+            PreviewMasks.Apply(m_Player, ShownOwner);
             int item = ItemIndex();
             m_Player.m_PreviewSoloOnce = item;
             try
@@ -510,11 +527,13 @@ namespace xpTURN.Feedback.Editor
         {
             if (!m_ItemMode)
                 return -1;
+            UnityEngine.Object owner = ShownOwner;
+            int count = PreviewMasks.ItemsOf(m_Player, owner).Count;
             if (m_ItemId < 0)
-                return m_ItemIndex < m_Player.Items.Count ? m_ItemIndex : -1;
-            for (int i = 0; i < m_Player.Items.Count; i++)
+                return m_ItemIndex < count ? m_ItemIndex : -1;
+            for (int i = 0; i < count; i++)
             {
-                if (PreviewMasks.ReferenceId(m_Player, i) == m_ItemId)
+                if (PreviewMasks.ReferenceId(m_Player, owner, i) == m_ItemId)
                     return i;
             }
             return -1;
@@ -557,11 +576,12 @@ namespace xpTURN.Feedback.Editor
         // the item's ▶: it alone in this play and the replays after it — its delay ignored by a seek to it
         internal void PlayItem(int listIndex, bool ignoreDelay)
         {
-            if (m_Player == null || listIndex < 0 || listIndex >= m_Player.Items.Count)
+            if (m_Player == null || listIndex < 0 || listIndex >= ShownItems.Count)
                 return;
-            new SerializedObject(PresetLinks.Owner(m_Player)).Update();
+            UnityEngine.Object owner = ShownOwner;
+            new SerializedObject(PreviewMasks.IsVariant(m_Player, owner) ? owner : PresetLinks.Owner(m_Player)).Update();
             m_ItemMode = true;
-            m_ItemId = PreviewMasks.ReferenceId(m_Player, listIndex);
+            m_ItemId = PreviewMasks.ReferenceId(m_Player, owner, listIndex);
             m_ItemIndex = listIndex;
             m_IgnoreDelay = ignoreDelay;
             Replay();
@@ -828,6 +848,7 @@ namespace xpTURN.Feedback.Editor
                 m_Player.ReleaseRuntime();
                 m_Player.Bind(null);
                 m_Player.m_PreviewMasks = null;
+                m_Player.m_PreviewMaskOwner = null;
             }
             if (!ReferenceEquals(m_MotionDriver, null))
                 m_MotionDriver.Bind(null);

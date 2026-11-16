@@ -19,6 +19,8 @@ namespace xpTURN.Feedback
 
         protected override LayerSpace Space => m_Space;
 
+        protected override LayerSpace DescribedSpace => m_Position.m_Space == PositionSpace.World ? LayerSpace.World : LayerSpace.Local;
+
         protected override bool Acquire(in PrepareContext context, bool direct, out ValueSlot<Vector3, Vector3Ops> slot)
         {
             slot = null;
@@ -26,7 +28,7 @@ namespace xpTURN.Feedback
             if (target == null)
                 return Refuse(TargetResolver.Describe(failure));
             m_Target = target;
-            m_Space = m_Position.m_Space == PositionSpace.World ? LayerSpace.World : LayerSpace.Local;
+            m_Space = DescribedSpace;
             // an Anchored item on a plain Transform moves as Local (FB-G14)
             m_Anchored = m_Position.m_Space == PositionSpace.Anchored ? target as RectTransform : null;
             _ = target.parent;
@@ -83,6 +85,10 @@ namespace xpTURN.Feedback
 
         protected override LayerSpace Space => m_Space;
 
+        protected override LayerSpace DescribedSpace => m_Rotation.m_Space == TransformSpace.World ? LayerSpace.World : LayerSpace.Local;
+
+        protected override string GraphUnit => "°";
+
         protected override bool Acquire(in PrepareContext context, bool direct, out ValueSlot<Quaternion, QuaternionOps> slot)
         {
             slot = null;
@@ -90,7 +96,7 @@ namespace xpTURN.Feedback
             if (target == null)
                 return Refuse(TargetResolver.Describe(failure));
             m_Target = target;
-            m_Space = m_Rotation.m_Space == TransformSpace.World ? LayerSpace.World : LayerSpace.Local;
+            m_Space = DescribedSpace;
             m_Shortest = m_Rotation.m_Interpolation == RotationInterpolation.Shortest ? Evaluator as TweenEvaluator : null;
             _ = target.parent;
             if (direct)
@@ -273,6 +279,8 @@ namespace xpTURN.Feedback
         protected override Vector3 FromMotion(in Vector4 value) => Vector3.Scale(Reference, Factors(m_Squash.m_Axis, value.x));
 
         protected override Vector3 MapOffset(in Vector3 offset) => Factors(m_Squash.m_Axis, offset.x) - Vector3.one;
+
+        protected override string GraphUnit => "squash";
     }
 
     // the position slot's orbit — the value is degrees about the world axis through the pivot, read each frame. The target's
@@ -291,6 +299,10 @@ namespace xpTURN.Feedback
         }
 
         protected override LayerSpace Space => LayerSpace.World;
+
+        protected override LayerSpace DescribedSpace => LayerSpace.World;
+
+        protected override string GraphUnit => "° around the pivot";
 
         protected override bool Acquire(in PrepareContext context, bool direct, out ValueSlot<Vector3, Vector3Ops> slot)
         {
@@ -610,8 +622,8 @@ namespace xpTURN.Feedback
             if (Live && !m_HasStart[record])
                 StartPlay(record, context.Serial);
             TakeDestination(ref m_Destinations[record]);
-            uint seed = Hash32.Tagged(context.ItemSeed, Hash32.Occurrence, Hash32.Fold(context.Occurrence));
-            m_Evaluator.Begin(ref m_States[record], Vector4.zero, new MotionBegin { Seed = seed, Intensity = context.Intensity });
+            uint seed = PlayMath.OccurrenceSeed(context.ItemSeed, context.Occurrence);
+            m_Evaluator.Begin(ref m_States[record], Vector4.zero, new MotionBegin { Seed = seed, Intensity = context.Intensity, Endless = context.Endless });
         }
 
         // as ValueTargetBinding's — the direction for the end and the next play's start; the start values and the origin stay

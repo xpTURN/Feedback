@@ -127,10 +127,13 @@ namespace xpTURN.Feedback.Editor
         }
 
         // the live plays' places on the nominal axis — off-nominal ones dimmed
-        internal static void Heads(FeedbackPlayer player, List<Head> heads)
+        internal static void Heads(FeedbackPlayer player, List<Head> heads) => Heads(player, null, heads);
+
+        // the plays of the list `owner` owns — a Variant's runtime for its preset, else the player's
+        internal static void Heads(FeedbackPlayer player, Object owner, List<Head> heads)
         {
             heads.Clear();
-            PlayerRuntime runtime = player != null ? player.Runtime : null;
+            PlayerRuntime runtime = player == null ? null : owner is FeedbackPreset preset ? player.RuntimeFor(preset) : player.Runtime;
             if (runtime == null || runtime.IsReleased)
                 return;
             for (int r = 0; r < runtime.RecordCount; r++)

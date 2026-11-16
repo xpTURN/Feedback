@@ -15,7 +15,7 @@ namespace xpTURN.Feedback
     public sealed class MaterialColorItem : TargetItem, IMaterialPropertyItem
     {
         static readonly TargetTraits s_Traits = new TargetTraits(valueKind: ValueKind.Color,
-            supportedMotions: MotionMask.Tween | MotionMask.Flash | MotionMask.Gradient | MotionMask.Punch | MotionMask.Oscillate | MotionMask.Blink | MotionMask.Spring,
+            supportedMotions: MotionMask.Tween | MotionMask.Flash | MotionMask.Gradient | MotionMask.Punch | MotionMask.Bounce | MotionMask.Oscillate | MotionMask.Blink | MotionMask.Spring,
             category: FeedbackCategory.None, flashSensitive: true, applyMode: ApplyMode.Offset);
 
         [SerializeField] internal string m_PropertyName = "";     // empty = the main color ([MainColor], else _Color)
@@ -44,7 +44,7 @@ namespace xpTURN.Feedback
     public sealed class MaterialFloatItem : TargetItem, IMaterialPropertyItem
     {
         static readonly TargetTraits s_Traits = new TargetTraits(valueKind: ValueKind.Float,
-            supportedMotions: MotionMask.Tween | MotionMask.Flash | MotionMask.Punch | MotionMask.Shake | MotionMask.Curve | MotionMask.Oscillate | MotionMask.Spring,
+            supportedMotions: MotionMask.Tween | MotionMask.Flash | MotionMask.Punch | MotionMask.Bounce | MotionMask.Shake | MotionMask.Curve | MotionMask.Oscillate | MotionMask.Spring,
             category: FeedbackCategory.None, flashSensitive: false, applyMode: ApplyMode.Offset);
 
         [SerializeField] internal string m_PropertyName = "";

@@ -139,7 +139,7 @@ namespace xpTURN.Feedback
                 return;
             }
             m_Played = true;
-            PlayArgs args = PlayArgs.Default.WithSeed(Hash32.Tagged(context.ItemSeed, Hash32.Occurrence, Hash32.Fold(context.Occurrence)));
+            PlayArgs args = PlayArgs.Default.WithSeed(PlayMath.OccurrenceSeed(context.ItemSeed, context.Occurrence));
             if (play.m_PassIntensity)
                 args = args.WithIntensity(context.Intensity);
             if (play.m_PassDirection && context.Reverse)
@@ -415,7 +415,7 @@ namespace xpTURN.Feedback
             if (m_Waits || m_Begins == null || m_Begins[record].Serial != serial)
                 return;
             BeginContext c = m_Begins[record];
-            m_Begins[record] = new BeginContext(c.Intensity, c.ItemSeed, c.Occurrence, c.Serial, reverse, c.Seconds, c.HasPosition, c.Position, c.Swept);
+            m_Begins[record] = new BeginContext(c.Intensity, c.ItemSeed, c.Occurrence, c.Serial, reverse, c.Seconds, c.HasPosition, c.Position, c.Swept, endless: c.Endless);
         }
 
         internal override void Execute(int record, in BeginContext context)

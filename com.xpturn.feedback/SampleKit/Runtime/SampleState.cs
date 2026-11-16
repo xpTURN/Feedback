@@ -9,7 +9,7 @@ namespace xpTURN.Feedback.Samples
     // is closed then; the next play starts from the settings)
     public static class SampleState
     {
-        const int Count = 9;
+        const int Count = 10;
         public const float MaxIntensity = 2f;
         static bool s_Captured;
         static bool s_Quitting;

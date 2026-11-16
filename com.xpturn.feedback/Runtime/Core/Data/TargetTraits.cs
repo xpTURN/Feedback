@@ -24,6 +24,8 @@ namespace xpTURN.Feedback
         UI = 7,
         /// <summary>Gamepad rumble, and your own haptic feedbacks.</summary>
         Haptics = 8,
+        /// <summary>Sounds, audio filters and mixers, and your own sound feedbacks.</summary>
+        Audio = 9,
     }
 
     // the closed motion set. Not saved — MotionMask uses 1 << value
@@ -40,6 +42,7 @@ namespace xpTURN.Feedback
         Blink = 8,
         Wiggle = 9,
         Spring = 10,
+        Bounce = 11,
     }
 
     // not saved. Rotation targets are Vector3 (euler)
@@ -69,6 +72,7 @@ namespace xpTURN.Feedback
         Blink = 1 << 8,
         Wiggle = 1 << 9,
         Spring = 1 << 10,
+        Bounce = 1 << 11,
     }
 
     internal enum ApplyMode

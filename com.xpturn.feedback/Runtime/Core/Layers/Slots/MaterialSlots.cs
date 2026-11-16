@@ -235,6 +235,8 @@ namespace xpTURN.Feedback
         int[] m_At = Array.Empty<int>();
         bool m_Restored;
         bool m_Let;
+        // a dry registry's: no copies — the originals are read
+        bool m_Dry;
 
         internal MaterialInstance(Renderer renderer, int propertyId, int index)
         {
@@ -261,6 +263,7 @@ namespace xpTURN.Feedback
         internal void Attach<T, TAccess>(PropertyLayerRegistry registry, TAccess access) where TAccess : struct, IMaterialAccess<T>
         {
             Renderer renderer = m_Renderer;
+            m_Dry = registry.Dry;
             m_Copies = registry.GetOrCreate(renderer, 0, -1, () => new MaterialCopiesSlot(renderer));
             int from = m_Index < 0 ? 0 : m_Index;
             int to = m_Index < 0 ? m_Copies.Count : Math.Min(m_Index + 1, m_Copies.Count);
@@ -277,12 +280,13 @@ namespace xpTURN.Feedback
                 if (!Takes<T, TAccess>(access, i))
                     continue;
                 m_At[n++] = i;
-                m_Copies.Ensure(i);
+                if (!m_Dry)
+                    m_Copies.Ensure(i);
             }
         }
 
         internal T Read<T, TAccess>(TAccess access) where TAccess : struct, IMaterialAccess<T>
-            => m_At.Length > 0 ? access.Get(CopyAt(0), m_Id) : default;
+            => m_At.Length > 0 ? access.Get(m_Dry ? m_Copies.Original(m_At[0]) : CopyAt(0), m_Id) : default;
 
         internal void Write<T, TAccess>(TAccess access, in T value) where TAccess : struct, IMaterialAccess<T>
         {

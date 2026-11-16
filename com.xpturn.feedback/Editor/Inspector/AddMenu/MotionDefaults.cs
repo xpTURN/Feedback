@@ -13,6 +13,7 @@ namespace xpTURN.Feedback.Editor
         internal const float ShakeHalf = 0.5f;
         internal const float ShakeDuration = 0.5f;
         internal const float CameraShakeDuration = 0.1f;
+        internal const float BounceDuration = 0.6f;
         internal const float RotationBump = 1900f;
         internal const float LightBump = 60f;
         internal const float Bump = 30f;
@@ -141,6 +142,34 @@ namespace xpTURN.Feedback.Editor
         internal const float RumbleBy = 0.5f;
         internal const float RumbleFlashDuration = 0.2f;
 
+        // seen from a new component's own values (a source's volume 1 · pitch 1 · pan 0 · a low pass's 5007.73 Hz · a high
+        // pass's 5000 · an echo's wet mix 1 · a distortion's 0.5 · a User reverb's level 0 · the listener's 1) — a Tween to
+        // silence, an octave up, hard left, muffled, thinner, dry, full and wet; a punch's and a curve's swing the way the value
+        // has room, a shake's and an oscillation's, a spring's bump peaking near the punch
+        static bool Audio(Type item, out float to, out float punch, out float shake, out float oscillate, out float bump)
+        {
+            to = punch = shake = oscillate = bump = 0f;
+            if (item == typeof(AudioVolumeItem) || item == typeof(AudioListenerVolumeItem))
+                (to, punch, shake, oscillate, bump) = (0f, -0.5f, 0.25f, 0.25f, -30f);
+            else if (item == typeof(AudioPitchItem))
+                (to, punch, shake, oscillate, bump) = (2f, 0.5f, 0.1f, 0.1f, 30f);
+            else if (item == typeof(AudioStereoPanItem))
+                (to, punch, shake, oscillate, bump) = (-1f, 0.5f, 0.5f, 1f, 30f);
+            else if (item == typeof(AudioLowPassCutoffItem))
+                (to, punch, oscillate, bump) = (500f, -2000f, 2000f, -125000f);
+            else if (item == typeof(AudioHighPassCutoffItem))
+                (to, punch, oscillate, bump) = (2000f, 1000f, 1000f, 62500f);
+            else if (item == typeof(AudioEchoWetMixItem))
+                (to, punch, oscillate, bump) = (0f, -0.5f, 0.5f, -30f);
+            else if (item == typeof(AudioDistortionLevelItem))
+                (to, punch, oscillate, bump) = (1f, 0.5f, 0.25f, 30f);
+            else if (item == typeof(AudioReverbLevelItem))
+                (to, punch, oscillate, bump) = (2000f, 1000f, 1000f, 62500f);
+            else
+                return false;
+            return true;
+        }
+
         internal static FeedbackMotion Create(Type item, MotionKind kind, out float duration)
         {
             duration = -1f;
@@ -155,7 +184,12 @@ namespace xpTURN.Feedback.Editor
                 : item == typeof(GraphicTextureOffsetItem) ? TextureOffsetSize : item == typeof(GraphicTextureScaleItem) ? TextureScaleSize
                 : item == typeof(ImageFillItem) ? 0.25f : item == typeof(TextFontSizeItem) ? FontSizeSize : item == typeof(RectSizeDeltaItem) ? RectSizeSize
                 : IsTMPText(item) ? TMPTextSize : IsTMPMaterial(item) ? TMPMaterialSize : IsTMPCharacter(item) ? TMPCharacterSize : 1f;
+            bool audio = Audio(item, out float audioTo, out float audioPunch, out float audioShake, out float audioOscillate, out float audioBump);
+            if (audio)
+                size = audioPunch;
             Vector4 sized = Vector4.one * size;
+            Vector4 punch = item == typeof(LineWidthItem) ? Vector4.one * LineWidthPunch : item == typeof(LineColorItem) ? LineColorPunch
+                : item == typeof(AnimatorSpeedItem) ? Vector4.one * AnimatorSpeedPunch : sized;
             switch (kind)
             {
                 case MotionKind.Set:
@@ -172,7 +206,7 @@ namespace xpTURN.Feedback.Editor
                 case MotionKind.Tween:
                 {
                     var m = new TweenMotion();
-                    m.m_Params.m_To = TweenTo(item, sized);
+                    m.m_Params.m_To = audio ? Vector4.one * audioTo : TweenTo(item, sized);
                     if (IsTMPCharacter(item))
                     {
                         m.m_Params.m_Mode = TweenMode.From;
@@ -190,15 +224,14 @@ namespace xpTURN.Feedback.Editor
                 case MotionKind.Punch:
                 {
                     var m = new PunchMotion();
-                    m.m_Params.m_Amplitude = item == typeof(LineWidthItem) ? Vector4.one * LineWidthPunch : item == typeof(LineColorItem) ? LineColorPunch
-                        : item == typeof(AnimatorSpeedItem) ? Vector4.one * AnimatorSpeedPunch : sized;
+                    m.m_Params.m_Amplitude = punch;
                     return m;
                 }
                 case MotionKind.Shake:
                 {
                     var m = new ShakeMotion();
                     bool half = item == typeof(PositionItem) || item == typeof(ScaleItem) || item == typeof(CameraOrthographicSizeItem);
-                    m.m_Params.m_Amplitude = half ? Vector4.one * ShakeHalf : item == typeof(CameraFieldOfViewItem) ? Vector4.one * FieldOfViewShake : sized;
+                    m.m_Params.m_Amplitude = half ? Vector4.one * ShakeHalf : item == typeof(CameraFieldOfViewItem) ? Vector4.one * FieldOfViewShake : audio ? Vector4.one * audioShake : sized;
                     duration = item == typeof(CameraShakeItem) ? CameraShakeDuration : ShakeDuration;
                     return m;
                 }
@@ -247,7 +280,7 @@ namespace xpTURN.Feedback.Editor
                 case MotionKind.Oscillate:
                 {
                     var m = new OscillateMotion();
-                    m.m_Params.m_Amplitude = item == typeof(TMPCharacterOffsetItem) ? TMPCharacterWave : sized;
+                    m.m_Params.m_Amplitude = item == typeof(TMPCharacterOffsetItem) ? TMPCharacterWave : audio ? Vector4.one * audioOscillate : sized;
                     return m;
                 }
                 case MotionKind.Blink:
@@ -278,8 +311,16 @@ namespace xpTURN.Feedback.Editor
                     float bump = item == typeof(RotationItem) ? RotationBump : item == typeof(LightIntensityItem) ? LightBump
                         : item == typeof(LightRangeItem) ? RangeBump : item == typeof(CameraFieldOfViewItem) ? FieldOfViewBump
                         : item == typeof(CameraOrthographicSizeItem) ? OrthographicSizeBump : item == typeof(SpriteAlphaItem) || item == typeof(GraphicAlphaItem) ? AlphaBump
-                        : IsTMPText(item) ? TMPTextBump : Bump;
+                        : IsTMPText(item) ? TMPTextBump : audio ? audioBump : Bump;
                     m.m_Params.m_Value = Vector4.one * bump;
+                    return m;
+                }
+                case MotionKind.Bounce:
+                {
+                    // a hop goes up — a position's and a camera shake's on Y only
+                    var m = new BounceMotion();
+                    m.m_Params.m_Amplitude = item == typeof(PositionItem) || item == typeof(CameraShakeItem) ? new Vector4(0f, punch.y, 0f, 0f) : punch;
+                    duration = BounceDuration;
                     return m;
                 }
                 default:

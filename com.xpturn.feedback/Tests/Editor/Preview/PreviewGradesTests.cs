@@ -1179,6 +1179,99 @@ namespace xpTURN.Feedback.Tests.Editor
             Assert.That(string.Join(",", Kinds()), Is.EqualTo("Locked,ExecuteAlways"), "the defaults");
         }
 
+        // the project's Default Audio Output — the preview reads the defaults: a Play At Point with no output of its own or of
+        // its player is told where play sends it
+        [Test, Category(OptionalAssemblyTests.DevProjectCategory)]
+        public void PX20g_TheProjectsAudioOutputIsTold()
+        {
+            var mixer = AssetDatabase.LoadAssetAtPath<UnityEngine.Audio.AudioMixer>("Packages/com.xpturn.feedback/Tests/Editor/Audio/FeedbackTestMixer.mixer");
+            UnityEngine.Audio.AudioMixerGroup master = mixer.FindMatchingGroups("Master")[0];
+            Settings(s => s.m_AudioOutput = master);
+            FeedbackPlayer player = Player("Voice");
+            var item = On<AudioPlayAtPointItem>(player, player.transform, new SetMotion(), 0f);
+            item.m_Resource = AudioClip.Create("voice", 441, 1, 44100, false);
+            Assert.That(PreviewSession.Start(player, default), Is.EqualTo(PreviewRefusal.None), "started");
+            Seconds(0.05);
+            Assert.That(Text(PreviewNoticeKind.AudioOutput), Is.EqualTo("In play the Play At Point sounds with no output go to Master (the project's Default Audio Output)."));
+            PreviewSession.Current?.Stop();
+            player.m_AudioOutput = master;
+            PreviewSession.Start(player, default);
+            Seconds(0.05);
+            Assert.That(Kinds(), Has.No.Member(PreviewNoticeKind.AudioOutput), "the player's own output");
+            PreviewSession.Current?.Stop();
+            player.m_AudioOutput = null;
+            item.m_Output = master;
+            PreviewSession.Start(player, default);
+            Seconds(0.05);
+            Assert.That(Kinds(), Has.No.Member(PreviewNoticeKind.AudioOutput), "the item's own output");
+        }
+
+        // the audio items the preview does not play — the ones there named, in the inspector bar's warning box · a Play At Point
+        // (displayed) is not one of them
+        [Test, Category(OptionalAssemblyTests.DevProjectCategory)]
+        public void PX20h_TheAudioItemsThatPlayInPlayModeOnlyAreTold()
+        {
+            var mixer = AssetDatabase.LoadAssetAtPath<UnityEngine.Audio.AudioMixer>("Packages/com.xpturn.feedback/Tests/Editor/Audio/FeedbackTestMixer.mixer");
+            FeedbackPlayer player = Player("Mix");
+            On<PositionItem>(player, null, Tween(1f), 1f);
+            var parameter = On<AudioMixerParameterItem>(player, null, Tween(-6f), 0.5f);
+            parameter.m_Mixer = mixer;
+            parameter.m_Parameter = "FeedbackTestVolume";
+            var snapshot = On<AudioMixerSnapshotItem>(player, null, new SetMotion(), 0f);
+            snapshot.m_Snapshot = mixer.FindSnapshot("B");
+            Assert.That(PreviewSession.Start(player, default), Is.EqualTo(PreviewRefusal.None), "started");
+            Seconds(0.05);
+            Assert.That(Text(PreviewNoticeKind.AudioPlayOnly), Is.EqualTo("Mixer Parameter and Mixer Snapshot play in play mode only."));
+            var bar = new PreviewBar(player);
+            bar.Refresh();
+            Assert.That((bar.Notice.text, bar.Notice.style.display.value), Is.EqualTo(("Mixer Parameter and Mixer Snapshot play in play mode only.", UnityEngine.UIElements.DisplayStyle.Flex)), "the inspector bar's warning box");
+            PreviewSession.Current?.Stop();
+            On<AudioListenerVolumeItem>(player, null, Tween(0.5f), 0.5f);
+            PreviewSession.Start(player, default);
+            Seconds(0.05);
+            Assert.That(Text(PreviewNoticeKind.AudioPlayOnly), Is.EqualTo("Mixer Parameter, Mixer Snapshot and Listener Volume play in play mode only."));
+            PreviewSession.Current?.Stop();
+            FeedbackPlayer voice = Player("Voice");
+            On<PositionItem>(voice, null, Tween(1f), 1f);
+            On<AudioPlayAtPointItem>(voice, voice.transform, new SetMotion(), 0f).m_Resource = AudioClip.Create("voice", 441, 1, 44100, false);
+            PreviewSession.Start(voice, default);
+            Seconds(0.05);
+            Assert.That(Kinds(), Has.No.Member(PreviewNoticeKind.AudioPlayOnly), "a Play At Point plays in the preview");
+        }
+
+        // the editor's audio muted (the seam — the test does not mute the editor) with a sound item · no sound item · not muted
+        [Test, Category(OptionalAssemblyTests.DevProjectCategory)]
+        public void PX20i_TheEditorsMuteIsTold()
+        {
+            System.Func<bool> was = PreviewNotices.EditorMuted;
+            try
+            {
+                PreviewNotices.EditorMuted = () => true;
+                FeedbackPlayer voice = Player("Voice");
+                On<PositionItem>(voice, null, Tween(1f), 1f);
+                On<AudioPlayAtPointItem>(voice, voice.transform, new SetMotion(), 0f).m_Resource = AudioClip.Create("voice", 441, 1, 44100, false);
+                PreviewSession.Start(voice, default);
+                Seconds(0.05);
+                Assert.That(Text(PreviewNoticeKind.AudioMuted), Is.EqualTo("The editor's audio is muted (the Game view's Mute Audio) — the preview's sounds are not heard."));
+                var bar = new PreviewBar(voice);
+                bar.Refresh();
+                Assert.That(bar.Notice.text, Is.EqualTo("The editor's audio is muted (the Game view's Mute Audio) — the preview's sounds are not heard."), "the inspector bar's warning box");
+                PreviewNotices.EditorMuted = () => false;
+                Assert.That(Kinds(), Has.No.Member(PreviewNoticeKind.AudioMuted), "not muted");
+                PreviewSession.Current?.Stop();
+                PreviewNotices.EditorMuted = () => true;
+                FeedbackPlayer mover = Player("Mover");
+                On<PositionItem>(mover, null, Tween(1f), 1f);
+                PreviewSession.Start(mover, default);
+                Seconds(0.05);
+                Assert.That(Kinds(), Has.No.Member(PreviewNoticeKind.AudioMuted), "no sound item");
+            }
+            finally
+            {
+                PreviewNotices.EditorMuted = was;
+            }
+        }
+
         [Test]
         public void PX20e_NoSessionLeavesTheListEmpty()
         {

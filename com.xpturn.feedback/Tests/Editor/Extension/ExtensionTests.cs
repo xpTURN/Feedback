@@ -314,7 +314,7 @@ namespace xpTURN.Feedback.Tests.Editor
             Assert.That(ProbeLog.Calls, Is.EqualTo(new[] { "Fire s0 i1 c1 r0 w1" }), "a Seek inside the events runs at the pass's end — a sweep");
         }
 
-        // ---- the effect is a Custom Float Event's value: five motions both ways, bit for bit · the base back once on Revert
+        // ---- the effect is a Custom Float Event's value: six motions both ways, bit for bit · the base back once on Revert
         static FeedbackMotion MotionOf(int k)
         {
             switch (k)
@@ -327,8 +327,10 @@ namespace xpTURN.Feedback.Tests.Editor
                     return new ShakeMotion();
                 case 3:
                     return new CurveMotion { m_Params = new CurveParams { m_Curve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f), m_RemapZero = Vector4.zero, m_RemapOne = new Vector4(3f, 0f, 0f, 0f) } };
-                default:
+                case 4:
                     return new OscillateMotion { m_Params = new OscillateParams { m_Amplitude = new Vector4(1.5f, 0f, 0f, 0f), m_Frequency = 2f } };
+                default:
+                    return new BounceMotion { m_Params = new BounceParams { m_Amplitude = new Vector4(2.5f, 0f, 0f, 0f), m_Count = 4, m_Restitution = 0.6f } };
             }
         }
 
@@ -338,7 +340,7 @@ namespace xpTURN.Feedback.Tests.Editor
             var bad = new List<string>();
             foreach (bool backward in new[] { false, true })
             {
-                for (int k = 0; k < 5; k++)
+                for (int k = 0; k < 6; k++)
                 {
                     FeedbackScheduler s = Sched();
                     var listener = Go("Listener").AddComponent<FeedbackTestListener>();
@@ -368,7 +370,7 @@ namespace xpTURN.Feedback.Tests.Editor
             rp.Stop(StopMode.Revert);
             Assert.That((ProbeLog.Values.Last(), ProbeLog.Slots.Last()), Is.EqualTo((3f, -1)), "Revert — the base once, slot −1");
             FeedbackPlayer sp = Player(Sched(), new ProbeValue { m_Motion = new SpringMotion() });
-            Assert.That(sp.Runtime.Binding(0), Is.Null.Or.Property("SkipReason").Not.Null, "a motion outside the five is refused");
+            Assert.That(sp.Runtime.Binding(0), Is.Null.Or.Property("SkipReason").Not.Null, "a motion outside the six is refused");
         }
 
         // ---- categories: declared once per type · the override wins · Flash reads as None · off leaves new plays out · the
@@ -576,14 +578,14 @@ namespace xpTURN.Feedback.Tests.Editor
         }
 
         // ---- the Add menu: the attribute's path · Project/<name> without one · a shared path gets the type's name (the
-        // package's leaf keeps its own) · registered · an effect's five leaves · a new action's empty target is Self
+        // package's leaf keeps its own) · registered · an effect's six leaves · a new action's empty target is Self
         [Test]
         public void EX12_TheCatalogListsUserFeedbacks()
         {
             List<CatalogLeaf> leaves = FeedbackCatalog.Build(FeedbackCatalog.Sources());
             CatalogLeaf one = leaves.Single(l => l.Type == typeof(ProbeOneShot));
             Assert.That((one.Path, one.Registered, one.Custom), Is.EqualTo(("Probe/One Shot", true, true)));
-            Assert.That(leaves.Where(l => l.Type == typeof(ProbeValue)).Select(l => l.Path), Is.EqualTo(new[] { "Probe/Value/Curve", "Probe/Value/Oscillate", "Probe/Value/Punch", "Probe/Value/Shake", "Probe/Value/Tween" }));
+            Assert.That(leaves.Where(l => l.Type == typeof(ProbeValue)).Select(l => l.Path), Is.EqualTo(new[] { "Probe/Value/Bounce", "Probe/Value/Curve", "Probe/Value/Oscillate", "Probe/Value/Punch", "Probe/Value/Shake", "Probe/Value/Tween" }));
             Assert.That(leaves.Single(l => l.Type == typeof(ProbeNoAttribute)).Path, Is.EqualTo("Project/Probe No Attribute"));
             Assert.That(leaves.Single(l => l.Type == typeof(ProbeClash)).Path, Is.EqualTo("Flow/Unity Event (ProbeClash)"));
             Assert.That(leaves.Count(l => l.Path == "Flow/Unity Event"), Is.EqualTo(1), "the package's leaf keeps its path");

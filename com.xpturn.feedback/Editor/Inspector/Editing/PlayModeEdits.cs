@@ -26,7 +26,7 @@ namespace xpTURN.Feedback.Editor
         const string ManagedHead = "managedReferences[";
 
         // the player's fields the prepare reads — the rest reach the next Play
-        static readonly string[] s_PreparePaths = { "m_Items.", "m_Policy", "m_MaxOverlap", "m_Anchors", "m_ApplyInitialState", "m_Preset" };
+        static readonly string[] s_PreparePaths = { "m_Items.", "m_Policy", "m_MaxOverlap", "m_Anchors", "m_ApplyInitialState", "m_Preset", "m_Variants" };
 
         static readonly Dictionary<FeedbackPlayer, int> s_Pending = new Dictionary<FeedbackPlayer, int>();
         static readonly Dictionary<FeedbackPlayer, double> s_RebuildAt = new Dictionary<FeedbackPlayer, double>();

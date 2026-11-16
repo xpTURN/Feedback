@@ -549,6 +549,14 @@ namespace xpTURN.Feedback.Editor
                 foreach (PoolRow r in Reader.PoolRows)
                     ServiceLines.Add(r.Pooled ? "Pool " + DebuggerTable.NameOf(r.Prefab) + " — " + r.Live + " live · " + r.Resting + " resting · " + r.Grown + " grown" : "Not pooled — " + r.Live + " live");
             }
+            // the trauma — only once made (a line of each transform holding one)
+            if (Reader.Trauma != null)
+            {
+                TraumaService trauma = Reader.Trauma;
+                ServiceLines.Add("Trauma — " + trauma.Count + " of " + trauma.Capacity);
+                for (int i = 0; i < trauma.Count; i++)
+                    ServiceLines.Add("  " + DebuggerTable.NameOf(trauma.TargetAt(i)) + " " + trauma.TraumaAt(i).ToString("0.##", CultureInfo.InvariantCulture) + (trauma.CameraAt(i) ? " · Camera" : " · Motion") + (trauma.RunningAt(i) ? "" : " · resting"));
+            }
             // the extensions made — read without making one
             for (int e = 0; e < Reader.ExtensionNames.Count; e++)
             {

@@ -14,17 +14,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: xpTURN.Feedback.Samples::xpTURN.Feedback.Samples.SampleCard
   Title: Combat Hit Lab
   Try: "Hit the dummy: 1 light, 2 heavy, 3 critical. See the hit stop, the flash,
-    the knockback and the number \u2014 set the time scale to 0.1 to see the hit
-    stop."
+    the knockback and the number, and hear the hit \u2014 set the time scale to 0.1
+    to see the hit stop."
   See: "Each tier plays its preset (Hit Light, Hit Heavy, Hit Critical). The number
     takes the damage: intensity = damage / 100 with the number's \xD7100. Numbers
     are game information \u2014 they stay in Before. A pad rumbles on heavy and critical.
     The numbers' players are made at run time (after the TMP check) \u2014 the HUD's
-    Select Player does not pick them."
+    Select Player does not pick them. A tier's sound player plays with its preset
+    (a package preset can't hold the sample's clips): its hit from the pool, its
+    pitch a little different each time, and on heavy and critical a low-pass duck
+    that muffles the ambience a moment. The ambience is the scene's own sound \u2014
+    it plays in Before too."
   Controls: "1 \xB7 Space \xB7 Left click \xB7 Gamepad South \u2014 light \xB7 2
     \xB7 West \u2014 heavy \xB7 3 \xB7 North \u2014 critical"
   SceneGuid: 89b017b48748b445da166c40b3e87f3c
   SceneName: CombatHit
   RequiredType: xpTURN.Feedback.Samples.GameFeelLabs.CombatHitLab, xpTURN.Feedback.Samples.GameFeelLabs.CombatHit
-  RequiresText: 
+  RequiresText: the Audio module
   OpenInEditor: 0

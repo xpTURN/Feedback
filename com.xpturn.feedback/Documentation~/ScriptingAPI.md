@@ -37,8 +37,10 @@ Plays a list of feedback items: play, stop, pause, seek and wait for the end of 
 | `event Action<FeedbackPlayer, PlaybackHandle> Played` | Raised when a play starts; the handle tells which play. |
 | `event Action<FeedbackPlayer> Resumed` | Raised when the player resumes its paused plays. |
 | `event Action<FeedbackPlayer, PlaybackHandle> Stopped` | Raised when a play stops before its end; the handle tells which play. |
+| `float Intensity { get; set; }` | The player's Intensity: every play's strength is multiplied by it, from the next Play on — a play that runs keeps its own; a negative, NaN or infinite value is ignored with a warning. |
 | `bool IsPlaying { get; }` | True while any play runs, paused plays included. |
-| `float TotalDuration { get; }` | The list's nominal length — the duration multiplier and start delay in, no random part, infinity for an endless list; it prepares the player and is 0 when it cannot. |
+| `float TotalDuration { get; }` | The nominal length of the list Play() plays (the one the VariantKey picks, else the player's list) — the duration multiplier and start delay in, no random part, infinity for an endless list; it prepares the player and is 0 when it cannot. |
+| `string VariantKey { get; set; }` | The alias a play that names no preset picks among the player's lists — Play(), PlayFromEvent, a channel's play, a Timeline clip with an empty Preset; a key no list has, or none, plays the player's list. Set in Play mode only; a set outside it is ignored with a warning. |
 | `float GetDuration(PlaybackHandle handle)` | That play's own length, with its random parts and without its speed; 0 when the handle is not this player's live play. |
 | `void Pause()` | Pauses the plays that run now; paused plays still count as playing, so the Policy refuses or stops a later Play as it would a running one. |
 | `PlaybackHandle Play()` | Plays the list with the default arguments; returns the play's handle, or default when the play is refused. |
@@ -48,6 +50,7 @@ Plays a list of feedback items: play, stop, pause, seek and wait for the end of 
 | `Awaitable<PlaybackEnd> PlayAsync(CancellationToken token)` | Plays the list and returns an Awaitable that ends with the play's end reason; canceling `token` stops the play. |
 | `Awaitable<PlaybackEnd> PlayAsync(in PlayArgs args, CancellationToken token = default)` | Plays the list with `args` and returns an Awaitable that ends with the play's end reason; canceling `token` stops the play. |
 | `void PlayFromEvent()` | Plays the list with the default arguments, as Play does, and returns nothing — the call a UnityEvent, a UI Button or a Timeline Signal Receiver can pick; listen to Played and the other events for the play. |
+| `void PlayFromEvent(FeedbackPreset preset)` | Plays `preset` — the linked preset or one of the Variants — as Play does with `PlayArgs.WithPreset`, and returns nothing — a preset picked in a UnityEvent; another preset plays nothing. |
 | `void PlayFromEvent(bool forward)` | Plays the list forward when `forward` is true and backward when it is false, and returns nothing — a Toggle's value picked in a UnityEvent; a play running the other way turns around where it is instead, the same play going on. |
 | `void PlayFromEvent(float intensity)` | Plays the list with `intensity` as its intensity, as Play does with `PlayArgs.WithIntensity`, and returns nothing — a Slider's or a signal's value picked in a UnityEvent; a negative or NaN intensity plays nothing. |
 | `bool Rebuild()` | Rebuilds the player from its list and settings as they are now and stops the plays that run (Hold); false when it cannot be prepared, or when called inside its own Play, where nothing stops. |
@@ -60,6 +63,7 @@ Plays a list of feedback items: play, stop, pause, seek and wait for the end of 
 | `bool Skip()` | Ends the plays that run now: a seekable play runs its remaining events and completes, another stops with Complete; false when no play ended. |
 | `void Stop(StopMode mode = StopMode.Hold)` | Stops the plays that run now with `mode`; a play a Stopped handler starts keeps running. |
 | `bool Stop(PlaybackHandle handle, StopMode mode = StopMode.Hold)` | Stops one play with `mode`; false when the handle is not this player's live play. Stop(default) is the other overload and stops every play. |
+| `bool TryGetVariant(string alias, out FeedbackPreset preset)` | True when one of the player's lists has `alias` as its alias; `preset` is that Variant, or null for the player's own list (or its linked preset's). |
 <!-- /gen:api:xpTURN.Feedback.FeedbackPlayer -->
 
 Add it with `Component > xpTURN > Feedback > Feedback Player`, build its list in the inspector and call `Play` from a
@@ -78,7 +82,15 @@ through the player's **Remap Intensity**; a negative or NaN value plays nothing.
 true and backward on false — a Toggle's value; while a play runs the other way, it turns that play around where it is —
 the same play goes on, with no new `Played`, and **Policy**, **Cooldown** and **Chance** do not apply. A Slider calls on
 each change, so **Cooldown** spaces the plays. uGUI's pointer, selection and submit events have no UnityEvent of their own: a
-[`FeedbackUITrigger`](#feedbackuitrigger) plays from them.
+[`FeedbackUITrigger`](#feedbackuitrigger) plays from them. `PlayFromEvent(FeedbackPreset)` plays the preset given — the
+player's list for its linked preset, else one of its [Variants](Concepts.md#variants); a preset it does not list plays
+nothing.
+
+Two properties change the player from a script or a UnityEvent. `Intensity` is the inspector's **Intensity** — every
+play's strength is multiplied by it from the next `Play` on; a Slider can set it. `VariantKey`, set in Play mode, is the
+[alias](Concepts.md#variants) the plays that name no preset pick among the player's lists; `TryGetVariant` tells whether
+one of them has an alias, and `PlayArgs.WithVariant` gives a single play its key — a channel command carries it to every
+receiver, each picking its own list of that alias.
 
 <!-- gen:snippet:api-playing -->
 ```csharp
@@ -134,9 +146,10 @@ public class LevelExit : MonoBehaviour
   object becomes active.
 - After it prepares, the player plays what it read then. The list, an item's timing, targets, motion values, enabled
   toggles and category override, **Max Overlap** and a switch to or from **Overlap**, the anchors' item targets,
-  **Apply Initial State** and the linked **Preset** take effect at `Rebuild()`, which stops the plays that run (Hold).
-  The next `Play` takes the other player settings (the **Policy** among them) and an item's **Intensity**,
-  **Play Direction**, conditions and randomness without it.
+  **Apply Initial State**, the linked **Preset** and the **Variants** take effect at `Rebuild()`, which stops the plays
+  that run (Hold).
+  The next `Play` takes the other player settings (the **Policy** among them), `Intensity` and `VariantKey` and an
+  item's **Intensity**, **Play Direction**, conditions and randomness without it.
 - Events follow the play: a list that ends at its start raises `Played` then `Completed` inside `Play`, and a play that
   its own first instant stops raises `Stopped` before `Played`.
 - A `Play` called while the same player is inside `Play` — from a `Played` handler, say — is refused with a warning.
@@ -152,6 +165,8 @@ public class LevelExit : MonoBehaviour
   reach it, `IsPlaying` is false, and its listener still hears its end (the notes of [`PlaybackEnd`](#playbackend) list
   the plays that end otherwise). **Stop Hold** and **Stop Revert** stop them inside the disable or `Destroy` call.
   Choose a Stop behavior for objects that go back to a pool.
+- **Audio Output** is the Audio Mixer Group of the player's Play At Point sounds whose item names none — a VO player
+  and an SFX player send the same preset to their own groups. Without it they take the project's Default Audio Output.
 - Under **Stop Revert**, an item that turned off the player's own object or a parent of it leaves it off — Unity does
   not turn an object on while it is being disabled; a child it turned off comes back on. A play that a `Stopped` handler
   starts during that stop runs to its end while the object is off.
@@ -185,29 +200,38 @@ public class LevelExit : MonoBehaviour
 ### PlayArgs
 
 <!-- gen:api:xpTURN.Feedback.PlayArgs -->
-What one Play carries — intensity, seed, position, direction and listener; default is a play of intensity 1 with the player's own settings.
+What one Play carries — intensity, seed, position, direction, listener, preset and Variant key; default is a play at intensity 1 of the list the player picks — its VariantKey's, else its own — with the player's own settings.
 
 | Member | Description |
 |---|---|
-| `static PlayArgs Default { get; }` | The default play: intensity 1, no seed, no position, the player's direction, no listener. |
+| `static PlayArgs Default { get; }` | The default play: intensity 1, no seed, no position, the player's direction, no listener, no preset and no Variant key — the list the player's VariantKey picks, else the player's list. |
 | `PlayerDirection Direction { get; }` | The play's direction, when `PlayArgs.HasDirection` is true; Toggle reads and turns the player's own toggle. |
 | `bool HasDirection { get; }` | True when a direction is set; without one the player's own direction applies. |
+| `bool HasPlayerList { get; }` | True when the play plays the player's list whatever its VariantKey. |
 | `bool HasPosition { get; }` | True when a position is set. |
+| `bool HasPreset { get; }` | True when a preset is set. |
 | `bool HasSeed { get; }` | True when a seed is set. |
 | `float Intensity { get; }` | The play's intensity; 1 unless set. |
 | `IPlaybackListener Listener { get; }` | The listener that hears the play's end — hooked before the play starts, so a play that ends inside Play is heard too; null for none. |
 | `Vector3 Position { get; }` | The play's position, when `PlayArgs.HasPosition` is true. |
+| `FeedbackPreset Preset { get; }` | The preset the play plays, when `PlayArgs.HasPreset` is true. |
 | `uint Seed { get; }` | The seed of the play's random parts, when `PlayArgs.HasSeed` is true. |
+| `string VariantKey { get; }` | The alias the play picks among the player's lists; empty when none is set. |
 | `PlayArgs WithDirection(PlayerDirection direction)` | A copy with the direction set; a value that is not a defined direction makes Play refuse it. |
 | `PlayArgs WithIntensity(float intensity)` | A copy with the intensity set. |
 | `PlayArgs WithListener(IPlaybackListener listener)` | A copy with the listener set; null for none. |
+| `PlayArgs WithPlayerList()` | A copy that plays the player's list (or its linked preset's) whatever the player's VariantKey; it takes a preset set before away. |
 | `PlayArgs WithPosition(Vector3 position)` | A copy with the position set. |
+| `PlayArgs WithPreset(FeedbackPreset preset)` | A copy that plays `preset` — the player's linked preset or one of its Variants — instead of the player's list; null names no preset — the list the player's VariantKey picks, else the player's list. |
 | `PlayArgs WithSeed(uint seed)` | A copy with the seed set. |
+| `PlayArgs WithVariant(string alias)` | A copy that plays the player's list whose alias is `alias` — ahead of a preset set, which plays when no list has the alias; null or empty sets none. |
 <!-- /gen:api:xpTURN.Feedback.PlayArgs -->
 
 Start from `PlayArgs.Default` and chain the `With…` methods — each returns a changed copy, so one value can be kept and
 reused. A seed repeats a play's random parts, a position places its position-based effects and distance gates, and a
-direction replaces the player's **Direction** for that play.
+direction replaces the player's **Direction** for that play. A play picks its list in this order: the list of its
+Variant key's alias, its preset, the player's list when `WithPlayerList` asks for it, the list of the player's
+`VariantKey`, the player's list.
 
 ### PlaybackHandle
 
@@ -347,18 +371,28 @@ The player's **Direction**, and one play's with `PlayArgs.WithDirection`. Inside
 
 ### FeedbackPreset
 
+<!-- gen:api:xpTURN.Feedback.FeedbackPreset -->
+An item list that players copy or link; a linked player plays the preset's list and keeps its own settings.
+
+| Member | Description |
+|---|---|
+| `string Alias { get; }` | The alias a Variant key picks this preset's list by — FeedbackPlayer.VariantKey, PlayArgs.WithVariant, a Timeline clip's options; empty matches no key. |
+<!-- /gen:api:xpTURN.Feedback.FeedbackPreset -->
+
 Create one with `Assets > Create > xpTURN > Feedback Preset`, or from a player's items with **Save Items as Preset...**
 in the menu beside the player's **Preset** field; **Apply Items to Preset...** writes a player's items over a preset. A
-preset holds an item list only. A player whose **Preset** field links it plays the preset's list and keeps its own
-settings; **Unlink and Copy** turns the link into the player's own copy.
+preset holds an item list and its **Alias** — the text a [Variant key](Concepts.md#variants) picks that list by. A player
+whose **Preset** field links it plays the preset's list and keeps its own settings; **Unlink and Copy** turns the link
+into the player's own copy.
 
 Drop a preset on the Hierarchy to add a player to the object under it, or to a new object named after the preset —
 linked when the preset inspector's **Link on hierarchy drop (all presets)** is on and one preset lands where there is no
 player, a copy otherwise; on an object that has a player, the items are added to the end of its list, and on a linked
-player the drop is refused with a warning. In Play mode, an edit to a preset reaches the players that link it as an edit
-to their own list does: an item's **Intensity**, **Play Direction**, conditions and randomness at their next `Play`,
-curves and gradients at once, and the rest — the list, an item's timing, targets, motion values and enabled toggles — at
-their next `Rebuild()`, which the preset inspector's **Rebuild Them** calls for them.
+player the drop is refused with a warning. In Play mode, an edit to a preset reaches the players that link it or hold it
+in their **Variants** as an edit to their own list does: an item's **Intensity**, **Play Direction**, conditions and
+randomness at their next `Play`, curves and gradients at once, and the rest — the list, an item's timing, targets,
+motion values and enabled toggles — at their next `Rebuild()`, which the preset inspector's **Rebuild Them** calls for
+them.
 
 ## Broadcasting
 
@@ -592,6 +626,7 @@ The category an effect belongs to — its item's override first, then Flash for 
 | `Particles = 6` | Particle effects; an item's category override puts an effect here. |
 | `UI = 7` | UI effects; an item's category override puts an effect here. |
 | `Haptics = 8` | Gamepad rumble, and your own haptic feedbacks. |
+| `Audio = 9` | Sounds, audio filters and mixers, and your own sound feedbacks. |
 <!-- /gen:api:xpTURN.Feedback.FeedbackCategory -->
 
 The **Category** column of the [feedback reference](Feedbacks.md) gives each feedback's own category. An effect counts
@@ -632,10 +667,14 @@ reads that asset in each play session and never writes it; without one, the defa
 | **Adjust Fixed Delta Time** | off | Whether time items scale the physics step too. |
 | **Shake Receivers Per Play** | 4 | The camera shake receivers one channel shake reaches. |
 | **Receiver Contributions** | 8 | The shakes one camera shake receiver keeps room for at once. |
+| **Maximum Shake Offset** | 0 | The soft cap, in world units, on the camera shakes summed on one camera; 0 leaves them uncapped. |
+| **Maximum Shake Angle** | 0 | The soft cap, in degrees, on the camera shakes' turns summed on one camera; 0 leaves them uncapped. |
+| **Trauma Capacity** | 16 | The transforms that hold a trauma at once; when it is full, the one with the least trauma lets go. |
 | **Maximum Unscaled Delta** | 0 | The cap on an unscaled frame's time; 0 follows `Time.maximumDeltaTime`. |
 | **Overlay Sorting Order** | 32000 | The sorting order of the screen overlay's canvas. |
 | **Post FX Layer** | 0 | The layer of the package's post-processing volumes — your cameras' volume masks must take it. |
 | **Post FX Priority** | 1000 | The base priority of those volumes. |
+| **Default Audio Output** | none | The Audio Mixer Group of the Play At Point sounds whose item and player name none. |
 
 **Notes**
 
@@ -896,7 +935,7 @@ its **Lifetime**, a random range: the **Distance** on each axis that the **Move 
 
 Camera shakes sent to a channel move the cameras that receive them: a `CameraShakeReceiver` on a camera or any
 transform. A camera that a Cinemachine brain drives takes shakes through a `CinemachineShakeExtension` on its
-Cinemachine cameras.
+Cinemachine cameras. A trauma shakes a camera, or any transform, from a level that hits raise and time lowers.
 
 ### CameraShakeReceiver
 
@@ -904,6 +943,41 @@ Add it with `Component > xpTURN > Feedback > Camera Shake Receiver` to a camera,
 sent to a channel should move. It takes the shakes on its **Channel** (**Int** with an **Id**, or **Asset**); with a
 **Range** above 0, only shakes sent from within that distance. The settings' **Shake Receivers Per Play** and
 **Receiver Contributions** set how many receivers one shake reaches and how many shakes one receiver mixes.
+
+### FeedbackTrauma
+
+<!-- gen:api:xpTURN.Feedback.FeedbackTrauma -->
+Adds to, reads and clears the trauma that shakes a camera or any transform.
+
+| Member | Description |
+|---|---|
+| `static void Add(Camera camera, float amount)` | Adds an amount (0 to 1) to the camera's trauma. |
+| `static void Add(Transform target, float amount)` | Adds an amount (0 to 1) to the target's trauma, which shakes it and then fades on its own; the first add to a transform no feedback has prepared allocates once. |
+| `static void Clear(Transform target)` | Takes the target's trauma away at once; its shake stops. |
+| `static float Get(Transform target)` | The target's trauma, 0 to 1; 0 when it has none. |
+<!-- /gen:api:xpTURN.Feedback.FeedbackTrauma -->
+
+Each transform holds a trauma from 0 to 1. `Camera/Trauma` and `Transform/Trauma` add to it, and so does `Add` — scale
+the amount by the damage in your own code. Adds stop at 1, the trauma fades on its own, and while it is above 0 the
+transform shakes by its trauma to a power, so a light hit barely shows and many hits never shake past the maximum. A hit
+while it shakes raises the shake without a jump.
+
+**Notes**
+
+- A trauma belongs to its transform, not to a play: a player's Stop, Skip or Restore does not take it back, and a
+  backward play adds nothing. `Clear` ends it at once.
+- A camera's trauma — a transform with a `Camera` or a `CameraShakeReceiver`, or a camera a Cinemachine brain drives
+  through a `CinemachineShakeExtension` — follows the Camera category and the settings' shake caps; any other
+  transform's follows the Motion category.
+- A feedback prepares its target's trauma; the first `Add` to a transform no feedback has prepared allocates once.
+
+### TraumaShaker
+
+Add it with `Component > xpTURN > Feedback > Trauma Shaker` to a camera or any transform to set how its trauma shakes
+it: **Max Offset** (world units on its own axes) and **Max Angle** (degrees) at a trauma of 1, **Frequency**,
+**Exponent** (the shake grows as the trauma to this power), **Decay** (trauma lost a second) and **Time Mode**. Without
+it, a trauma uses the defaults of the feedback that added first — a camera's or an object's. The values are read when
+a trauma starts.
 
 ### CinemachineShakeExtension
 
@@ -936,13 +1010,13 @@ A Timeline track bound to a FeedbackPlayer; each of its clips is one play of tha
 <!-- /gen:api:xpTURN.Feedback.FeedbackTrack -->
 
 Add it from the Timeline window's track menu, **xpTURN > Feedback Track**, and bind it to a `FeedbackPlayer`. Each clip
-on the track is one play of that player — its list, its settings and its events. A clip made on the track draws its own
-**Seed** and takes the player's name.
+on the track is one play of that player — of its list, or of the variant the clip's **Preset** picks — with its settings
+and its events. A clip made on the track draws its own **Seed** and takes the player's name.
 
 ### FeedbackClip
 
 <!-- gen:api:xpTURN.Feedback.FeedbackClip -->
-A clip of a Feedback track: one play of the track's FeedbackPlayer, moved by the timeline's time or started with the clip.
+A clip of a Feedback track: one play of the track's FeedbackPlayer — its list, or the linked preset or one of its Variants the clip's Preset picks — moved by the timeline's time or started with the clip.
 
 | Member | Description |
 |---|---|
@@ -964,7 +1038,10 @@ A clip of a Feedback track: one play of the track's FeedbackPlayer, moved by the
   direction apply and its Time Scale items write.
 
 **End** — **Revert**, **Hold** or **Complete** — is how the clip ends its play when the timeline leaves it; stopping
-or destroying the director reverts. **Intensity** is the play's intensity.
+or destroying the director reverts. **Intensity** is the play's intensity. **Preset** picks the list: empty for the
+player's list (or its linked preset's), else one of the player's [Variants](Concepts.md#variants) — a preset the player
+does not list shows an error on the clip, and the clip's Inspector offers **Add to Variants**. **Hit Key** names the
+clip's row in its director's [`FeedbackTimelineOptions`](#feedbacktimelineoptions); clips may share one.
 
 **Notes**
 
@@ -996,18 +1073,55 @@ or destroying the director reverts. **Intensity** is the play's intensity.
 - A clip duplicated or pasted in the Timeline window draws a new **Seed**; set the **Seed** to give two clips the same
   random parts.
 
+### FeedbackTimelineOptions
+
+<!-- gen:api:xpTURN.Feedback.FeedbackTimelineOptions -->
+Options for the Feedback clips of the PlayableDirector on this GameObject: a Variant key every clip picks its list by, an intensity every clip's is multiplied by, and rows by a clip's Hit Key — read when a clip starts its play, in Play mode.
+
+| Member | Description |
+|---|---|
+| `float Intensity { get; set; }` | The number every clip's intensity is multiplied by; a negative, NaN or infinite value is ignored with a warning. |
+| `string VariantKey { get; set; }` | The alias every clip picks its list by on its track's player, ahead of the clip's Preset; a player with no list of that alias plays the clip as it is. Empty sets none. |
+| `void ClearHits()` | Takes every row away. |
+| `bool RemoveHit(string hitKey)` | Takes the row of `hitKey` away; false when the table has none. |
+| `void SetHit(string hitKey, float intensity = 1, string variantKey = default)` | Sets what the clips whose Hit Key is `hitKey` play with: `intensity` multiplies their intensity and `variantKey`, when not empty, picks their list ahead of the VariantKey; a key the table lacks is added, which may allocate once. |
+| `bool TryGetHit(string hitKey, out float intensity, out string variantKey)` | True when the table has a row for `hitKey` — the first one; `intensity` and `variantKey` are its values. |
+<!-- /gen:api:xpTURN.Feedback.FeedbackTimelineOptions -->
+
+Add it to the director's GameObject with `Component > xpTURN > Feedback > Feedback Timeline Options`. In Play mode each
+Feedback clip of that director reads it when it starts its play: the row of the clip's **Hit Key** — its intensity, and
+its **Variant Key** when the clip's player has a list of that alias — then **Variant Key** and **Intensity**. A key picks
+the clip's list ahead of its **Preset**; a player with no list of that alias plays the clip as it is. The clip's
+intensity is multiplied by the row's and the options'. Rows are set in the inspector, where + adds one of intensity 1, or
+from a script:
+
+<!-- gen:snippet:timeline-hits -->
+```csharp
+options.SetHit("finisher", 1.5f, "heavy");
+options.SetHit("hit2", 0.6f);
+```
+<!-- /gen:snippet:timeline-hits -->
+
+**Notes**
+
+- A change reaches each clip at its next entry; a Driven clip shows the same values at the same time while the options
+  stay.
+- The Timeline window's preview plays what the clips hold — the options wait for Play mode.
+- A Control track's inner timeline reads its own director's options.
+- Two rows of one key: the first one is read and `SetHit` changes it.
+
 ## Your own feedbacks
 
-Add what the package does not do — a sound, an FMOD or Wwise event, a phone's vibration — as a feedback of your own.
+Add what the package does not do — an FMOD or Wwise event, a phone's vibration — as a feedback of your own.
 Derive an item from `CustomActionItem` or `CustomEffectItem`, name it in the Add menu with `CustomFeedbackAttribute`,
 and put your code in the `CustomAction` or `CustomEffect` the item makes. The player plays it like its own items —
-timing, chance, intensity, direction, Seek, Skip and the stops — and calls your code. The package itself ships no sound,
-middleware or phone haptics code.
+timing, chance, intensity, direction, Seek, Skip and the stops — and calls your code. The package itself ships no
+middleware or phone haptics code; Unity's own sounds are the [Audio feedbacks](Feedbacks.md#audio).
 
 | You want | Use |
 |---|---|
-| An act at one moment: a one-shot sound, a haptic pulse | `CustomActionItem` with `Duration` 0 — your action's `Fire` |
-| An act with a length: a sound until the end, a vibration | `CustomActionItem` with a `Duration` — `Begin`, `Update`, `End` |
+| An act at one moment: a middleware one-shot, a haptic pulse | `CustomActionItem` with `Duration` 0 — your action's `Fire` |
+| An act with a length: a middleware event until the end, a vibration | `CustomActionItem` with a `Duration` — `Begin`, `Update`, `End` |
 | A value over time: a mixer or FMOD parameter, a Wwise RTPC, a vibration's strength | `CustomEffectItem` — `Apply` takes the motion's value |
 | A value of your own component, composed with other feedbacks | `IFeedbackTarget<T>` — [Your own targets](#your-own-targets) |
 | A call with no code of its own | `Flow/Unity Event`, `Custom/Float Event` |
@@ -1071,30 +1185,32 @@ turned by its Play Direction), so undo only what your `Fire` left. A timed act r
 
 <!-- gen:snippet:api-custom-action -->
 ```csharp
-[CustomFeedback("Audio/One Shot", Aliases = "sound sfx", Requires = typeof(AudioSource))]
+[CustomFeedback("Audio/Middleware One Shot", Aliases = "sound sfx fmod wwise", Requires = typeof(Transform))]
 [Serializable]
-public sealed class OneShotSound : CustomActionItem
+public sealed class MiddlewareOneShot : CustomActionItem
 {
-    [SerializeField] AudioClip clip;
+    [SerializeField] string sound = "event:/Hit";
     [SerializeField] float volume = 1f;
+
+    public override FeedbackCategory Category => FeedbackCategory.Audio;
 
     protected override CustomAction CreateAction() => new Action(this);
 
     sealed class Action : CustomAction
     {
-        readonly OneShotSound item;
-        AudioSource source;
+        readonly MiddlewareOneShot item;
+        Transform emitter;
 
-        public Action(OneShotSound item) => this.item = item;
+        public Action(MiddlewareOneShot item) => this.item = item;
 
-        protected override bool Prepare(in CustomPrepare context) => context.TryFindTarget(out source);
+        protected override bool Prepare(in CustomPrepare context) => context.TryFindTarget(out emitter);
 
         protected override void Fire(in CustomPlay play)
         {
             // a Seek or a Skip that sweeps over the moment does not play it
             if (play.Swept)
                 return;
-            source.PlayOneShot(item.clip, item.volume * play.Intensity * play.CategoryScale);
+            MyAudio.Post(item.sound, emitter.position, item.volume * play.Intensity * play.CategoryScale);
         }
     }
 }
@@ -1167,10 +1283,10 @@ The base of a custom effect: a motion's value handed to the CustomEffect it make
 | `protected CustomEffect CreateEffect()` | Makes the code object for one preparation; a player calls it each time it prepares the item. |
 <!-- /gen:api:xpTURN.Feedback.CustomEffectItem -->
 
-An effect takes the motions a `Custom/Float Event` takes — Tween, Punch, Shake, Curve and Oscillate — and the value is
-the same: an offset motion's value sits on the item's **Base** and takes the category's scale; a Tween does not take the
-scale. In a Motion Driver, an effect loops with Oscillate or Shake. When the Haptics category is turned off, a Haptics
-effect gets its base once and no more calls in that play.
+An effect takes the motions a `Custom/Float Event` takes — Tween, Punch, Shake, Curve, Oscillate and Bounce — and the
+value is the same: an offset motion's value sits on the item's **Base** and takes the category's scale; a Tween does not
+take the scale. In a Motion Driver, an effect loops with Oscillate or Shake. When the Haptics category is turned off, a
+Haptics effect gets its base once and no more calls in that play.
 
 ### CustomEffect
 
@@ -1188,23 +1304,22 @@ The code of a custom effect: Apply takes the motion's value every frame its play
 
 <!-- gen:snippet:api-custom-effect -->
 ```csharp
-[CustomFeedback("Audio/Mixer Parameter", Global = true)]
+[CustomFeedback("Audio/Middleware Parameter", Global = true)]
 [Serializable]
-public sealed class MixerParameter : CustomEffectItem
+public sealed class MiddlewareParameter : CustomEffectItem
 {
-    [SerializeField] AudioMixer mixer;
     [SerializeField] string parameter = "Volume";
 
     protected override CustomEffect CreateEffect() => new Effect(this);
 
     sealed class Effect : CustomEffect
     {
-        readonly MixerParameter item;
+        readonly MiddlewareParameter item;
 
-        public Effect(MixerParameter item) => this.item = item;
+        public Effect(MiddlewareParameter item) => this.item = item;
 
         // every frame the play runs; slot −1 puts the item's base back after a Revert or a Restore
-        protected override void Apply(int slot, float value) => item.mixer.SetFloat(item.parameter, value);
+        protected override void Apply(int slot, float value) => MyAudio.SetParameter(item.parameter, value);
     }
 }
 ```
@@ -1311,11 +1426,11 @@ With Run, the preview calls it with `InPreview` true; what your code changes out
 when the preview ends — put it back in `End` and `Release`.
 
 **Filling what the package leaves out.** Which call goes where; the calls are the middleware's or the platform's, so
-check them against the version you use.
+check them against the version you use. A sound Unity plays needs none of this: the Audio feedbacks play clips and
+sources and move filters and mixers.
 
 | Fill in | Base and call | What your code calls |
 |---|---|---|
-| A Unity sound | An instant action's `Fire` (return when `Swept`) | AudioSource.PlayOneShot, its volume times `Intensity` and `CategoryScale` |
 | An FMOD one-shot | An instant action's `Fire` | RuntimeManager.PlayOneShot with an EventReference and the play's position (FMOD for Unity 2.02 to 2.04); it cannot be stopped |
 | An FMOD event with a length | A timed action's `Begin`, `End` and `Release` | RuntimeManager.CreateInstance, start, then stop — IMMEDIATE when the end is Revert or Aborted, ALLOWFADEOUT otherwise — and release |
 | An FMOD parameter | An effect's `Apply` | EventInstance.setParameterByID with a cached id, or the Studio system's setParameterByName for a global one |
@@ -1360,14 +1475,14 @@ A component a Custom Value item drives: the getter gives the base value, the set
 
 <!-- gen:snippet:api-custom-target -->
 ```csharp
-public class EngineHum : MonoBehaviour, IFeedbackTarget<float>
+public class Engine : MonoBehaviour, IFeedbackTarget<float>
 {
-    [SerializeField] AudioSource hum;
+    [SerializeField] float throttle = 1f;
 
     public float FeedbackValue
     {
-        get => hum.volume;
-        set => hum.volume = value;
+        get => throttle;
+        set => throttle = value;
     }
 }
 ```

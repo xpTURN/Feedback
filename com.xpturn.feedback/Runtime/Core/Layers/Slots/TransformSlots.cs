@@ -27,6 +27,8 @@ namespace xpTURN.Feedback
 
         protected override void Write(in Vector3 value) => m_Target.localPosition = value;
 
+        protected override Vector3 Limit(in Vector3 sum, float limit) => Vector3Ops.SoftLimit(in sum, limit);
+
         // Local: the parent's axes (localPosition's space). World: the parent's inverse — exact under a skewed parent. Self:
         // the target's own axes in world units — a World offset turned by the target's base world rotation
         protected override Vector3 Offset(in Vector3 v, in Vector3 o, LayerSpace space)
@@ -73,6 +75,8 @@ namespace xpTURN.Feedback
         protected override Quaternion Read() => m_Target.localRotation;
 
         protected override void Write(in Quaternion value) => m_Target.localRotation = value;
+
+        protected override Quaternion Limit(in Quaternion sum, float limit) => QuaternionOps.SoftLimit(in sum, limit);
 
         // Local and Self: the target's own axes, v · o. World: the offset conjugated by the parent's world rotation — a
         // world-axis turn in Transform.rotation's sense, the drawn shape's only under a uniformly scaled parent

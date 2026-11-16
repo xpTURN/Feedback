@@ -118,6 +118,9 @@ namespace xpTURN.Feedback
             EvaluateRunning(record, index);
         }
 
+        // the handle names one of this runtime's live plays
+        internal bool Owns(PlaybackHandle handle) => handle != default && Find(handle, out _);
+
         bool Find(PlaybackHandle handle, out int index)
         {
             PlaybackRecord[] records = m_Records;
@@ -133,17 +136,34 @@ namespace xpTURN.Feedback
             return false;
         }
 
-        // the list index, not the program's: an inactive flow item ahead moves the program's numbers
-        uint ItemSeed(uint seed, int programItem) => Hash32.Of(seed, (uint)m_ListIndex[programItem]);
-
-        static float Range(Vector2 range, uint hash) => Factor(Mathf.Lerp(range.x, range.y, Hash32.ToUnit(hash)));
+        // the item's managed reference id under its own tag, else the list index — not the program's: an inactive flow item
+        // ahead moves the program's numbers
+        uint ItemSeed(uint seed, int programItem) => PlayMath.ItemSeed(seed, m_SeedKey[programItem], m_KeyIsId[programItem]);
 
         // a remap's or a falloff's result: finite and not negative, else 0
-        static float Factor0(float value) => value >= 0f && value < float.PositiveInfinity ? value : 0f;
+        internal static float Factor0(float value) => value >= 0f && value < float.PositiveInfinity ? value : 0f;
 
         static bool Finite(float value) => !float.IsNaN(value) && !float.IsInfinity(value);
 
         static bool Finite(Vector3 v) => Finite(v.x) && Finite(v.y) && Finite(v.z);
+
+        // a dry runtime's copy of another runtime's accepted play: its resolved timeline, final intensity, seed, direction, random
+        // outputs and turned items — the history's skips, the masks and the falloff come with them. The same program's shape
+        // only; a live runtime refuses
+        internal PlaybackHandle Replay(PlaybackRecord from)
+        {
+            if (!m_Dry || from == null || !m_Records[0].Resolved.SameShape(from.Resolved))
+                return default;
+            m_Replay = from;
+            try
+            {
+                return Play(PlayArgs.Default, default);
+            }
+            finally
+            {
+                m_Replay = null;
+            }
+        }
 
         // ---- the pipeline. The player has refused a nested Play and prepared already
 
@@ -184,33 +204,41 @@ namespace xpTURN.Feedback
             // a preview's unconditional play passes the player's cooldown, gate (its falloff too) and chance, the items'
             // chance, cooldown and plays, and the random lengths — a track's driven play too, in any kind
             bool free = (args.Unconditional && context.Kind == ContextKind.Preview) || args.Driven;
-            if (!free && now - m_LastPlay < player.m_Cooldown)
+            // a dry play is an accepted one — the player's cooldown, gate, policy and chance are the live plays'
+            bool admit = !free && !m_Dry;
+            if (admit && now - player.m_LastPlay < player.m_Cooldown)
                 return default;
             float falloff = 1f;
-            if (!free && player.m_UseDistanceGate && !Gate(in args, out falloff))
+            if (admit && player.m_UseDistanceGate && !Gate(in args, out falloff))
                 return default;
             PlayPolicy policy = player.m_Policy;
-            if (policy == PlayPolicy.Ignore && ActiveCount() > 0)
+            // Ignore: a play of any of the player's lists refuses
+            if (policy == PlayPolicy.Ignore && !m_Dry && player.AnyActive())
                 return default;
             // a refused backward play puts the random back to here
             XorShiftRandom random = m_Random;
-            if (!free && player.m_Chance < 100f && m_Random.NextUnit() * 100f >= player.m_Chance)
+            if (admit && player.m_Chance < 100f && m_Random.NextUnit() * 100f >= player.m_Chance)
                 return default;
             // the direction: the argument, else the setting (an unknown saved value is Forward). Toggle reads the cell — it
             // turns when the play is accepted
             PlayerDirection direction = args.HasDirection ? args.Direction : player.m_Direction;
             bool toggle = direction == PlayerDirection.Toggle;
-            bool reverse = toggle ? m_ToggleBackward : direction == PlayerDirection.Backward;
+            bool reverse = toggle ? player.m_ToggleBackward : direction == PlayerDirection.Backward;
             // the seed and each item's inputs: the items' random draws are the seed's hashes
             uint seed = args.HasSeed ? args.Seed : m_Random.Next();
-            float intensity = input;
-            if (player.m_RemapIntensity && player.m_IntensityRemap != null)
-                intensity = Factor0(player.m_IntensityRemap.Evaluate(input));
-            intensity *= Factor(player.m_Intensity) * falloff;
-            // a preview's masks — a masked item keeps its place
+            float intensity = PlayMath.PlayIntensity(player, input, falloff);
+            if (m_Replay != null)
+            {
+                seed = m_Replay.Seed;
+                intensity = m_Replay.Intensity;
+                reverse = m_Replay.Reverse;
+            }
+            // a preview's masks — a masked item keeps its place. They are by the shown list's indices: another list's plays
+            // read none
             bool preview = context.Kind == ContextKind.Preview;
-            byte[] masks = preview ? player.m_PreviewMasks : null;
-            int soloOnce = preview ? player.m_PreviewSoloOnce : -1;
+            bool shown = preview && !m_Dry && ReferenceEquals(m_Owner, player.MaskOwner);
+            byte[] masks = shown ? player.m_PreviewMasks : null;
+            int soloOnce = shown ? player.m_PreviewSoloOnce : -1;
             bool anySolo = AnySolo(masks);
             for (int i = 0; i < m_PlaySkip.Length; i++)
             {
@@ -219,13 +247,11 @@ namespace xpTURN.Feedback
                 m_PlaySkip[i] = m_Skip[i] || (preview && Masked(i, masks, anySolo, soloOnce)) || (args.Driven && m_Effects[i] is TimeScaleItem) || Skips(i, seed, intensity, now, reverse, free);
                 EffectItem effect = m_Effects[i];
                 if (!free && effect != null && effect.m_Random.m_RandomizeDuration)
-                    m_Scale[i] = Range(effect.m_Random.m_DurationRange, Hash32.Tagged(ItemSeed(seed, i), Hash32.Duration, 0u));
+                    m_Scale[i] = PlayMath.DurationScale(in effect.m_Random, ItemSeed(seed, i));
             }
             // the random part of the player's length is the seed's hash too — the backward check and the timeline take
             // the same
-            float global = Factor(player.m_DurationMultiplier);
-            if (!free && player.m_RandomizeDuration)
-                global *= Range(player.m_DurationRange, Hash32.Tagged(seed, Hash32.Duration, 0u));
+            float global = PlayMath.PlayerDurationScale(player, seed, free);
             float delay = Offset(player.m_StartDelay);
             // a backward play is confirmed in the runtime's own buffer first: a list that cannot play backward is refused
             // before the policy stops anything, the random put back (the confirmed result: a zero-period endless block and a
@@ -242,8 +268,11 @@ namespace xpTURN.Feedback
                     return default;
                 }
             }
-            // the policy makes room: user code (Stopped) runs here and may release this runtime
+            // the policy makes room: user code (Stopped) runs here and may release this runtime. Restart ends the plays of the
+            // player's other lists too
             StopForPolicy(policy);
+            if (policy == PlayPolicy.Restart && !m_Released && !m_Dry)
+                player.StopOthers(this);
             if (m_Released)
                 return default;
             // the token's entry — registered when new. Canceled since the refusals (the policy's Stopped, another thread):
@@ -257,11 +286,21 @@ namespace xpTURN.Feedback
             PlaybackRecord record = m_Records[index];
             // this play's timeline
             m_Program.Resolve(m_Scale, m_PlaySkip, global, delay, record.Resolved);
+            if (m_Replay != null)
+                m_Replay.Resolved.CopyTo(record.Resolved);
             // accepted: what a refused play must leave alone is written now
-            m_LastPlay = now;
-            if (toggle)
-                m_ToggleBackward = !m_ToggleBackward;
-            player.NoteAccepted();
+            if (m_Dry)
+                m_LastStamp++;
+            else
+            {
+                player.m_LastPlay = now;
+                if (toggle)
+                    player.m_ToggleBackward = !player.m_ToggleBackward;
+                m_LastStamp = ++player.m_Stamp;
+                player.NoteAccepted();
+            }
+            if (m_FirstStamp == 0)
+                m_FirstStamp = m_LastStamp;
             for (int i = 0; i < m_PlaySkip.Length; i++)
             {
                 record.Running[i] = false;
@@ -275,7 +314,12 @@ namespace xpTURN.Feedback
                 m_ItemLastPlay[i] = now;
                 m_ItemPlays[i]++;
                 if (effect.m_Random.m_RandomizeOutput)
-                    record.Output[i] = Range(effect.m_Random.m_OutputRange, Hash32.Tagged(ItemSeed(seed, i), Hash32.Output, 0u));
+                    record.Output[i] = PlayMath.Output(in effect.m_Random, ItemSeed(seed, i));
+            }
+            if (m_Replay != null)
+            {
+                Array.Copy(m_Replay.Output, record.Output, record.Output.Length);
+                Array.Copy(m_Replay.Turned, record.Turned, record.Turned.Length);
             }
             record.Active = true;
             record.Paused = false;
@@ -344,10 +388,11 @@ namespace xpTURN.Feedback
                 return default;
             // Played: once for every accepted play, after t = 0 and before its end. A play its own t = 0 stopped has had its
             // Stopped already
-            player.Raise(PlayerEventKind.Played, handle, context);
+            if (!m_Dry)
+                player.Raise(PlayerEventKind.Played, handle, context);
             // the Begin window's repeat boundaries come after Played — none when Played's subscriber ended the play: a play's
             // end is its last event
-            for (int n = record.BeginLooped; n > 0 && record.Active && record.Serial == serial; n--)
+            for (int n = record.BeginLooped; n > 0 && record.Active && record.Serial == serial && !m_Dry; n--)
                 player.Raise(PlayerEventKind.Looped, handle, context);
             if (record.Active && record.Serial == serial && record.Finished)
                 Finish(record, index);
@@ -431,19 +476,15 @@ namespace xpTURN.Feedback
             ref ItemConditions c = ref effect.m_Conditions;
             if (!free)
             {
-                if (c.m_Chance < 100f && Hash32.ToUnit(Hash32.Tagged(ItemSeed(seed, i), Hash32.Chance, 0u)) * 100f >= c.m_Chance)
+                if (c.m_Chance < 100f && PlayMath.ChanceSkips(in c, ItemSeed(seed, i)))
                     return true;
                 if (now - m_ItemLastPlay[i] < c.m_Cooldown)
                     return true;
                 if (c.m_MaxPlays > 0 && m_ItemPlays[i] >= c.m_MaxPlays)
                     return true;
             }
-            // the direction's condition (the items' inputs)
-            if (c.m_Direction == DirectionCondition.ReverseOnly ? !reverse : c.m_Direction == DirectionCondition.ForwardOnly && reverse)
-                return true;
-            if (c.m_UseIntensityRange && (intensity < c.m_IntensityRange.x || intensity > c.m_IntensityRange.y))
-                return true;
-            return false;
+            // the direction's condition and the intensity range (the items' inputs)
+            return PlayMath.ConditionSkips(in c, reverse, intensity);
         }
 
         // a preview's mask of an effect item by its list index — a flow item never: the item's ▶ leaves its item alone, a Solo
@@ -647,7 +688,7 @@ namespace xpTURN.Feedback
                         return;
                     }
                     EffectItem effect = m_Effects[item];
-                    float intensity = effect.m_Intensity == IntensityResponse.Ignore ? record.Output[item] : record.Intensity * record.Output[item];
+                    float intensity = PlayMath.ItemIntensity(effect.m_Intensity, record.Intensity, record.Output[item]);
                     // a one-direction instant does its forward act in its own direction
                     // a turned item runs the other way
                     bool reverse = (e.Reverse != record.Turned[item]) && !(e.Kind == TimelineEventKind.Fired && effect.m_Conditions.m_Direction == DirectionCondition.ReverseOnly);
@@ -667,7 +708,8 @@ namespace xpTURN.Feedback
                         hasPosition = true;
                         position = record.OwnerPlace;
                     }
-                    var context = new BeginContext(intensity, ItemSeed(record.Seed, item), e.Occurrence, record.Serial, reverse, seconds, hasPosition, position, record.Sweeping);
+                    var context = new BeginContext(intensity, ItemSeed(record.Seed, item), e.Occurrence, record.Serial, reverse, seconds, hasPosition, position, record.Sweeping,
+                        endless: record.Resolved.ItemDuration(item) == TimelineTime.Infinite);
                     record.Touched[item] = true;
                     if (e.Kind == TimelineEventKind.Fired)
                     {
@@ -686,7 +728,8 @@ namespace xpTURN.Feedback
                         record.BeginLooped++;
                         return;
                     }
-                    m_Player.Raise(PlayerEventKind.Looped, record.Handle, m_Scheduler.Context);
+                    if (!m_Dry)
+                        m_Player.Raise(PlayerEventKind.Looped, record.Handle, m_Scheduler.Context);
                     return;
                 case TimelineEventKind.Finished:
                     record.Finished = true;
@@ -697,18 +740,7 @@ namespace xpTURN.Feedback
         // the item runs against the play's way — never an item with a direction condition, one its binding ends, one without
         // an end
         bool Turns(int item, bool reverse, long natural)
-        {
-            EffectItem effect = m_Effects[item];
-            if (effect == null || effect.m_Conditions.m_Direction != DirectionCondition.Always || m_Program.ItemOpen(item) || natural == TimelineTime.Infinite)
-                return false;
-            switch (effect.m_PlayDirection)
-            {
-                case ItemPlayDirection.Forward: return reverse;
-                case ItemPlayDirection.Backward: return !reverse;
-                case ItemPlayDirection.Opposite: return true;
-                default: return false;
-            }
-        }
+            => PlayMath.Turns(m_Effects[item], reverse, m_Program.ItemOpen(item), natural == TimelineTime.Infinite);
 
         static void Mark(PlaybackRecord record, int item)
         {
@@ -764,18 +796,41 @@ namespace xpTURN.Feedback
                     binding.Settle(index);
                     continue;
                 }
-                if (record.Turned[i])
-                {
-                    if (sample != null)
-                        binding.Evaluate(index, new MotionTime(sample.LocalTimeFromEnd(i), sample.SecondsFromEnd(i)));
-                    else
-                        binding.Evaluate(index, new MotionTime(cursor.LocalTimeFromEnd(i), cursor.SecondsFromEnd(i)));
-                }
-                else if (sample != null)
-                    binding.Evaluate(index, new MotionTime(sample.LocalTime(i), sample.Seconds(i)));
-                else
-                    binding.Evaluate(index, new MotionTime(cursor.LocalTime(i), cursor.Seconds(i)));
+                binding.Evaluate(index, TimeOf(record, sample, cursor, i));
             }
+        }
+
+        // a running item's time: the backward head's sample or the cursor, from the end for a turned item
+        static MotionTime TimeOf(PlaybackRecord record, TimelineSample sample, TimelineCursor cursor, int i)
+        {
+            if (record.Turned[i])
+            {
+                if (sample != null)
+                    return new MotionTime(sample.LocalTimeFromEnd(i), sample.SecondsFromEnd(i));
+                return new MotionTime(cursor.LocalTimeFromEnd(i), cursor.SecondsFromEnd(i));
+            }
+            if (sample != null)
+                return new MotionTime(sample.LocalTime(i), sample.Seconds(i));
+            return new MotionTime(cursor.LocalTime(i), cursor.Seconds(i));
+        }
+
+        // a running item's time as the last evaluation took it — read between frames (the editor's record). False: not running
+        internal bool RecordTime(int index, int item, out MotionTime time)
+        {
+            PlaybackRecord record = m_Records[index];
+            if (!record.Active || item < 0 || item >= record.Running.Length || !record.Running[item])
+            {
+                time = default;
+                return false;
+            }
+            TimelineSample sample = null;
+            if (record.Reverse)
+            {
+                sample = m_Sample;
+                record.Sampler.Sample(record.Sampler.ReversePosition, true, sample);
+            }
+            time = TimeOf(record, sample, record.Cursor, item);
+            return true;
         }
 
         // ---- the ends
@@ -799,7 +854,8 @@ namespace xpTURN.Feedback
             m_Scheduler.Remove(handle);
             // the listener is taken before the event — a Play inside it takes this record
             IPlaybackListener listener = Take(record);
-            m_Player.Raise(PlayerEventKind.Completed, handle, m_Scheduler.Context);
+            if (!m_Dry)
+                m_Player.Raise(PlayerEventKind.Completed, handle, m_Scheduler.Context);
             Ended(handle, PlaybackEnd.Completed, false);
             Notify(listener, handle, PlaybackEnd.Completed);
             ReleaseIfDone();
@@ -834,15 +890,15 @@ namespace xpTURN.Feedback
                     EndItem(binding, index, reason);
                     Mark(record, i);
                 }
-                else if (reason == EndReason.Revert && record.Touched[i])
-                    EndItem(binding, index, EndReason.Revert);
+                else if (record.Touched[i] && (reason == EndReason.Revert || binding.EndsInstants))
+                    EndItem(binding, index, reason);
             }
             SettleEnded(record, index);
             record.Active = false;
             record.Cursor.Abort();
             m_Scheduler.Remove(handle);
             IPlaybackListener listener = Take(record);
-            if (stopped)
+            if (stopped && !m_Dry)
                 m_Player.Raise(PlayerEventKind.Stopped, handle, m_Scheduler.Context);
             Ended(handle, end, !stopped);
             Notify(listener, handle, end);
@@ -862,6 +918,8 @@ namespace xpTURN.Feedback
         // the diagnostics' end — every end, with a listener or without
         void Ended(PlaybackHandle handle, PlaybackEnd end, bool quiet)
         {
+            if (m_Dry)
+                return;
             try
             {
                 FeedbackDiagnostics.RaiseEnded(m_Player, handle, end, quiet);
@@ -951,9 +1009,11 @@ namespace xpTURN.Feedback
         }
 
         // the plays that run now — one a Stopped subscriber starts is not among them
-        internal void StopAll(StopMode mode)
+        internal void StopAll(StopMode mode) => StopAll(mode, m_Serial);
+
+        // the plays up to the play numbered last
+        internal void StopAll(StopMode mode, long last)
         {
-            long last = m_Serial;
             EndReason reason = ReasonOf(mode);
             for (int r = 0; r < m_Records.Length; r++)
             {
@@ -962,8 +1022,8 @@ namespace xpTURN.Feedback
             }
         }
 
-        // a mark on each play that runs — Paused once when one changed
-        internal void Pause()
+        // a mark on each play that runs — true when one changed: the player raises Paused once for its lists
+        internal bool Pause()
         {
             bool any = false;
             for (int r = 0; r < m_Records.Length; r++)
@@ -972,13 +1032,13 @@ namespace xpTURN.Feedback
                 if (!record.Active || record.Paused || record.Held)
                     continue;
                 record.Paused = true;
+                Suspend(record, r, true);
                 any = true;
             }
-            if (any)
-                m_Player.Raise(PlayerEventKind.Paused, default, m_Scheduler.Context);
+            return any;
         }
 
-        internal void Resume()
+        internal bool Resume()
         {
             bool any = false;
             for (int r = 0; r < m_Records.Length; r++)
@@ -987,10 +1047,29 @@ namespace xpTURN.Feedback
                 if (!record.Active || !record.Paused)
                     continue;
                 record.Paused = false;
+                Suspend(record, r, false);
                 any = true;
             }
-            if (any)
-                m_Player.Raise(PlayerEventKind.Resumed, default, m_Scheduler.Context);
+            return any;
+        }
+
+        // the items the play began or executed hear the change — each alone
+        void Suspend(PlaybackRecord record, int index, bool paused)
+        {
+            ItemBinding[] bindings = m_Bindings;
+            for (int i = 0; i < bindings.Length; i++)
+            {
+                if (bindings[i] == null || !record.Touched[i])
+                    continue;
+                try
+                {
+                    bindings[i].Suspend(index, paused);
+                }
+                catch (Exception e)
+                {
+                    m_Scheduler.Context.LogException(e);
+                }
+            }
         }
 
         // the play's own length — 0 for a handle that is not a live play of this player
@@ -1250,6 +1329,7 @@ namespace xpTURN.Feedback
                     m_Scheduler.Context.LogException(e);
                 }
             }
+            m_FirstStamp = 0;
         }
 
         // the waits Signal would end now — the forward plays' — and how many of them have no timeout

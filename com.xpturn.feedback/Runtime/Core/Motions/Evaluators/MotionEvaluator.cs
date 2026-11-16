@@ -15,6 +15,7 @@ namespace xpTURN.Feedback
     {
         public uint Seed;
         public float Intensity;
+        public bool Endless;
     }
 
     // one per play record × item
@@ -23,6 +24,7 @@ namespace xpTURN.Feedback
         public Vector4 Start;
         public uint Seed;
         public float Intensity;
+        public bool Endless;
     }
 
     // T is 0 ~ 1 (0 for an infinite item), Seconds the item's elapsed seconds — both the timeline's forward coordinate
@@ -58,6 +60,8 @@ namespace xpTURN.Feedback
 
         internal abstract MotionWrite Write { get; }
 
+        internal int Dimension => m_Dimension;
+
         internal virtual bool IsInstant => false;
 
         // seconds, −1 = none (the item timing's duration) — the same value as the motion data's
@@ -69,6 +73,7 @@ namespace xpTURN.Feedback
             s.Start = current;
             s.Seed = args.Seed;
             s.Intensity = MotionKernels.Finite(args.Intensity);
+            s.Endless = args.Endless;
         }
 
         internal abstract void Evaluate(in MotionState s, in MotionTime time, out MotionSample sample);
@@ -77,6 +82,14 @@ namespace xpTURN.Feedback
         internal virtual float EvaluateShape(in MotionState s, in MotionTime time) => 0f;
 
         protected static float Cap(float intensity) => MotionKernels.Clamp01(intensity);
+
+        // the envelope's height h(T): the fade's linear height, eased on its slopes and cut to 0 ~ 1 (an overshooting ease does
+        // not take the motion past its amplitude)
+        protected static float Fade(float t, float fadeIn, float fadeOut, in Ease ease)
+        {
+            float h = MotionKernels.Fade(t, fadeIn, fadeOut, out bool ramp);
+            return ramp ? MotionKernels.Clamp01(ease.Evaluate(h)) : h;
+        }
 
         protected static Vector4 Finite(in Vector4 v)
             => new Vector4(MotionKernels.Finite(v.x), MotionKernels.Finite(v.y), MotionKernels.Finite(v.z), MotionKernels.Finite(v.w));

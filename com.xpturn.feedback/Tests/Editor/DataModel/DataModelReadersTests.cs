@@ -252,7 +252,8 @@ namespace xpTURN.Feedback.Tests.Editor
                 }
             }
             int expected = (OptionalAssemblyTests.Implemented(typeof(ScreenFlashItem)) ? 1 : 0) + (OptionalAssemblyTests.Implemented(typeof(PostFXBloomItem)) ? 1 : 0)
-                + (OptionalAssemblyTests.Implemented(typeof(CinemachineImpulseItem)) ? 1 : 0) + (OptionalAssemblyTests.Implemented(typeof(GamepadRumbleItem)) ? 1 : 0);
+                + (OptionalAssemblyTests.Implemented(typeof(CinemachineImpulseItem)) ? 1 : 0) + (OptionalAssemblyTests.Implemented(typeof(GamepadRumbleItem)) ? 1 : 0)
+                + (OptionalAssemblyTests.Implemented(typeof(AudioPlayAtPointItem)) ? 1 : 0);
             if (extensions != expected)
                 fails.Add("extension services at a SubsystemRegistration " + extensions + " (" + expected + " expected)");
             List<MethodInfo> registering = typeof(xpTURN.Feedback.Editor.PreviewGlobalState).Assembly.GetTypes().SelectMany(t => t.GetMethods(Static | BindingFlags.DeclaredOnly))

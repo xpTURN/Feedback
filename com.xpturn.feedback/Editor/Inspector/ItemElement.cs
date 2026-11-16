@@ -88,7 +88,7 @@ namespace xpTURN.Feedback.Editor
             Body.SetEnabled(!m_Owner.ReadOnly);
             if (host != null && value is EffectItem)
             {
-                PreviewMask mask = PreviewMasks.Get(host, index);
+                PreviewMask mask = PreviewMasks.Get(host, m_Owner.ListOwner, index);
                 Header.Solo.SetValueWithoutNotify(mask == PreviewMask.Solo);
                 Header.Mute.SetValueWithoutNotify(mask == PreviewMask.Mute);
             }

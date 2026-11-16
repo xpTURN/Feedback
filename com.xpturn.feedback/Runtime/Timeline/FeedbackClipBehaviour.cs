@@ -19,8 +19,12 @@ namespace xpTURN.Feedback
         internal const string NotScrubbedWarning = "A Feedback clip set to Driven plays a list that cannot be scrubbed — it plays as Triggered.";
 
         internal FeedbackClip m_Clip;
+        // the director's GameObject — its FeedbackTimelineOptions
+        internal GameObject m_Owner;
         FeedbackPlayer m_Player;
         PlaybackHandle m_Handle;
+        // the entry's arguments — its list, intensity and key; a loop's next play takes them again
+        PlayArgs m_Args;
         bool m_In;
         bool m_Entering;
         bool m_Driving;
@@ -103,23 +107,31 @@ namespace xpTURN.Feedback
             if (player == null || m_Clip == null)
                 return;
             FromRestored();
+            m_Args = Args(player);
             FeedbackClipTiming timing = m_Clip.m_Timing;
             if (timing == FeedbackClipTiming.Triggered)
             {
                 PlayTriggered(playable);
                 return;
             }
-            if (!player.CanDrive() || (!Application.isPlaying && !TrackPreview.Hook.Drives(player)))
+            FeedbackPreset preset = m_Clip.m_Preset;
+            // arguments that pick none of the player's lists play nothing — its Play refuses and warns, not this clip
+            if (!player.Lists(in m_Args))
+            {
+                PlayTriggered(playable);
+                return;
+            }
+            if (!player.CanDrive(in m_Args) || (!Application.isPlaying && !TrackPreview.Hook.Drives(player, preset)))
             {
                 WarnNotScrubbed(player);
                 PlayTriggered(playable);
                 return;
             }
             // the timeline's time is the direction: a driven play is forward
-            m_Handle = player.Play(PlayArgs.Default.WithIntensity(m_Clip.m_Intensity).WithSeed(m_Clip.m_Seed).WithDirection(PlayerDirection.Forward).WithDriven());
+            m_Handle = player.Play(m_Args.WithSeed(m_Clip.m_Seed).WithDirection(PlayerDirection.Forward).WithDriven());
             if (m_Handle == default)
                 return;
-            SeekRefusal refusal = Application.isPlaying ? player.SeekRange(m_Handle, out _, out _) : TrackPreview.Hook.Scrub(player, m_Handle);
+            SeekRefusal refusal = Application.isPlaying ? player.SeekRange(m_Handle, out _, out _) : TrackPreview.Hook.Scrub(player, m_Handle, preset);
             if (refusal == SeekRefusal.None)
             {
                 m_Driving = true;
@@ -150,9 +162,30 @@ namespace xpTURN.Feedback
 #endif
         }
 
+        // the clip's preset and intensity; in Play mode its director's options too: the row of its Hit Key — that row's
+        // Variant key when the player has a list of that alias, its intensity — and the options' own key and intensity
+        PlayArgs Args(FeedbackPlayer player)
+        {
+            PlayArgs args = PlayArgs.Default.WithPreset(m_Clip.m_Preset);
+            float intensity = m_Clip.m_Intensity;
+            if (Application.isPlaying && m_Owner != null && m_Owner.TryGetComponent(out FeedbackTimelineOptions options))
+            {
+                string key = options.m_VariantKey;
+                if (options.TryGetHit(m_Clip.m_HitKey, out float hit, out string hitKey))
+                {
+                    intensity *= PlayerRuntime.Factor(hit);
+                    if (player.TryGetVariant(hitKey, out _))
+                        key = hitKey;
+                }
+                intensity *= PlayerRuntime.Factor(options.m_Intensity);
+                args = args.WithVariant(key);
+            }
+            return args.WithIntensity(intensity);
+        }
+
         void PlayTriggered(Playable playable)
         {
-            m_Handle = m_Player.Play(PlayArgs.Default.WithIntensity(m_Clip.m_Intensity));
+            m_Handle = m_Player.Play(in m_Args);
             m_Started = true;
             m_Held = false;
             if (m_Handle != default)

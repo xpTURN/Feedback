@@ -15,7 +15,7 @@ namespace xpTURN.Feedback
         internal bool IsValid => Id != 0;
     }
 
-    // the requests' stack (fixed capacity, the top wins) × the base scale. Every request runs out on its own unscaled
+    // the requests' stack (fixed capacity, the slowest wins) × the base scale. Every request runs out on its own unscaled
     // lifetime, and a new one is not shortened by the first Update it meets (a request made after our Update gets its whole
     // length too). Time.timeScale is written here, after the others'-write check, and only while playing (the editor's
     // settings stay clean) — an idle service's base scale is the one write outside Update. The two delta-time values follow
@@ -76,16 +76,50 @@ namespace xpTURN.Feedback
         internal bool FreshAt(int i) => m_Stack[i].Fresh;
         internal bool IsOwning => m_Owning;
         internal float BaseScale => m_HasBase ? m_Base : (Writes ? Time.timeScale : 1f);
-        internal float Effective => Mathf.Clamp(m_Count > 0 ? BaseScale * m_Stack[m_Count - 1].Scale : m_OpenId != 0 ? BaseScale * m_OpenScale : BaseScale, 0f, 100f);
+        internal float Effective => Mathf.Clamp(m_Count > 0 ? BaseScale * SlowestScale() : Untimed, 0f, 100f);
         internal bool HasOpen => m_OpenId != 0;
         internal float OpenValue => m_OpenScale;
+
+        // the time until the last timed request ends
+        internal double LongestRemaining
+        {
+            get
+            {
+                double longest = 0.0;
+                for (int i = 0; i < m_Count; i++)
+                {
+                    if (m_Stack[i].Remaining > longest)
+                        longest = m_Stack[i].Remaining;
+                }
+                return longest;
+            }
+        }
+
+        // the scale without the timed requests — the base × the open request
+        float Untimed => Mathf.Clamp(m_OpenId != 0 ? BaseScale * m_OpenScale : BaseScale, 0f, 100f);
+
+        float SlowestScale()
+        {
+            float slowest = m_Stack[0].Scale;
+            for (int i = 1; i < m_Count; i++)
+            {
+                if (m_Stack[i].Scale < slowest)
+                    slowest = m_Stack[i].Scale;
+            }
+            return slowest;
+        }
 
         internal float OpenScaleOf(TimeScaleHandle handle) => handle.IsValid && handle.Id == m_OpenId ? m_OpenScale : 1f;
 
         // the scale a minimum condition compares: playing, the smaller of what the engine runs at and the computed one (a
         // request of this frame not written yet), else the computed one — a second freeze in a frame is skipped in every
-        // stage and layer
-        internal float Current => Writes ? Mathf.Min(Time.timeScale, Effective) : Effective;
+        // stage and layer. The engine's value that is still our last write is the computed one: a request taken back
+        // since (a Restart's) no longer holds it
+        internal float Current => !Writes ? Effective : m_Owning && Time.timeScale == m_Written ? Effective : Mathf.Min(Time.timeScale, Effective);
+
+        // Current's rule on the scale without the timed requests — an Extend hit stop's minimum condition: the game's pause
+        // and slow motion count, the other hit stops do not
+        internal float CurrentWithoutTimed => !Writes ? Untimed : m_Owning && Time.timeScale == m_Written ? Untimed : Mathf.Min(Time.timeScale, Untimed);
 
         internal void SetBaseScale(float scale)
         {

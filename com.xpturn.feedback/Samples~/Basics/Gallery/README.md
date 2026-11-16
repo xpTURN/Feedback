@@ -6,7 +6,7 @@ Pick a tab, then a button: the feedback plays on the object in the middle. 'Comp
 
 ## See
 
-Every feedback type of the package with the add menu's motion — the line at the bottom says what it does, its motion and its category (an item of category None plays in Before too). Short flashes are easier to see at a lower time scale. Hit Stop and Time Scale act on game time — watch the turning cube stop or slow down.
+Every feedback type of the package with the add menu's motion — the line at the bottom says what it does, its motion and its category (an item of category None plays in Before too). Short flashes are easier to see at a lower time scale. Hit Stop and Time Scale act on game time — watch the turning cube stop or slow down. The Audio tab plays on a looping tone through the gallery's own mixer — its motions reach farther than the add menu's, to be heard; the tone is the scene's sound and plays in Before too.
 
 ## Controls
 
@@ -22,4 +22,4 @@ H · L3 — fold the HUD
 
 ## Requires
 
-the Particle System, Physics, Physics 2D and Animation modules
+the Particle System, Physics, Physics 2D, Animation and Audio modules

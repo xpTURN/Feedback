@@ -148,6 +148,8 @@ namespace xpTURN.Feedback.Tests.Editor.Samples
                 var want = new List<string> { "XPTURN_FEEDBACK_SAMPLES_INPUTSYSTEM", "XPTURN_FEEDBACK_SAMPLES_UGUI", "XPTURN_FEEDBACK_SAMPLES_URP" };
                 if (asmdef.name.EndsWith(".TimelineCutscene", StringComparison.Ordinal))
                     want.Add("XPTURN_FEEDBACK_SAMPLES_TIMELINE");
+                if (asmdef.name.EndsWith(".Accessibility", StringComparison.Ordinal))
+                    want.Add("XPTURN_FEEDBACK_SAMPLES_AUDIO");
                 Assert.That(asmdef.defineConstraints, Is.EquivalentTo(want), asmdef.name);
             }
             Assert.That(names, Is.EquivalentTo(new[] { "TimelineFlow", "ChannelsRange", "StressZeroGC", "Accessibility", "TimelineCutscene" }.Select(n => "xpTURN.Feedback.Samples.Advanced." + n)));
@@ -685,10 +687,58 @@ namespace xpTURN.Feedback.Tests.Editor.Samples
             Call(lab, "Step", 3, 1);
             Call(lab, "Step", 4, 1);
             bool timeOff = !FeedbackCategories.IsEnabled(FeedbackCategory.Time), hapticsOff = !FeedbackCategories.IsEnabled(FeedbackCategory.Haptics);
+            Call(lab, "Step", 5, -2);
+            float sound = FeedbackCategories.GetScale(FeedbackCategory.Audio);
             yield return null;
-            string camera = F<Text>(lab, "m_CameraScale").text, flash = F<Text>(lab, "m_FlashLimit").text;
+            string quarter = F<Text>(lab, "m_SoundScale").text;
+            Call(lab, "Step", 5, -1);
+            bool soundOff = !FeedbackCategories.IsEnabled(FeedbackCategory.Audio);
+            yield return null;
+            string camera = F<Text>(lab, "m_CameraScale").text, flash = F<Text>(lab, "m_FlashLimit").text, off = F<Text>(lab, "m_SoundScale").text;
             Assert.That((Mathf.Abs(shake - 0.5f) < 1e-4f, motionOff, limit, flashOff, timeOff, hapticsOff, camera, flash),
                 Is.EqualTo((true, true, 1, true, true, true, "0.50", "Off")));
+            Assert.That((Mathf.Abs(sound - 0.25f) < 1e-4f, quarter, soundOff, off), Is.EqualTo((true, "0.25", true, "Off")), "the Sound row");
+        }
+
+        // ---- S12's sound: a hit's voice takes the Audio scale when it starts — 25 % a quarter of 100 %'s volume · Off no voice ·
+        // 100 % again the same as before
+
+        static float Voice(AudioClip clip)
+        {
+            float v = -1f;
+            foreach (AudioSource s in Resources.FindObjectsOfTypeAll<AudioSource>())
+                if (s != null && s.isPlaying && s.clip == clip)
+                    v = Mathf.Max(v, s.volume);
+            return v;
+        }
+
+        [UnityTest]
+        public IEnumerator VQ13b_TheSound()
+        {
+            yield return new EnterPlayMode();
+            yield return Open("Accessibility");
+            Component lab = Lab("AccessibilityLab");
+            var clip = (AudioClip)F<UnityEngine.Object>(Items(F<FeedbackPlayer>(lab, "m_LightSound"))[0], "m_Resource");
+            Call(lab, "Attack", 0);
+            yield return null;
+            float full = Voice(clip);
+            yield return Real(0.4f);
+            Call(lab, "Step", 5, -2);
+            Call(lab, "Attack", 0);
+            yield return null;
+            float quarter = Voice(clip);
+            yield return Real(0.4f);
+            Call(lab, "Step", 5, -1);
+            Call(lab, "Attack", 0);
+            yield return null;
+            float off = Voice(clip);
+            Call(lab, "Step", 5, 3);
+            Call(lab, "Attack", 0);
+            yield return null;
+            float back = Voice(clip);
+            SampleState.Restore();
+            Assert.That((full > 0f, Mathf.Abs(quarter - full * 0.25f) < 1e-3f, off, Mathf.Abs(back - full) < 1e-3f), Is.EqualTo((true, true, -1f, true)),
+                $"the light's voice — 100 % {full:0.###} · 25 % {quarter:0.###} · Off {off:0.###} · 100 % again {back:0.###}");
         }
 
         // ---- S12 live: a running sway halves at Motion 50 % · Hit stop off — a heavy hit leaves the time scale at 1 (on — it
@@ -744,15 +794,19 @@ namespace xpTURN.Feedback.Tests.Editor.Samples
             EditorSceneManager.OpenScene(scene, OpenSceneMode.Single);
             PlayableDirector director = Resources.FindObjectsOfTypeAll<PlayableDirector>().First(d => d.gameObject.scene.isLoaded);
             var rows = new List<string>();
+            var hits = new List<string>();
             foreach (PlayableBinding b in director.playableAsset.outputs)
             {
                 UnityEngine.Object track = b.sourceObject;
                 UnityEngine.Object bound = director.GetGenericBinding(track);
                 var parts = new List<string>();
-                foreach (object clip in ((IEnumerable)track.GetType().GetMethod("GetClips").Invoke(track, null)).Cast<object>())
+                foreach (object clip in ((IEnumerable)track.GetType().GetMethod("GetClips").Invoke(track, null)).Cast<object>().OrderBy(c => D(c, "start")))
                 {
                     object asset = P(clip, "asset");
-                    parts.Add($"{D(clip, "start"):0.##}-{D(clip, "start") + D(clip, "duration"):0.##} {F<object>(asset, "m_Timing")}{(F<bool>(asset, "m_Loop") ? " Loop" : "")}");
+                    var preset = F<FeedbackPreset>(asset, "m_Preset");
+                    if (track.name == "Camera Shake")
+                        hits.Add($"{D(clip, "start"):0.##} {F<string>(asset, "m_HitKey")}");
+                    parts.Add($"{D(clip, "start"):0.##}-{D(clip, "start") + D(clip, "duration"):0.##} {F<object>(asset, "m_Timing")}{(F<bool>(asset, "m_Loop") ? " Loop" : "")}{(preset != null ? " " + preset.name : "")}");
                 }
                 foreach (object marker in ((IEnumerable)track.GetType().GetMethod("GetMarkers").Invoke(track, null)).Cast<object>())
                     parts.Add($"@{D(marker, "time"):0.##} {((UnityEngine.Object)P(marker, "asset")).name}");
@@ -764,18 +818,38 @@ namespace xpTURN.Feedback.Tests.Editor.Samples
             SampleCard card = Catalogs().SelectMany(c => c.Cards).First(c => c.SceneName == "TimelineCutscene");
             Assert.That(rows, Is.EqualTo(new[]
             {
-                "FeedbackTrack Camera Shake → Shake Player: 1-2.2 Driven",
+                "FeedbackTrack Camera Shake → Shake Player: 0.4-0.8 Driven Light Shake · 1-2.2 Driven · 4.5-5.5 Driven Heavy Shake",
                 "FeedbackTrack Hero → Hero: 0-6 Driven Loop",
                 "FeedbackTrack Flash → Flash Player: 3-4 Triggered",
                 "SignalTrack Burst → Burst: @4.5 Burst",
             }));
             Assert.That((target is FeedbackPlayer, target.name, reaction.GetPersistentMethodName(0), reaction.GetPersistentEventCount()), Is.EqualTo((true, "Burst", "PlayFromEvent", 1)));
+            // the three hits of one player: its own list the normal one, its Variants the light and the heavy — the heavy one
+            // kicks the field of view too
+            var shake = (FeedbackPlayer)Resources.FindObjectsOfTypeAll<FeedbackPlayer>().First(p => p.name == "Shake Player" && p.gameObject.scene.isLoaded);
+            List<FeedbackPreset> variants = F<List<FeedbackPreset>>(shake, "m_Variants");
+            Assert.That(variants.Select(v => v != null ? v.name : "null"), Is.EqualTo(new[] { "Light Shake", "Heavy Shake" }));
+            Assert.That(variants.Select(v => string.Join(",", F<List<FeedbackItem>>(v, "m_Items").Select(i => i.GetType().Name))),
+                Is.EqualTo(new[] { "CameraShakeItem", "CameraShakeItem,CameraFieldOfViewItem" }));
+            Assert.That(Items(shake).Select(i => i.GetType().Name), Is.EqualTo(new[] { "CameraShakeItem" }));
+            // the keys: the Variants' aliases and the list's, the three clips' Hit Keys, the director's options set to none
+            Assert.That((string.Join(",", variants.Select(v => F<string>(v, "m_Alias"))), F<string>(shake, "m_ListAlias")), Is.EqualTo(("light,heavy", "normal")));
+            Assert.That(hits, Is.EqualTo(new[] { "0.4 hit1", "1 hit2", "4.5 hit3" }));
+            Component options = director.GetComponent(Type.GetType("xpTURN.Feedback.FeedbackTimelineOptions, xpTURN.Feedback.Timeline"));
+            Assert.That(options != null && F<string>(options, "m_VariantKey") == "" && F<float>(options, "m_Intensity") == 1f && ((IList)F<object>(options, "m_Hits")).Count == 0, Is.True, "the director's options");
             Assert.That((director.playOnAwake, director.timeUpdateMode, director.extrapolationMode), Is.EqualTo((true, DirectorUpdateMode.GameTime, DirectorWrapMode.Loop)));
             Assert.That((card.RequiresText, card.OpenInEditor, card.Try.Contains("Window > Sequencing > Timeline"), card.RequiredType),
                 Is.EqualTo(("Timeline 1.8 or later", true, true, "xpTURN.Feedback.Samples.Advanced.TimelineCutsceneLab, xpTURN.Feedback.Samples.Advanced.TimelineCutscene")));
         }
 
         static void OnBurst(FeedbackPlayer p, PlaybackHandle h) => s_Bursts++;
+
+        // the plays running on the list a preset picks of a player — its own for none
+        static int Active(FeedbackPlayer player, FeedbackPreset preset)
+        {
+            object runtime = typeof(FeedbackPlayer).GetMethod("RuntimeFor", All).Invoke(player, new object[] { preset });
+            return runtime == null ? -1 : (int)runtime.GetType().GetMethod("ActiveCount", All).Invoke(runtime, null);
+        }
 
         // ---- S14 in play: the Driven shake shows the same camera at the same time after a scrub away and back · the Triggered
         // flash plays from its clip · the Signal plays the burst once a loop · Before starts the cutscene over with the camera
@@ -795,6 +869,8 @@ namespace xpTURN.Feedback.Tests.Editor.Samples
             PlayableDirector director = F<PlayableDirector>(lab, "m_Director");
             Transform cam = Camera.main.transform;
             Vector3 rest = cam.localPosition;
+            float restFov = Camera.main.fieldOfView;
+            float restTime = (float)director.time;
             float until = Time.realtimeSinceStartup + 30f;
             while (director.time < 1.5 && Time.realtimeSinceStartup < until)
                 yield return null;
@@ -819,6 +895,27 @@ namespace xpTURN.Feedback.Tests.Editor.Samples
             }
             burst.Played -= OnBurst;
             int bursts = s_Bursts;
+            // the three hits swept with the slider: the light and the heavy clips play the Shake Player's Variants, the normal
+            // one its list; their peaks rise in that order and the heavy one moves the field of view
+            FeedbackPlayer shake = Named("Shake Player");
+            List<FeedbackPreset> variants = F<List<FeedbackPreset>>(shake, "m_Variants");
+            float[][] spans = { new[] { 0.45f, 0.75f }, new[] { 1.05f, 2.15f }, new[] { 4.55f, 5.45f } };
+            var peaks = new float[3];
+            var listed = new bool[3];
+            float fov = 0f;
+            for (int k = 0; k < 3; k++)
+            {
+                for (int i = 0; i <= 12; i++)
+                {
+                    Call(lab, "OnSeek", Mathf.Lerp(spans[k][0], spans[k][1], i / 12f));
+                    yield return null;
+                    peaks[k] = Mathf.Max(peaks[k], (cam.localPosition - rest).magnitude);
+                    if (k == 2)
+                        fov = Mathf.Max(fov, Mathf.Abs(Camera.main.fieldOfView - restFov));
+                    if (i == 6)
+                        listed[k] = Active(shake, k == 0 ? variants[0] : k == 2 ? variants[1] : null) > 0;
+                }
+            }
             SampleState.SetAfter(false);
             yield return Frames(3);
             float restart = (float)director.time;
@@ -844,13 +941,74 @@ namespace xpTURN.Feedback.Tests.Editor.Samples
             (int e1, int w1) = Counts();
             Assert.That(((at - rest).magnitude > 1e-3f, (again - at).magnitude < 1e-5f, paused), Is.EqualTo((true, true, true)), $"rest {rest:F4} · at 1.6 {at:F4} · again {again:F4}");
             Assert.That((flashed, bursts), Is.EqualTo((true, 1)));
+            Assert.That(restTime, Is.LessThan(0.4f), "the rest before the light hit");
+            Assert.That((peaks[0] > 1e-3f, peaks[0] < peaks[1], peaks[1] < peaks[2]), Is.EqualTo((true, true, true)), $"peaks light {peaks[0]:F4} · normal {peaks[1]:F4} · heavy {peaks[2]:F4}");
+            Assert.That(listed, Is.EqualTo(new[] { true, true, true }), "each hit plays its own list");
+            Assert.That(fov, Is.GreaterThan(0.5f), "the heavy hit's field of view");
             Assert.That((restart < 0.5f, (before - rest).magnitude < 1e-5f, (hero - Vector3.one).magnitude < 1e-5f), Is.EqualTo((true, true, true)), $"restart {restart:F2} · camera {before:F4} · hero {hero:F4}");
             Assert.That(c50 - q50, Is.GreaterThan(40), $"the positive control (a dead counter) — medians quiet {q50} · control {c50}");
             Assert.That(b50 - q50, Is.LessThan(40), $"the lab's frames against the quiet ones — medians quiet {q50} · lab {b50} · control {c50}");
             Assert.That((e1 - e0, w1 - w0), Is.EqualTo((0, 0)));
         }
 
-        // ---- S12's scene: its name unique in the bundles · the three Hit presets · five rows · Navigation None
+        // ---- S14's keys in play: the director's Variant Key makes the three hits one list — heavy · light · normal, the list's
+        // own alias — and a Hits row changes its hit alone; the light key leaves the field of view still
+
+        // a sweep of the three hits under the options as they are: the list each one plays (a static method — a closure over the
+        // test's locals would not live through the Play mode's domain reload)
+        static IEnumerator Sweep(Component lab, FeedbackPlayer shake, List<FeedbackPreset> variants, float restFov, string what, List<string> seen, float[] fov)
+        {
+            float[] mids = { 0.6f, 1.6f, 5.0f };
+            var row = new List<string>();
+            for (int k = 0; k < 3; k++)
+            {
+                Call(lab, "OnSeek", 3.0f);
+                yield return null;
+                Call(lab, "OnSeek", mids[k]);
+                yield return null;
+                fov[0] = Mathf.Max(fov[0], Mathf.Abs(Camera.main.fieldOfView - restFov));
+                row.Add(Active(shake, variants[0]) > 0 ? "light" : Active(shake, variants[1]) > 0 ? "heavy" : Active(shake, null) > 0 ? "normal" : "none");
+            }
+            seen.Add(what + ": " + string.Join(" ", row));
+        }
+
+        [UnityTest]
+        public IEnumerator VQ18_TheDirectorsKeys()
+        {
+            Scene("TimelineCutscene");
+            NeedsTimeline();
+            yield return new EnterPlayMode();
+            Time.captureDeltaTime = 1f / 60f;
+            yield return Open("TimelineCutscene");
+            (int e0, int w0) = Counts();
+            Component lab = Lab("TimelineCutsceneLab");
+            PlayableDirector director = F<PlayableDirector>(lab, "m_Director");
+            Type type = Type.GetType("xpTURN.Feedback.FeedbackTimelineOptions, xpTURN.Feedback.Timeline");
+            Component options = director.GetComponent(type);
+            FeedbackPlayer shake = Named("Shake Player");
+            List<FeedbackPreset> variants = F<List<FeedbackPreset>>(shake, "m_Variants");
+            float restFov = Camera.main.fieldOfView;
+            var seen = new List<string>();
+            var lightFov = new float[1];
+            var other = new float[1];
+            foreach (string key in new[] { "heavy", "light", "normal", "" })
+            {
+                type.GetProperty("VariantKey").SetValue(options, key);
+                yield return Sweep(lab, shake, variants, restFov, key, seen, key == "light" ? lightFov : other);
+            }
+            type.GetMethod("SetHit").Invoke(options, new object[] { "hit3", 1f, "light" });
+            yield return Sweep(lab, shake, variants, restFov, "hit3 light", seen, other);
+            type.GetMethod("ClearHits").Invoke(options, null);
+            (int e1, int w1) = Counts();
+            Assert.That(seen, Is.EqualTo(new[]
+            {
+                "heavy: heavy heavy heavy", "light: light light light", "normal: normal normal normal", ": light normal heavy", "hit3 light: light normal light",
+            }));
+            Assert.That(lightFov[0], Is.LessThan(0.1f), "the light key leaves the field of view still");
+            Assert.That((e1 - e0, w1 - w0), Is.EqualTo((0, 0)));
+        }
+
+        // ---- S12's scene: its name unique in the bundles · the three Hit presets · six rows · Navigation None
 
         [Test]
         public void VQ14_TheScene()
@@ -863,7 +1021,7 @@ namespace xpTURN.Feedback.Tests.Editor.Samples
             int rows = F<Text[]>(lab, "m_Values").Length;
             bool none = Resources.FindObjectsOfTypeAll<Selectable>().Where(s => s.gameObject.scene.isLoaded).All(s => s.navigation.mode == Navigation.Mode.None);
             Assert.That(presets, Is.EqualTo(new[] { "Hit Light", "Hit Heavy", "Hit Critical" }));
-            Assert.That((same, rows, none, F<FeedbackPlayer>(lab, "m_Rumble").GetComponent<FeedbackPlayer>() != null), Is.EqualTo((1, 5, true, true)));
+            Assert.That((same, rows, none, F<FeedbackPlayer>(lab, "m_Rumble").GetComponent<FeedbackPlayer>() != null), Is.EqualTo((1, 6, true, true)));
         }
 
         // ---- the hub: every card inside the canvas at 16:9 · 21:9 · 4:3 (CanvasScaler 1920 × 1080 · match 0.5) · no two overlap

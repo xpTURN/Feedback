@@ -18,6 +18,8 @@ namespace xpTURN.Feedback
         [SerializeField, Min(0f)] internal float m_Frequency;
         [SerializeField] internal ShakeNoise m_Noise;
         [SerializeField] internal Ease m_Falloff;
+        [SerializeField, Range(0f, 1f)] internal float m_FadeIn;
+        [SerializeField] internal Ease m_FadeEase;
 
         internal static ShakeParams Default => new ShakeParams { m_Amplitude = Vector4.one, m_Frequency = 10f };
     }

@@ -16,6 +16,7 @@ namespace xpTURN.Feedback.Editor
 
         internal readonly List<string> Fields = new List<string>();
         internal Foldout Advanced;
+        internal ItemGraphField Graph;
 
         internal ItemBody()
         {
@@ -26,6 +27,7 @@ namespace xpTURN.Feedback.Editor
         {
             Clear();
             Fields.Clear();
+            Graph = null;
             var value = item.managedReferenceValue as FeedbackItem;
             if (value == null)
                 return;
@@ -39,7 +41,7 @@ namespace xpTURN.Feedback.Editor
             {
                 if (field == "m_Motion")
                 {
-                    AddMotion(item, value, () => Build(item, foldKey, host));
+                    AddMotion(item, value, () => Build(item, foldKey, host), foldKey, host);
                     continue;
                 }
                 SerializedProperty p = item.FindPropertyRelative(field);
@@ -71,6 +73,20 @@ namespace xpTURN.Feedback.Editor
                     var layer = new LayerField(ItemRules.Label(value, field) ?? p.displayName);
                     layer.BindProperty(p);
                     Add(layer);
+                    Fields.Add(field);
+                    continue;
+                }
+                // an audio item's asset — a field of the asset's type · a Mixer Parameter's name — picked from its mixer
+                System.Type asset = AudioFields.Typed(value, field);
+                if (asset != null)
+                {
+                    (ItemRules.Advanced(field) ? Advanced.contentContainer : this).Add(AudioFields.Object(p, ItemRules.Label(value, field) ?? p.displayName, asset));
+                    Fields.Add(field);
+                    continue;
+                }
+                if (value is AudioMixerParameterItem && field == "m_Parameter")
+                {
+                    Add(new AudioMixerParameterField(item, field, ItemRules.Label(value, field) ?? p.displayName));
                     Fields.Add(field);
                     continue;
                 }
@@ -106,7 +122,7 @@ namespace xpTURN.Feedback.Editor
         }
 
         // the motion and its parameters, one level under m_Params — after the target, before the timing
-        void AddMotion(SerializedProperty item, FeedbackItem value, System.Action changed)
+        void AddMotion(SerializedProperty item, FeedbackItem value, System.Action changed, string foldKey, UnityEngine.Component host)
         {
             var target = value as TargetItem;
             if (target == null)
@@ -119,21 +135,27 @@ namespace xpTURN.Feedback.Editor
             ValueKind kind = target.Traits.ValueKind;
             bool weighs = target.Traits.ApplyMode == ApplyMode.WeightTowardTarget;
             bool told = false;
+            bool perAxis = parameters.FindPropertyRelative("m_PerAxis")?.boolValue ?? false;
             SerializedProperty it = parameters.Copy();
             SerializedProperty end = parameters.GetEndProperty();
             bool enter = true;
             while (it.NextVisible(enter) && !SerializedProperty.EqualContents(it, end))
             {
                 enter = false;
+                if (!ItemRules.MotionParameterVisible(kind, it.name, perAxis))
+                    continue;
                 string label = ItemRules.Label(value, it.name) ?? it.displayName;
                 if (it.propertyType == SerializedPropertyType.Vector4)
-                    Add(new ValueField(it, kind, label));
+                    Add(new ValueField(it, ItemRules.PerComponent(it.name) && kind == ValueKind.Color ? ValueKind.Vector4 : kind, label));
                 else if (it.propertyType == SerializedPropertyType.Generic && it.type == EaseField.TypeName)
                     Add(new EaseField(it, label));
                 else
                 {
                     var f = new PropertyField(it.Copy(), label);
                     f.BindProperty(it.Copy());
+                    // Per Axis shows or hides its two numbers
+                    if (it.name == "m_PerAxis")
+                        f.TrackPropertyValue(it.Copy(), _ => changed());
                     Add(f);
                 }
                 Fields.Add("m_Motion.m_Params." + it.name);
@@ -144,6 +166,8 @@ namespace xpTURN.Feedback.Editor
                     told = true;
                 }
             }
+            if (ItemGraphField.Draws(value, host))
+                Add(Graph = new ItemGraphField(item, foldKey, host));
         }
 
         // the item's fields — timing · conditions · random · a flow item's play one level in — in order: label, target, motion,

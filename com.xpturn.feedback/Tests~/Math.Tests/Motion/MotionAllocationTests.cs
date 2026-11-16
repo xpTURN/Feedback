@@ -24,7 +24,7 @@ namespace xpTURN.Feedback.Tests.Motion
             ("Easing.Evaluate/4", static () =>
             {
                 double s = 0;
-                for (int e = 0; e < 32; e++)
+                for (int e = 0; e <= 32; e++)
                     for (int i = 0; i <= 16; i++)
                         s += Easing.Evaluate((EaseType)e, 1.70158f, 0.3f, i / 16f);
                 return s;
@@ -60,6 +60,54 @@ namespace xpTURN.Feedback.Tests.Motion
                     if (ramp)
                         s += 1;
                 }
+                return s;
+            }),
+            ("MotionKernels.Fade/4", static () =>
+            {
+                double s = 0;
+                for (int i = 0; i <= 64; i++)
+                {
+                    s += MotionKernels.Fade(i / 64f, 0.2f, 0.3f, out bool ramp);
+                    if (ramp)
+                        s += 1;
+                }
+                return s;
+            }),
+            ("MotionKernels.Bounce/3", static () =>
+            {
+                double s = 0;
+                for (int i = 0; i <= 64; i++)
+                    s += MotionKernels.Bounce(i / 64f, 3, 0.5f) + MotionKernels.Bounce(i / 64f, 4, 1f);
+                return s;
+            }),
+            ("MotionKernels.SoftLimit/2", static () =>
+            {
+                double s = 0;
+                for (int i = 0; i <= 64; i++)
+                    s += MotionKernels.SoftLimit(i / 16f, 2f);
+                return s;
+            }),
+            ("MotionKernels.TraumaAdd/2", static () =>
+            {
+                double s = 0;
+                float t = 0f;
+                for (int i = 0; i <= 64; i++)
+                    s += t = MotionKernels.TraumaAdd(t, i / 640f);
+                return s;
+            }),
+            ("MotionKernels.TraumaDecay/3", static () =>
+            {
+                double s = 0;
+                float t = 1f;
+                for (int i = 0; i <= 64; i++)
+                    s += t = MotionKernels.TraumaDecay(t, 1f, 0.01);
+                return s;
+            }),
+            ("MotionKernels.TraumaShape/2", static () =>
+            {
+                double s = 0;
+                for (int i = 0; i <= 64; i++)
+                    s += MotionKernels.TraumaShape(i / 64f, 2f);
                 return s;
             }),
             ("MotionKernels.Blink/6", static () =>

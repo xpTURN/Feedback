@@ -9,12 +9,31 @@ namespace xpTURN.Feedback
     public sealed class CameraShakeItem : TargetItem
     {
         static readonly TargetTraits s_Traits = new TargetTraits(valueKind: ValueKind.Vector3,
-            supportedMotions: MotionMask.Shake | MotionMask.Punch | MotionMask.Wiggle | MotionMask.Curve,
+            supportedMotions: MotionMask.Shake | MotionMask.Punch | MotionMask.Bounce | MotionMask.Wiggle | MotionMask.Curve,
             category: FeedbackCategory.Camera, flashSensitive: false, applyMode: ApplyMode.Offset);
 
         [SerializeField] internal Vector3 m_RotationAmplitude;      // degrees, zero = no rotation shake
 
         public CameraShakeItem()
+        {
+            m_Target.m_Mode = TargetRefMode.MainCamera;
+        }
+
+        internal override TargetTraits Traits => s_Traits;
+    }
+
+    // adds Amount × the play's intensity to the camera's trauma — instant (a Set); the trauma shakes the camera and fades on
+    // its own (TraumaService). A channel target adds to each camera shake receiver it reaches
+    [FeedbackTarget("Camera/Trauma", PreviewGrade.Full, Aliases = "trauma screen shake stack", Requires = typeof(Camera))]
+    [Serializable]
+    public sealed class CameraTraumaItem : TargetItem
+    {
+        static readonly TargetTraits s_Traits = new TargetTraits(valueKind: ValueKind.Bool, supportedMotions: MotionMask.Set,
+            category: FeedbackCategory.Camera, flashSensitive: false, applyMode: ApplyMode.Offset);
+
+        [SerializeField, Range(0f, 1f)] internal float m_Amount = 0.3f;
+
+        public CameraTraumaItem()
         {
             m_Target.m_Mode = TargetRefMode.MainCamera;
         }
@@ -28,7 +47,7 @@ namespace xpTURN.Feedback
     public sealed class CameraFieldOfViewItem : TargetItem
     {
         static readonly TargetTraits s_Traits = new TargetTraits(valueKind: ValueKind.Float,
-            supportedMotions: MotionMask.Tween | MotionMask.Punch | MotionMask.Shake | MotionMask.Spring,
+            supportedMotions: MotionMask.Tween | MotionMask.Punch | MotionMask.Bounce | MotionMask.Shake | MotionMask.Spring,
             category: FeedbackCategory.Camera, flashSensitive: false, applyMode: ApplyMode.Offset);
 
         public CameraFieldOfViewItem()
@@ -44,7 +63,7 @@ namespace xpTURN.Feedback
     public sealed class CameraOrthographicSizeItem : TargetItem
     {
         static readonly TargetTraits s_Traits = new TargetTraits(valueKind: ValueKind.Float,
-            supportedMotions: MotionMask.Tween | MotionMask.Punch | MotionMask.Shake | MotionMask.Spring,
+            supportedMotions: MotionMask.Tween | MotionMask.Punch | MotionMask.Bounce | MotionMask.Shake | MotionMask.Spring,
             category: FeedbackCategory.Camera, flashSensitive: false, applyMode: ApplyMode.Offset);
 
         public CameraOrthographicSizeItem()
@@ -60,7 +79,7 @@ namespace xpTURN.Feedback
     [Serializable]
     public sealed class CameraZoomItem : TargetItem
     {
-        static readonly TargetTraits s_Traits = new TargetTraits(valueKind: ValueKind.Float, supportedMotions: MotionMask.Tween | MotionMask.Punch,
+        static readonly TargetTraits s_Traits = new TargetTraits(valueKind: ValueKind.Float, supportedMotions: MotionMask.Tween | MotionMask.Punch | MotionMask.Bounce,
             category: FeedbackCategory.Camera, flashSensitive: false, applyMode: ApplyMode.Offset);
 
         public CameraZoomItem()

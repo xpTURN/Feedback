@@ -106,6 +106,20 @@ namespace xpTURN.Feedback.Tests.Motion
                 }
         }
 
+        // Steps: n even steps, each jump at its step's end, t = 1 the last · n is P1 rounded half up, 1 ~ 1000
+        [Test]
+        public void StepsJumpAtEachStepsEnd()
+        {
+            static float S(float p1, float t) => Easing.Evaluate(EaseType.Steps, p1, 0f, t);
+            Assert.That(new[] { 0f, 0.2499f, 0.25f, 0.5f, 0.9999f, 1f }.Select(t => S(4f, t)), Is.EqualTo(new[] { 0f, 0f, 0.25f, 0.5f, 0.75f, 1f }));
+            foreach (float p1 in new[] { float.NaN, 0f, -3f, float.NegativeInfinity })
+                Assert.That((S(p1, 0.9f), S(p1, 1f)), Is.EqualTo((0f, 1f)), $"P1 {p1} is one step");
+            Assert.That(S(2.6f, 0.5f), Is.EqualTo(1f / 3f), "2.6 rounds to 3 steps");
+            foreach (float p1 in new[] { 1e9f, float.PositiveInfinity })
+                Assert.That(S(p1, 0.0015f), Is.EqualTo(0.001f), $"P1 {p1} is 1000 steps");
+            Assert.That((S(4f, -1f), S(4f, float.NaN), S(4f, 2f)), Is.EqualTo((0f, 0f, 1f)), "the input cut to [0, 1]");
+        }
+
         [Test]
         public void CustomAndUnknownValuesAreLinear()
         {

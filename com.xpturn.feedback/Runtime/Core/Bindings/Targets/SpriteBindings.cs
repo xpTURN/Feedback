@@ -57,6 +57,8 @@ namespace xpTURN.Feedback
 
         protected override Color MapOffset(in Color offset) => new Color(0f, 0f, 0f, offset.r);
 
+        protected override string GraphUnit => "alpha";
+
         protected override Color MapOverride(in Color target) => new Color(0f, 0f, 0f, target.r);
 
         protected override Vector4 OverrideMask => new Vector4(0f, 0f, 0f, 1f);

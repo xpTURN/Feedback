@@ -2,21 +2,25 @@ using UnityEngine;
 
 namespace xpTURN.Feedback
 {
-    // I · A_c · N(seed_c, F, Seconds) · (1 − Falloff(T)) — each component its own seed. An infinite item has T = 0, so no
-    // falloff
+    // I · A_c · N(seed_c, F, Seconds) · (1 − Falloff(T)) · h(T) — each component its own seed, h the Fade In along Fade Ease (1
+    // without one). An infinite item has T = 0, so no falloff, and takes no fade
     internal sealed class ShakeEvaluator : MotionEvaluator
     {
         readonly ShakeParams m_Params;
+        readonly bool m_Fades;
 
         internal ShakeEvaluator(in ShakeParams p, int dimension) : base(dimension)
         {
             m_Params = p;
             m_Params.m_Amplitude = Finite(p.m_Amplitude);
+            m_Fades = MotionKernels.AtLeast(p.m_FadeIn, 0f) > 0f;
         }
 
         internal override MotionWrite Write => MotionWrite.Offset;
 
         float Falloff(in MotionTime time) => 1f - m_Params.m_Falloff.Evaluate(time.T);
+
+        float Height(in MotionTime time) => Fade(time.T, m_Params.m_FadeIn, 0f, in m_Params.m_FadeEase);
 
         float Sample(uint seed, uint component, double seconds)
         {
@@ -29,6 +33,8 @@ namespace xpTURN.Feedback
         internal override void Evaluate(in MotionState s, in MotionTime time, out MotionSample sample)
         {
             float k = Falloff(time) * s.Intensity;
+            if (m_Fades && !s.Endless)
+                k *= Height(time);
             double seconds = time.Seconds;
             Vector4 a = m_Params.m_Amplitude;
             Vector4 v = default;
@@ -44,6 +50,9 @@ namespace xpTURN.Feedback
         }
 
         internal override float EvaluateShape(in MotionState s, in MotionTime time)
-            => Sample(s.Seed, 0, time.Seconds) * Falloff(time) * s.Intensity;
+        {
+            float v = Sample(s.Seed, 0, time.Seconds) * Falloff(time) * s.Intensity;
+            return m_Fades && !s.Endless ? v * Height(time) : v;
+        }
     }
 }

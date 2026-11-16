@@ -25,10 +25,11 @@ public class Enemy : MonoBehaviour
 
 ## What you get
 
-- **Targets × motions** — 141 targets take 11 motions in 361 combinations.
-- **The Add menu** — 377 entries with search, favorites and recent items.
-- **Edit-mode preview** — press ▶ on a player to see it in the Scene and Game views; the values come back when it stops.
-- **Presets** — 21 presets to drop on an object or link from a player.
+- **Targets × motions** — 157 targets take 12 motions in 467 combinations.
+- **The Add menu** — 483 entries with search, favorites and recent items.
+- **Edit-mode preview** — press ▶ on a player to see it in the Scene and Game views; the values come back when it stops;
+  graphs in the inspector draw the values each item and the list write.
+- **Presets** — 21 presets to drop on an object, link from a player or play as its variants.
 - **A validator and a debugger** — `Window > xpTURN > Feedback Validator` with one-click fixes, and
   `Window > xpTURN > Feedback Debugger` for what is playing now.
 - **Samples** — 5 bundles, from a first feedback to a short game.
@@ -55,6 +56,7 @@ compiles only when that package is installed at the version shown or later.
 | Physics module | 1.0.0 | Rigidbody forces, velocities and explosions · Collider switches |
 | Physics 2D module | 1.0.0 | Rigidbody 2D forces and velocities |
 | Video module | 1.0.0 | Video Player control |
+| Audio module | 1.0.0 | playing sounds · sound volumes, pitch, pan and filters · the listener's volume · mixer parameters and snapshots · pooled sounds at a point |
 
 The versions shown are where each assembly starts to compile. The package is tested with Universal RP 17.3.0, uGUI
 2.0.0, Cinemachine 3.1.7, Input System 1.20.1, UniTask 2.5.11 and Timeline 1.8.13 (Unity 6000.6: its built-in Timeline
@@ -68,7 +70,7 @@ reinstalled.
 ## Install
 
 - In the Package Manager, choose **+ > Add package from git URL…** and enter
-  `https://github.com/xpTURN/Feedback.git?path=/com.xpturn.feedback#v0.1.0`.
+  `https://github.com/xpTURN/Feedback.git?path=/com.xpturn.feedback#v0.2.0`.
 - Or choose **+ > Add package from disk…** and select `package.json` in the `com.xpturn.feedback` folder.
 - Or choose **+ > Add package from tarball…** and select the package's `.tgz`.
 - Or add it to `Packages/manifest.json` (a relative path starts from the `Packages` folder):
@@ -98,8 +100,9 @@ puts both back.
 - [Concepts](com.xpturn.feedback/Documentation~/Concepts.md) — targets and motions, how values are written, time and playback, Unity
   Timeline
 - [Scripting API](com.xpturn.feedback/Documentation~/ScriptingAPI.md) — the types you call from code, and the bases for feedbacks of your
-  own (a sound, a middleware event, a phone's vibration)
+  own (a middleware event, a phone's vibration)
 - [Feedback reference](com.xpturn.feedback/Documentation~/Feedbacks.md) — every feedback and the motions it takes
+- [Motion reference](com.xpturn.feedback/Documentation~/Motions.md) — each motion's shape and parameters, and the eases
 - [Performance](com.xpturn.feedback/Documentation~/Performance.md) — no allocation per play, against a coroutine per play, the cost by
   target
 

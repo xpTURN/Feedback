@@ -9,7 +9,8 @@ namespace xpTURN.Feedback.Samples.GameFeelLabs
     // S4 Combat Hit Lab: Action1 · 2 · 3 hit the dummy light · heavy · critical. The tier's preset plays as it is (the presets carry
     // the tiers); only the damage number takes the damage — intensity = damage / 100 with the preset's ×100 (a raw damage would
     // grow every item of a player). The numbers live in a prefab made after the TMP check; the dummy faces the camera so the
-    // critical's local −Z punch pushes it back
+    // critical's local −Z punch pushes it back. A tier's sound player plays with its preset (a package preset can't hold the
+    // sample's clips): the hit sound from the pool, and on heavy and critical a low-pass duck of the ambience
     public sealed class CombatHitLab : MonoBehaviour
     {
         public const int Light = 0, Heavy = 1, Critical = 2;
@@ -20,6 +21,9 @@ namespace xpTURN.Feedback.Samples.GameFeelLabs
         [SerializeField] FeedbackPlayer m_Light;
         [SerializeField] FeedbackPlayer m_Heavy;
         [SerializeField] FeedbackPlayer m_Critical;
+        [SerializeField] FeedbackPlayer m_LightSound;
+        [SerializeField] FeedbackPlayer m_HeavySound;
+        [SerializeField] FeedbackPlayer m_CriticalSound;
         [SerializeField] FeedbackPlayer m_Rumble;
         [SerializeField] GameObject m_NumbersPrefab;
         [SerializeField] Transform m_Chest;
@@ -100,6 +104,9 @@ namespace xpTURN.Feedback.Samples.GameFeelLabs
             FeedbackPlayer hit = tier == Light ? m_Light : tier == Heavy ? m_Heavy : m_Critical;
             if (hit != null)
                 hit.Play();
+            FeedbackPlayer sound = tier == Light ? m_LightSound : tier == Heavy ? m_HeavySound : m_CriticalSound;
+            if (sound != null)
+                sound.Play();
             if (tier != Light && m_Rumble != null)
                 m_Rumble.Play(new PlayArgs().WithIntensity(tier == Critical ? 1f : 0.6f));
             int damage = s_DamageOf != null ? s_DamageOf(tier) : Random.Range(s_Damage[tier].x, s_Damage[tier].y + 1);

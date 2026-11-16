@@ -61,6 +61,20 @@ namespace xpTURN.Feedback
         // the query's base — only of a live target
         internal abstract Vector4 BaseVector { get; }
 
+        // the editor's graph: the value now (a dry slot's own), how offsets compose, the capped group's limit, and a dry
+        // slot's start taken from the live slot of the same key
+        internal virtual Vector4 GraphValue => BaseVector;
+
+        internal virtual Composition GraphComposition => Composition.Additive;
+
+        internal virtual bool GraphLimit(out float limit)
+        {
+            limit = 0f;
+            return false;
+        }
+
+        internal virtual bool SeedFrom(LayerSlot live) => false;
+
         internal abstract void Revert();
 
         internal abstract void Apply();

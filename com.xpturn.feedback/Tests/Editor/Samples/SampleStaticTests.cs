@@ -251,6 +251,49 @@ namespace xpTURN.Feedback.Tests.Editor.Samples
             Assert.That(File.Exists(SampleBuild.RestorePath), Is.False, "a restore file left behind");
         }
 
+        // the kit's category lists hold every category — the HUD's names (its 'off in the settings' line) and the state's arrays
+        [Test]
+        public void KQ17_TheKitCoversEveryCategory()
+        {
+            const System.Reflection.BindingFlags statics = System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static;
+            string[] names = (string[])typeof(SampleHud).GetField("s_CategoryNames", statics).GetValue(null);
+            int count = (int)typeof(SampleState).GetField("Count", statics).GetRawConstantValue();
+            string[] expected = Enum.GetValues(typeof(FeedbackCategory)).Cast<FeedbackCategory>().Select(c => c == FeedbackCategory.None ? "" : c.ToString()).ToArray();
+            Assert.That(names, Is.EqualTo(expected), "the HUD's names");
+            Assert.That(count, Is.EqualTo(expected.Length), "the state's arrays");
+        }
+
+        // the bundles' sounds (tools/samples/sounds.py) imported with the defaults — Vorbis, Decompress On Load (an ADPCM import
+        // pads a loop and moves its seam) · a loop as long as the generator writes it · a one-shot under a second
+        static readonly Dictionary<string, int> s_LoopSamples = new Dictionary<string, int> { { "Tone Loop", 2 * 44100 }, { "Ambience Loop", 4 * 44100 } };
+
+        [Test]
+        public void KQ18_TheSounds()
+        {
+            var problems = new List<string>();
+            int n = 0, loops = 0;
+            foreach (SampleCatalog catalog in Catalogs())
+                foreach (string path in AssetDatabase.FindAssets("t:AudioClip", new[] { BundleRoot(catalog) }).Select(AssetDatabase.GUIDToAssetPath))
+                {
+                    n++;
+                    AudioImporterSampleSettings s = ((AudioImporter)AssetImporter.GetAtPath(path)).defaultSampleSettings;
+                    var clip = AssetDatabase.LoadAssetAtPath<AudioClip>(path);
+                    if (s.compressionFormat != AudioCompressionFormat.Vorbis || s.loadType != AudioClipLoadType.DecompressOnLoad)
+                        problems.Add($"{path}: {s.compressionFormat} · {s.loadType}");
+                    if (s_LoopSamples.TryGetValue(Path.GetFileNameWithoutExtension(path), out int samples))
+                    {
+                        loops++;
+                        if (clip.samples != samples)
+                            problems.Add($"{path}: {clip.samples} samples (the generator writes {samples})");
+                    }
+                    else if (clip.length >= 1f)
+                        problems.Add($"{path}: {clip.length:0.###} s");
+                }
+            Debug.Log($"KQ18 sounds={n} loops={loops}");
+            Assert.That((n > 0, loops > 0), Is.EqualTo((true, true)), "no sound or no loop in the bundles");
+            Assert.That(problems, Is.Empty);
+        }
+
         // the bytes of the settings files are the tool's (the run's end saves them)
         [Test]
         public void KQ5_BuildSamplesAndRestore()

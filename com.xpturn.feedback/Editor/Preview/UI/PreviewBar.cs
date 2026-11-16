@@ -232,6 +232,9 @@ namespace xpTURN.Feedback.Editor
             PlayerDirection? d = Direction;
             if (d.HasValue)
                 args = args.WithDirection(d.Value);
+            FeedbackPreset shown = m_Player != null ? VariantShow.Get(m_Player) : null;
+            if (shown != null)
+                args = args.WithPreset(shown);
             return args;
         }
 
@@ -267,6 +270,34 @@ namespace xpTURN.Feedback.Editor
                 OnPlay();
             Mine?.PlayItem(listIndex, true);
             Refresh();
+        }
+
+        // a graph's press: the session started with the bar's arguments when there is none, then the scrub — None when it
+        // moved, else why not
+        internal SeekRefusal ScrubAt(double seconds)
+        {
+            if (m_Player == null || EditorApplication.isPlayingOrWillChangePlaymode)
+                return SeekRefusal.NotLive;
+            if (Mine == null)
+                OnPlay();
+            PreviewSession s = Mine;
+            SeekRefusal refusal = s != null ? s.Scrub(seconds) : SeekRefusal.NotLive;
+            Refresh();
+            return refusal;
+        }
+
+        internal Component Subject => m_Subject;
+
+        // the bar of the subject nearest an element — up its ancestors (an inspector holds its component's bar)
+        internal static PreviewBar Near(VisualElement from, Component subject)
+        {
+            for (VisualElement e = from; e != null && subject != null; e = e.parent)
+            {
+                PreviewBar bar = e.Query<PreviewBar>().Where(b => b.Subject == subject).First();
+                if (bar != null)
+                    return bar;
+            }
+            return null;
         }
 
         internal void OnPause()
@@ -376,7 +407,7 @@ namespace xpTURN.Feedback.Editor
                 if (n.Kind == PreviewNoticeKind.CameraGameView || n.Kind == PreviewNoticeKind.CameraMainScene || n.Kind == PreviewNoticeKind.NoMainCamera
                     || n.Kind == PreviewNoticeKind.ScreenGameView || n.Kind == PreviewNoticeKind.PostFXSceneView || n.Kind == PreviewNoticeKind.PostFXCamera
                     || n.Kind == PreviewNoticeKind.PostFXGameView || n.Kind == PreviewNoticeKind.CinemachineNoExtension || n.Kind == PreviewNoticeKind.CinemachinePlayOnly
-                    || n.Kind == PreviewNoticeKind.RumblePlayOnly)
+                    || n.Kind == PreviewNoticeKind.RumblePlayOnly || n.Kind == PreviewNoticeKind.AudioMuted || n.Kind == PreviewNoticeKind.AudioPlayOnly)
                     return n.Text;
             }
             return "";

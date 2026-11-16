@@ -25,11 +25,19 @@ namespace xpTURN.Feedback
         static uint s_SeedCounter;
 
         readonly FeedbackPlayer m_Player;
+        // the list this runtime plays and the object whose data holds it — the player's list (its own or the linked preset's)
+        // or a variant preset's
+        readonly List<FeedbackItem> m_Items;
+        readonly UnityEngine.Object m_Owner;
         readonly FeedbackScheduler m_Scheduler;
         // the player's transform, read once here — the engine makes an object's C# transform on the first read
         readonly Transform m_Transform;
         readonly TimelineProgram m_Program;
         readonly int[] m_ListIndex;             // program item → list index (an inactive flow item is not in the program)
+        // program item → what its seed hashes: the folded managed reference id the list's owner gave the item, else its list
+        // index — an item with an id keeps its random parts when items are added, removed or moved
+        readonly uint[] m_SeedKey;
+        readonly bool[] m_KeyIsId;
         readonly ItemBinding[] m_Bindings;      // by program item — null = no effect (a flow item or a skipped one)
         readonly EffectItem[] m_Effects;        // by program item — the conditions and the randomness a Play reads; null for a flow item and a null slot
         readonly bool[] m_Skip;                 // by program item — an effect item without a binding keeps its place
@@ -45,31 +53,41 @@ namespace xpTURN.Feedback
         readonly double[] m_ItemLastPlay;
         readonly int[] m_ItemPlays;
         XorShiftRandom m_Random;
-        double m_LastPlay = double.NegativeInfinity;
         long m_Serial;
+        // the player's stamps of this runtime's first play since its prepare or Restore (0: none) and of its last play — the
+        // order the player takes its lists back in
+        long m_FirstStamp;
+        long m_LastStamp;
         float m_NominalFactor;
         float m_NominalDelay;
         bool m_Released;
-        // the next Toggle play runs backward · the player is destroyed and its finite plays go on
-        bool m_ToggleBackward;
+        // the player is destroyed and its finite plays go on
         bool m_Detached;
         // each effect item's effective category (copied at the prepare), whether the flash limit counts it (Flash or Flashes)
         // and the context's gate
         readonly FeedbackCategory[] m_Category;
         readonly bool[] m_Flashes;
         readonly CategoryGate m_Gate;
+        // a dry scheduler's runtime (the editor's graph): only the bindings that describe values, no event, no admission, the
+        // player's own state untouched
+        readonly bool m_Dry;
+        // the play a dry Replay copies, while it is accepted
+        PlaybackRecord m_Replay;
         // made at the first token
         PlaybackTokens m_Tokens;
 
-        // old: Rebuild's runtime — its snapshots and Toggle cell are handed over. initial: the first frame is written at the
-        // end
-        internal PlayerRuntime(FeedbackPlayer player, FeedbackScheduler scheduler, PlayerRuntime old, bool initial)
+        // items · owner: the list and its owner. old: Rebuild's runtime of the same list — its snapshots are handed over.
+        // initial: the first frame is written at the end. only: the one list index prepared (the editor's graph of an item
+        // alone) — the others keep their places
+        internal PlayerRuntime(FeedbackPlayer player, List<FeedbackItem> items, UnityEngine.Object owner, FeedbackScheduler scheduler, PlayerRuntime old, bool initial, int only = -1)
         {
             m_Player = player;
+            m_Items = items;
+            m_Owner = owner;
             m_Scheduler = scheduler;
+            m_Dry = scheduler.Context.Layers.Dry;
             m_Transform = player.transform;
             player.TouchAnchors();
-            List<FeedbackItem> items = player.Items;
             int overlap = player.MaxOverlap;
             var context = new PrepareContext(player.gameObject, player, scheduler.Context, overlap, this, -1);
             var descs = new List<TimelineItemDesc>(items.Count);
@@ -78,13 +96,16 @@ namespace xpTURN.Feedback
             var effects = new List<EffectItem>(items.Count);
             var skip = new List<bool>(items.Count);
             int missing = TimelineConversion.DescribeList(items, descs, listIndex);
+            var seedKey = new uint[descs.Count];
+            var keyIsId = new bool[descs.Count];
             for (int k = 0; k < descs.Count; k++)
             {
                 int i = listIndex[k];
                 FeedbackItem item = items[i];
+                seedKey[k] = PlayMath.SeedKey(owner, item, i, out keyIsId[k]);
                 ItemBinding binding = null;
                 bool effect = descs[k].Kind == TimelineItemKind.Effect;
-                if (item != null && effect && item.m_Active)
+                if (item != null && effect && item.m_Active && (only < 0 || only == i))
                     binding = Prepare((EffectItem)item, i, in context);
                 bindings.Add(binding);
                 effects.Add(effect ? (EffectItem)item : null);
@@ -96,6 +117,8 @@ namespace xpTURN.Feedback
 #endif
             m_Program = TimelineProgram.Compile(descs.ToArray());
             m_ListIndex = listIndex.ToArray();
+            m_SeedKey = seedKey;
+            m_KeyIsId = keyIsId;
             m_Bindings = bindings.ToArray();
             m_Effects = effects.ToArray();
             m_Skip = skip.ToArray();
@@ -143,10 +166,32 @@ namespace xpTURN.Feedback
         internal int ItemCount => m_ListIndex.Length;
         internal int ListIndex(int programItem) => m_ListIndex[programItem];
         internal ItemBinding Binding(int programItem) => m_Bindings[programItem];
+
+        // what a program item's seeds hash — the managed reference id or the list index this runtime took when it was made
+        internal uint SeedKey(int programItem, out bool isId)
+        {
+            isId = m_KeyIsId[programItem];
+            return m_SeedKey[programItem];
+        }
+
+        // a dry runtime takes another's seed keys — the ids the list had when that one was made
+        internal void UseSeedKeys(uint[] keys, bool[] isId)
+        {
+            if (!m_Dry || keys == null || isId == null || keys.Length != m_SeedKey.Length || isId.Length != m_KeyIsId.Length)
+                return;
+            Array.Copy(keys, m_SeedKey, keys.Length);
+            Array.Copy(isId, m_KeyIsId, isId.Length);
+        }
         internal ReadOnlySpan<bool> Skip => m_Skip;
         internal bool IsReleased => m_Released;
-        internal bool ToggleBackward => m_ToggleBackward;
+        internal bool ToggleBackward => m_Player.m_ToggleBackward;
         internal bool IsDetached => m_Detached;
+        internal List<FeedbackItem> Items => m_Items;
+        internal UnityEngine.Object ItemsOwner => m_Owner;
+        internal long FirstStamp => m_FirstStamp;
+        internal long LastStamp => m_LastStamp;
+        // the newest play's number — a stop of the plays that run now leaves the ones started after it
+        internal long LastSerial => m_Serial;
 
         // a record's place on the nominal axis — the cursor's forward, the head's backward
         internal long Position(int record) => m_Records[record].Reverse ? m_Records[record].Sampler.ReversePosition : m_Records[record].Cursor.Position;
@@ -163,14 +208,19 @@ namespace xpTURN.Feedback
                 binding = FeedbackImplementations.Create(effect);
                 if (binding == null)
                 {
-                    WarnUnregistered(effect.GetType(), m_Player);
+                    if (!m_Dry)
+                        WarnUnregistered(effect.GetType(), m_Player);
                     return null;
                 }
+                // a dry runtime's other items keep their places — prepared, they would play sounds, raise events, spawn
+                if (m_Dry && !DescribesValues(binding))
+                    return null;
                 PrepareContext own = context.ForItem(listIndex);
                 if (binding.Prepare(in own))
                     return binding;
 #if DEBUG
-                Debug.LogWarning(SkippedWarning + listIndex + " (" + effect.GetType().Name + ")" + (binding.SkipReason != null ? ": " + binding.SkipReason : ""), m_Player);
+                if (!m_Dry)
+                    Debug.LogWarning(SkippedWarning + listIndex + " (" + effect.GetType().Name + ")" + (binding.SkipReason != null ? ": " + binding.SkipReason : ""), m_Player);
 #endif
             }
             catch (Exception e)
@@ -180,6 +230,13 @@ namespace xpTURN.Feedback
             // a binding that refused or threw gives back what it got
             Release(binding);
             return null;
+        }
+
+        static bool DescribesValues(ItemBinding binding)
+        {
+            var channels = new List<GraphChannel>();
+            binding.Describe(channels);
+            return channels.Count > 0;
         }
 
         // the first player that meets the type is the context — a click on the log finds one user of it. MotionDriver shares
@@ -232,11 +289,11 @@ namespace xpTURN.Feedback
             }
         }
 
-        // the Toggle cell, and each binding of an item the old runtime had too takes that binding's snapshots — the binding
-        // checks the property
+        // each binding of an item the old runtime had too takes that binding's snapshots — the binding checks the property —
+        // and the stamp of the first play they were taken at
         internal void Inherit(PlayerRuntime old)
         {
-            m_ToggleBackward = old.m_ToggleBackward;
+            m_FirstStamp = old.m_FirstStamp;
             for (int i = 0; i < m_Bindings.Length; i++)
             {
                 ItemBinding binding = m_Bindings[i];
@@ -267,10 +324,7 @@ namespace xpTURN.Feedback
         {
             FeedbackPlayer player = m_Player;
             bool backward = player.m_Direction == PlayerDirection.Backward;
-            float intensity = 1f;
-            if (player.m_RemapIntensity && player.m_IntensityRemap != null)
-                intensity = Factor0(player.m_IntensityRemap.Evaluate(1f));
-            intensity *= Factor(player.m_Intensity);
+            float intensity = PlayMath.PlayIntensity(player, 1f, 1f);
             int count = m_Bindings.Length;
             for (int k = 0; k < count; k++)
             {

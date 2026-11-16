@@ -99,6 +99,7 @@ namespace RecompileCheck
                         RecompilePlayers.MakeAll();
                         RecompilePlayers.MakeReceivers();
                         RecompileRecord.Write("players-made frame=" + Time.frameCount + " " + RecompilePlayers.State());
+                        RecompileRecord.Write("variants-made " + RecompilePlayers.Variants(false));
                         RecompileRecord.Write("receivers-made " + RecompilePlayers.Receivers() + " " + RecompilePlayers.SendToReceiver());
                         RecompileRecord.Write("listeners-made " + RecompilePlayers.MakeListeners());
                         RecompileRecord.Write("drivers-made frame=" + Time.frameCount + " " + RecompilePlayers.MakeDrivers());
@@ -135,6 +136,7 @@ namespace RecompileCheck
                         SessionState.SetInt(StageFrameKey, RecompileRecord.DefaultFrame());
                         RecompileRecord.Write("after-reload frame=" + Time.frameCount + " " + RecompileRecord.State() + " reserved=" + RecompileRecord.DefaultReserved() + " players " + RecompilePlayers.State());
                         RecompileRecord.Write("after-actions " + RecompilePlayers.Act());
+                        RecompileRecord.Write("variants-after " + RecompilePlayers.Variants(true));
                         RecompileRecord.Write("receivers-after " + RecompilePlayers.Receivers() + " " + RecompilePlayers.SendToReceiver());
                         RecompileRecord.Write("exit-plays " + RecompilePlayers.MakeExitPlays());
                         RecompileRecord.Write("drivers-after frame=" + Time.frameCount + " reserved=" + RecompileRecord.DefaultReserved() + " " + RecompilePlayers.Drivers());
@@ -154,6 +156,7 @@ namespace RecompileCheck
                     RecompileRecord.Write("after-frames frames=" + (Time.frameCount - first) + " stages=" + (RecompileRecord.DefaultFrame() - SessionState.GetInt(StageFrameKey, 0))
                         + " " + RecompileRecord.State() + " players " + RecompilePlayers.State());
                     RecompileRecord.Write("drivers-frames frame=" + Time.frameCount + " reserved=" + RecompileRecord.DefaultReserved() + " " + RecompilePlayers.Drivers());
+                    RecompileRecord.Write("variants-frames " + RecompilePlayers.Variants(false));
                     RecompileRecord.Write("pools-frames frame=" + Time.frameCount + " " + RecompilePlayers.Pools());
                     SessionState.SetInt(PhaseKey, WaitExit);
                     EditorApplication.ExitPlaymode();

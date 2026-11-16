@@ -4,7 +4,7 @@
 
 > 이 문서는 영어 [README](README.md) 의 번역입니다. 내용이 다르면 영어판을 기준으로 합니다.
 
-<!-- english: ba1e8cb6028f -->
+<!-- english: 95f21f0706de -->
 
 ![브릭 브레이커 보스에 재생한 피드백 — 치명타 · 폭발 · 화면 번쩍임 — 을 Game 뷰에서 미리 본 모습](com.xpturn.feedback/Documentation~/images/hero.gif)
 
@@ -29,10 +29,11 @@ public class Enemy : MonoBehaviour
 
 ## 들어 있는 것
 
-- **대상 × 모션** — 대상 <!-- gen:count:targets -->141<!-- /gen:count:targets --> 가지가 모션 <!-- gen:count:motions -->11<!-- /gen:count:motions --> 가지를 <!-- gen:count:combinations -->361<!-- /gen:count:combinations --> 가지 조합으로 받습니다.
-- **추가 메뉴** — 검색 · 즐겨찾기 · 최근 항목을 갖춘 항목 <!-- gen:count:leaves -->377<!-- /gen:count:leaves --> 개.
-- **에디트 모드 미리보기** — 플레이어의 ▶ 를 누르면 Scene 뷰와 Game 뷰에서 보이고, 멈추면 값이 돌아옵니다.
-- **프리셋** — 오브젝트에 놓거나 플레이어에서 링크하는 프리셋 <!-- gen:count:presets -->21<!-- /gen:count:presets --> 개.
+- **대상 × 모션** — 대상 <!-- gen:count:targets -->157<!-- /gen:count:targets --> 가지가 모션 <!-- gen:count:motions -->12<!-- /gen:count:motions --> 가지를 <!-- gen:count:combinations -->467<!-- /gen:count:combinations --> 가지 조합으로 받습니다.
+- **추가 메뉴** — 검색 · 즐겨찾기 · 최근 항목을 갖춘 항목 <!-- gen:count:leaves -->483<!-- /gen:count:leaves --> 개.
+- **에디트 모드 미리보기** — 플레이어의 ▶ 를 누르면 Scene 뷰와 Game 뷰에서 보이고, 멈추면 값이 돌아옵니다. 인스펙터의 그래프는
+  각 항목과 목록이 쓰는 값을 그립니다.
+- **프리셋** — 오브젝트에 놓거나, 플레이어에서 링크하거나, 플레이어의 변형으로 재생하는 프리셋 <!-- gen:count:presets -->21<!-- /gen:count:presets --> 개.
 - **검증기와 디버거** — 클릭 한 번으로 고치는 `Window > xpTURN > Feedback Validator`, 지금 재생 중인 것을 보여 주는
   `Window > xpTURN > Feedback Debugger`.
 - **샘플** — 첫 피드백부터 짧은 게임까지, 묶음 <!-- gen:count:bundles -->5<!-- /gen:count:bundles --> 개.
@@ -59,6 +60,7 @@ Unity 6000.0.85f2 이상. Unity 6000.3.28f1 과 6000.6.8f1 에서 시험했습�
 | Physics module | 1.0.0 | Rigidbody 의 힘 · 속도 · 폭발 · Collider 켜고 끄기 |
 | Physics 2D module | 1.0.0 | Rigidbody 2D 의 힘과 속도 |
 | Video module | 1.0.0 | Video Player 제어 |
+| Audio module | 1.0.0 | 소리 재생 · 소리의 볼륨 · 피치 · 팬 · 필터 · 리스너 볼륨 · 믹서 매개변수와 스냅샷 · 풀에서 꺼내 한 자리에서 내는 소리 |
 
 표의 판은 각 어셈블리가 컴파일되기 시작하는 판입니다. 이 패키지는 Universal RP 17.3.0 · uGUI 2.0.0 · Cinemachine 3.1.7 ·
 Input System 1.20.1 · UniTask 2.5.11 · Timeline 1.8.13(Unity 6000.6 은 내장 Timeline 6.6.0)으로 시험했습니다.
@@ -70,7 +72,7 @@ Input System 1.20.1 · UniTask 2.5.11 · Timeline 1.8.13(Unity 6000.6 은 내장
 ## 설치
 
 - Package Manager 에서 **+ > Add package from git URL…** 을 고르고
-  `https://github.com/xpTURN/Feedback.git?path=/com.xpturn.feedback#v0.1.0` 을 넣습니다.
+  `https://github.com/xpTURN/Feedback.git?path=/com.xpturn.feedback#v0.2.0` 을 넣습니다.
 - 또는 **+ > Add package from disk…** 를 고르고 `com.xpturn.feedback` 폴더의 `package.json` 을 고릅니다.
 - 또는 **+ > Add package from tarball…** 을 고르고 패키지의 `.tgz` 를 고릅니다.
 - 또는 `Packages/manifest.json` 에 더합니다(상대 경로는 `Packages` 폴더에서 시작합니다):
@@ -98,9 +100,10 @@ Essential Resources 를 가져오십시오.
 - [문서 홈](com.xpturn.feedback/Documentation~/index.md)
 - [시작하기](com.xpturn.feedback/Documentation~/GettingStarted.md) — 첫 피드백을 한 걸음씩, 그다음 내 장면 · 에디터 도구 · 샘플
 - [개념](com.xpturn.feedback/Documentation~/Concepts.md) — 대상과 모션 · 값이 쓰이는 방식 · 시간과 재생 · Unity Timeline
-- [스크립트 API](com.xpturn.feedback/Documentation~/ScriptingAPI.md) — 코드에서 부르는 형식과, 직접 만드는 피드백(소리 ·
-  미들웨어 이벤트 · 휴대폰 진동)의 바탕
+- [스크립트 API](com.xpturn.feedback/Documentation~/ScriptingAPI.md) — 코드에서 부르는 형식과, 직접 만드는 피드백(미들웨어 이벤트 ·
+  휴대폰 진동)의 바탕
 - [피드백 레퍼런스](com.xpturn.feedback/Documentation~/Feedbacks.md) — 모든 피드백과 각각이 받는 모션
+- [모션 레퍼런스](com.xpturn.feedback/Documentation~/Motions.md) — 모션마다의 모양과 매개변수, 그리고 이징
 - [성능](com.xpturn.feedback/Documentation~/Performance.md) — 재생마다 할당 없음 · 재생마다 코루틴과의 비교 · 대상별 비용
 
 ## AI 코딩 어시스턴트

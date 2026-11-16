@@ -100,9 +100,10 @@ namespace xpTURN.Feedback.Tests.Editor
         {
             FeedbackPlayer player = Player(null);
             Assert.That(Listed(player, Type.EmptyTypes), Is.EquivalentTo(new[] { "Void PlayFromEvent()", "Void Pause()", "Void Resume()", "Void Restore()", "Void Signal()" }));
-            Assert.That(Listed(player, new[] { typeof(float) }), Is.EqualTo(new[] { "Void PlayFromEvent(Single)" }), "the intensity version");
+            Assert.That(Listed(player, new[] { typeof(float) }), Is.EqualTo(new[] { "Void PlayFromEvent(Single)", "Void set_Intensity(Single)" }), "the intensity version · the Intensity setter");
             Assert.That(Listed(player, new[] { typeof(bool) }), Is.EqualTo(new[] { "Void PlayFromEvent(Boolean)" }), "the direction version");
-            Assert.That(Listed(player, new[] { typeof(int) }).Concat(Listed(player, new[] { typeof(string) })), Is.Empty, "no other argument version");
+            Assert.That(Listed(player, new[] { typeof(string) }), Is.EqualTo(new[] { "Void set_VariantKey(String)" }), "the VariantKey setter");
+            Assert.That(Listed(player, new[] { typeof(int) }), Is.Empty, "no other argument version");
         }
 
         [Test]

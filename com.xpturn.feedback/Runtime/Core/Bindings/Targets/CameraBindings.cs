@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace xpTURN.Feedback
@@ -45,6 +46,9 @@ namespace xpTURN.Feedback
         bool[] m_Held;
         bool[] m_Running;
         int m_RunningCount;
+        // the settings' soft caps on a camera's shakes summed (0 = none) — times the Camera category's scale at each evaluation
+        float m_MaximumOffset;
+        float m_MaximumAngle;
 #if DEBUG
         bool m_WarnedMany;
 #endif
@@ -84,6 +88,12 @@ namespace xpTURN.Feedback
                     p.m_Amplitude = amplitude;
                     return new PunchEvaluator(in p, 3);
                 }
+                case BounceMotion m:
+                {
+                    BounceParams p = m.m_Params;
+                    p.m_Amplitude = amplitude;
+                    return new BounceEvaluator(in p, 3);
+                }
                 case WiggleMotion m:
                 {
                     WiggleParams p = m.m_Params;
@@ -108,6 +118,54 @@ namespace xpTURN.Feedback
         // the next Begin
         internal override bool IsAlive => m_OnChannel || Live || (m_FollowsCamera && m_RunningCount == 0);
 
+        // Prepare's and Describe's evaluators: the position's, and the rotation's copy (none without a rotation amplitude)
+        void Evaluators(FeedbackMotion motion, out MotionEvaluator position, out MotionEvaluator rotation)
+        {
+            position = MotionEvaluators.Create(motion, 3);
+            rotation = position != null ? RotationCopy(motion, m_Item.m_RotationAmplitude) : null;
+        }
+
+        internal override void Describe(List<GraphChannel> into)
+        {
+            FeedbackMotion motion = m_Item.m_Motion;
+            if (motion == null || !m_Item.Traits.Supports(motion.Kind))
+                return;
+            Evaluators(motion, out MotionEvaluator position, out MotionEvaluator rotation);
+            if (position == null)
+                return;
+            into.Add(new GraphChannel("Position", position, LayerSpace.Self));
+            if (rotation != null)
+                into.Add(new GraphChannel("Rotation", rotation, LayerSpace.Local, copySeed: true, unit: "°"));
+        }
+
+        // a channel's receivers are found when it plays — none here
+        internal override void GraphSlots(List<LayerSlot> into)
+        {
+            if (m_PositionSlot != null)
+                into.Add(m_PositionSlot);
+            if (m_RotationSlot != null)
+                into.Add(m_RotationSlot);
+        }
+
+        // channel 0 the position, 1 the rotation — while the record reaches a target (a channel's receivers)
+        internal override bool GraphRecord(int record, int channel, in MotionTime time, out Vector4 value)
+        {
+            value = default;
+            if (m_Reached == null || record < 0 || record >= m_Reached.Length || m_Reached[record] == 0)
+                return false;
+            float scale = m_Gate.Scale(m_Category);
+            if (channel == 1)
+                return m_Rotation != null && GraphSample(m_Rotation, in m_RotationStates[record], in time, MotionWrite.Offset, false, false, scale, out value);
+            return GraphSample(m_Position, in m_PositionStates[record], in time, MotionWrite.Offset, false, false, scale, out value);
+        }
+
+        // the receivers a channel's record reached — 0 for a transform target
+        internal int Receivers(int record) => m_OnChannel && m_Reached != null && record >= 0 && record < m_Reached.Length ? m_Reached[record] : 0;
+
+        // observation
+        internal MotionEvaluator PreparedPosition => m_Position;
+        internal MotionEvaluator PreparedRotation => m_Rotation;
+
         internal override bool Prepare(in PrepareContext context)
         {
             FeedbackMotion motion = m_Item.m_Motion;
@@ -121,14 +179,15 @@ namespace xpTURN.Feedback
                 return Refuse(null);
 #endif
             }
-            m_Position = MotionEvaluators.Create(motion, 3);
+            Evaluators(motion, out m_Position, out m_Rotation);
             if (m_Position == null)
                 return Refuse("an unknown motion");
-            m_Rotation = RotationCopy(motion, m_Item.m_RotationAmplitude);
             m_Gate = context.Context.Categories;
             m_Category = m_Item.EffectiveCategory;
             m_Layers = context.Context.Layers;
             m_Context = context;
+            m_MaximumOffset = context.Context.Settings.MaximumShakeOffset;
+            m_MaximumAngle = context.Context.Settings.MaximumShakeAngle;
             m_Owner = context.Player != null ? context.Player.transform : null;
             int n = context.MaxOverlap;
             m_OnChannel = m_Item.m_Target.m_Mode == TargetRefMode.Channel;
@@ -231,10 +290,10 @@ namespace xpTURN.Feedback
                 m_Running[record] = true;
                 m_RunningCount++;
             }
-            uint seed = Hash32.Tagged(context.ItemSeed, Hash32.Occurrence, Hash32.Fold(context.Occurrence));
-            m_Position.Begin(ref m_PositionStates[record], default, new MotionBegin { Seed = seed, Intensity = context.Intensity });
+            uint seed = PlayMath.OccurrenceSeed(context.ItemSeed, context.Occurrence);
+            m_Position.Begin(ref m_PositionStates[record], default, new MotionBegin { Seed = seed, Intensity = context.Intensity, Endless = context.Endless });
             // the copy's seed is tagged as a copy — a use of its own
-            m_Rotation?.Begin(ref m_RotationStates[record], default, new MotionBegin { Seed = Hash32.Tagged(seed, Hash32.Copy, 1u), Intensity = context.Intensity });
+            m_Rotation?.Begin(ref m_RotationStates[record], default, new MotionBegin { Seed = Hash32.Tagged(seed, Hash32.Copy, 1u), Intensity = context.Intensity, Endless = context.Endless });
             if (m_Held[record])
             {
                 // the pass's earlier occurrence hands its contributions over
@@ -290,9 +349,9 @@ namespace xpTURN.Feedback
         void Reach(int at, ValueSlot<Vector3, Vector3Ops> position, ValueSlot<Quaternion, QuaternionOps> rotation)
         {
             m_PositionSlots[at] = position;
-            m_PositionHandles[at] = position.Begin(ContributionKind.Offset, LayerSpace.Self);
+            m_PositionHandles[at] = position.Begin(ContributionKind.Offset, LayerSpace.Self, true);
             m_RotationSlots[at] = rotation;
-            m_RotationHandles[at] = rotation != null ? rotation.Begin(ContributionKind.Offset, LayerSpace.Local) : default;
+            m_RotationHandles[at] = rotation != null ? rotation.Begin(ContributionKind.Offset, LayerSpace.Local, true) : default;
         }
 
         // the Camera category's scale on both, read at each evaluation
@@ -312,6 +371,8 @@ namespace xpTURN.Feedback
                 turn = Quaternion.Euler(e.x, e.y, e.z);
             }
             int at = record * m_Max;
+            // the caps follow the Camera category whatever the item's — every shake on a slot sets the same
+            float camera = m_MaximumOffset > 0f || m_MaximumAngle > 0f ? m_Gate.Scale(FeedbackCategory.Camera) : 0f;
             for (int k = 0; k < n; k++)
             {
                 CameraShakeReceiver receiver = m_Receivers[at + k];
@@ -328,8 +389,14 @@ namespace xpTURN.Feedback
                 if (m_PositionSlots[at + k] == null)
                     continue;
                 m_PositionSlots[at + k].SetOffset(m_PositionHandles[at + k], in offset);
+                if (m_MaximumOffset > 0f)
+                    m_PositionSlots[at + k].SetLimit(m_MaximumOffset * camera);
                 if (m_RotationSlots[at + k] != null)
+                {
                     m_RotationSlots[at + k].SetOffset(m_RotationHandles[at + k], in turn);
+                    if (m_MaximumAngle > 0f)
+                        m_RotationSlots[at + k].SetLimit(m_MaximumAngle * camera);
+                }
             }
         }
 
@@ -383,5 +450,135 @@ namespace xpTURN.Feedback
         }
 
         internal override void Release() => ReleaseSlots();
+    }
+
+    // a trauma add — Camera/Trauma (the camera shake's targets: the main camera followed, a transform, a channel's receivers)
+    // and Transform/Trauma (a transform target's modes). Instant: the Set's start adds Amount × the intensity; backward it adds
+    // nothing, and no end takes a trauma back (it is the target's state, TraumaService). The prepare warms the target's cell,
+    // so a play adds without allocating — a main camera that changed, or a receiver met first, makes its cell at that add
+    internal sealed class TraumaBinding : ItemBinding
+    {
+        readonly TargetItem m_Item;
+        readonly bool m_CameraItem;
+        TraumaService m_Service;
+        Transform m_Target;
+        bool m_FollowsCamera;
+        Camera m_Camera;
+        bool m_OnChannel;
+        ChannelService m_Channels;
+        ChannelKey m_Key;
+        int m_Max;
+        Transform m_Owner;
+
+        internal TraumaBinding(TargetItem item)
+        {
+            m_Item = item;
+            m_CameraItem = item is CameraTraumaItem;
+        }
+
+        // observation
+        internal TraumaService Service => m_Service;
+        internal Transform Target => m_FollowsCamera ? (m_Camera != null ? m_Camera.transform : null) : m_Target;
+
+        float Amount => m_Item is CameraTraumaItem c ? c.m_Amount : ((TransformTraumaItem)m_Item).m_Amount;
+
+        TraumaKind Kind => m_CameraItem ? TraumaKind.Camera : TraumaKind.Object;
+
+        internal override bool IsAlive => m_OnChannel || m_FollowsCamera || m_Target != null;
+
+        internal override bool Prepare(in PrepareContext context)
+        {
+            FeedbackMotion motion = m_Item.m_Motion;
+            if (motion == null)
+                return Refuse("no motion");
+            if (!m_Item.Traits.Supports(motion.Kind))
+            {
+#if DEBUG
+                return Refuse("the target does not take " + motion.Kind);
+#else
+                return Refuse(null);
+#endif
+            }
+            m_Owner = context.Player != null ? context.Player.transform : null;
+            TargetRefMode mode = m_Item.m_Target.m_Mode;
+            if (m_CameraItem && mode == TargetRefMode.Channel)
+            {
+                m_Service = context.Context.Trauma;
+                m_OnChannel = true;
+                m_Channels = context.Context.Channels;
+                m_Key = new ChannelKey(in m_Item.m_Target.m_Channel);
+                m_Max = context.Context.Settings.ShakeReceiversPerPlay;
+                return true;
+            }
+            if (m_CameraItem && mode == TargetRefMode.MainCamera)
+            {
+                m_Service = context.Context.Trauma;
+                m_FollowsCamera = true;
+                m_Camera = Camera.main;
+                if (m_Camera != null)
+                    m_Service.Warm(m_Camera.transform, TraumaKind.Camera);
+                return true;
+            }
+            m_Target = TargetResolver.Find<Transform>(in m_Item.m_Target, in context, out TargetFailure failure);
+            if (m_Target == null)
+                return Refuse(TargetResolver.Describe(failure));
+            m_Service = context.Context.Trauma;
+            m_Service.Warm(m_Target, Kind);
+            return true;
+        }
+
+        internal override void Execute(int record, in BeginContext context)
+        {
+            if (context.Reverse)
+                return;
+            float amount = Amount * context.Intensity;
+            if (m_OnChannel)
+            {
+                AddToReceivers(amount, in context);
+                return;
+            }
+            if (m_FollowsCamera)
+            {
+                m_Camera = Camera.main;
+                if (m_Camera != null)
+                    m_Service.Add(m_Camera.transform, amount, TraumaKind.Camera);
+                return;
+            }
+            if (m_Target != null)
+                m_Service.Add(m_Target, amount, Kind);
+        }
+
+        // each receiver the channel reaches from the play's place — its Range, the settings' receivers per play
+        void AddToReceivers(float amount, in BeginContext context)
+        {
+            ReceiverList<CameraShakeReceiver> list = m_Channels.Shakes(in m_Key);
+            if (list == null)
+                return;
+            Vector3 from = context.HasPosition ? context.Position : (m_Owner != null ? m_Owner.position : Vector3.zero);
+            int reached = 0;
+            for (int i = 0; i < list.Count && reached < m_Max; i++)
+            {
+                CameraShakeReceiver receiver = list.Items[i];
+                if (receiver == null || !receiver.IsLive)
+                    continue;
+                float range = receiver.Range;
+                if (range > 0f && (receiver.Transform.position - from).sqrMagnitude > range * range)
+                    continue;
+                m_Service.Add(receiver.Transform, amount, TraumaKind.Camera);
+                reached++;
+            }
+        }
+
+        internal override void Begin(int record, in BeginContext context)
+        {
+        }
+
+        internal override void Evaluate(int record, in MotionTime time)
+        {
+        }
+
+        internal override void End(int record, EndReason reason)
+        {
+        }
     }
 }

@@ -77,8 +77,12 @@ namespace xpTURN.Feedback.Editor
         // a linked player's list — Copy only, no drag, the bodies and the switches off
         internal bool ReadOnly { get; }
 
-        // the fold key's object — the host, else the edited object (a preset)
-        internal Object FoldHost => m_Host != null ? m_Host : m_So.targetObject;
+        // the fold key's object — the host, else the edited object (a preset). A Variant's list shown by a player: the preset —
+        // its own inspector's folds, and a copied preset's ids apart
+        internal Object FoldHost => m_Host != null && !PreviewMasks.IsVariant(m_Host, m_So.targetObject) ? m_Host : m_So.targetObject;
+
+        // the list's owner — the player, its linked preset, a Variant, or the preset host
+        internal Object ListOwner => m_So.targetObject;
 
         internal int Count
         {
@@ -283,7 +287,7 @@ namespace xpTURN.Feedback.Editor
         internal void SetMask(int index, PreviewMask mask)
         {
             if (m_Host != null)
-                PreviewMasks.Set(m_Host, index, mask);
+                PreviewMasks.Set(m_Host, ListOwner, index, mask);
         }
     }
 }

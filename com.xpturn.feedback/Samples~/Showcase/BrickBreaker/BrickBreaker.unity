@@ -177,8 +177,10 @@ MonoBehaviour:
   m_Items:
   - rid: 1742887167292866776
   - rid: 1742887167292866778
+  - rid: 7216148963394322440
   - rid: 1742887167292866780
   - rid: 1742887167292866782
+  - rid: 7216148960718880834
   m_Preset: {fileID: 0}
   m_Anchors: []
   m_FormatVersion: 1
@@ -253,6 +255,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -482,6 +485,136 @@ MonoBehaviour:
         m_Params:
           m_Value: {x: 0, y: 0, z: 0, w: 0}
           m_Relative: 0
+    - rid: 7216148960718880834
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0.9, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148960718880835
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.7
+        m_Pitch: 1
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148960718880835
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+    - rid: 7216148963394322440
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0, y: 0.6}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148963394322441
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.35
+        m_Pitch: 1.6
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148963394322441
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
 --- !u!23 &52200971
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -639,6 +772,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 2
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds: []
@@ -801,6 +935,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 2
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds: []
@@ -818,6 +953,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: xpTURN.Feedback::xpTURN.Feedback.FeedbackPlayer
   m_Items:
   - rid: 1742887167292866816
+  - rid: 7216148960718880824
   m_Preset: {fileID: 0}
   m_Anchors: []
   m_FormatVersion: 1
@@ -892,6 +1028,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -949,6 +1086,71 @@ MonoBehaviour:
           m_Amplitude: {x: 0.35, y: 0, z: 0, w: 0}
           m_Vibrato: 1
           m_Decay: 1
+    - rid: 7216148960718880824
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 0
+          m_IntensityRange: {x: 0, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148960718880825
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 8a9ac3375b75a43eb8106763266a5d31, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.6
+        m_Pitch: 1
+        m_PitchRandom: 0.05
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 4
+    - rid: 7216148960718880825
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
 --- !u!1 &56589512
 GameObject:
   m_ObjectHideFlags: 0
@@ -15515,8 +15717,10 @@ MonoBehaviour:
   m_Items:
   - rid: 1742887167292866760
   - rid: 1742887167292866762
+  - rid: 7216148963394322444
   - rid: 1742887167292866764
   - rid: 1742887167292866766
+  - rid: 7216148960718880838
   m_Preset: {fileID: 0}
   m_Anchors: []
   m_FormatVersion: 1
@@ -15591,6 +15795,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -15815,6 +16020,136 @@ MonoBehaviour:
         m_DirectWrite: 0
         m_Count: 12
     - rid: 1742887167292866767
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+    - rid: 7216148960718880838
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0.9, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148960718880839
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.7
+        m_Pitch: 1
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148960718880839
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+    - rid: 7216148963394322444
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0, y: 0.6}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148963394322445
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.35
+        m_Pitch: 1.6
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148963394322445
       type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
       data:
         m_Params:
@@ -20874,6 +21209,9 @@ MonoBehaviour:
   m_Boom: {fileID: 1517936925}
   m_Banner: {fileID: 534048344}
   m_Cheer: {fileID: 52431980}
+  m_LostSound: {fileID: 1462735674}
+  m_BossHitSound: {fileID: 1022578913}
+  m_DefeatSound: {fileID: 1832671468}
   m_BossBar: {fileID: 355039746}
   m_BossBarRoot: {fileID: 355039742}
   m_ScoreText: {fileID: 826720934}
@@ -20894,7 +21232,10 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1462735675}
+  - {fileID: 1022578914}
+  - {fileID: 1832671469}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &208199087
@@ -20955,8 +21296,10 @@ MonoBehaviour:
   m_Items:
   - rid: 1742887167292866568
   - rid: 1742887167292866570
+  - rid: 7216148963394322492
   - rid: 1742887167292866572
   - rid: 1742887167292866574
+  - rid: 7216148960718880886
   m_Preset: {fileID: 0}
   m_Anchors: []
   m_FormatVersion: 1
@@ -21031,6 +21374,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -21260,6 +21604,136 @@ MonoBehaviour:
         m_Params:
           m_Value: {x: 0, y: 0, z: 0, w: 0}
           m_Relative: 0
+    - rid: 7216148960718880886
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0.9, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148960718880887
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.7
+        m_Pitch: 1
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148960718880887
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+    - rid: 7216148963394322492
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0, y: 0.6}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148963394322493
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.35
+        m_Pitch: 1.6
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148963394322493
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
 --- !u!23 &208199091
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -21416,8 +21890,10 @@ MonoBehaviour:
   m_Items:
   - rid: 1742887167292866720
   - rid: 1742887167292866722
+  - rid: 7216148963394322454
   - rid: 1742887167292866724
   - rid: 1742887167292866726
+  - rid: 7216148960718880848
   m_Preset: {fileID: 0}
   m_Anchors: []
   m_FormatVersion: 1
@@ -21492,6 +21968,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -21716,6 +22193,136 @@ MonoBehaviour:
         m_DirectWrite: 0
         m_Count: 12
     - rid: 1742887167292866727
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+    - rid: 7216148960718880848
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0.9, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148960718880849
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.7
+        m_Pitch: 1
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148960718880849
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+    - rid: 7216148963394322454
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0, y: 0.6}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148963394322455
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.35
+        m_Pitch: 1.6
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148963394322455
       type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
       data:
         m_Params:
@@ -31500,8 +32107,10 @@ MonoBehaviour:
   m_Items:
   - rid: 1742887167292866736
   - rid: 1742887167292866738
+  - rid: 7216148963394322450
   - rid: 1742887167292866740
   - rid: 1742887167292866742
+  - rid: 7216148960718880844
   m_Preset: {fileID: 0}
   m_Anchors: []
   m_FormatVersion: 1
@@ -31576,6 +32185,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -31800,6 +32410,136 @@ MonoBehaviour:
         m_DirectWrite: 0
         m_Count: 12
     - rid: 1742887167292866743
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+    - rid: 7216148960718880844
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0.9, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148960718880845
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.7
+        m_Pitch: 1
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148960718880845
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+    - rid: 7216148963394322450
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0, y: 0.6}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148963394322451
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.35
+        m_Pitch: 1.6
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148963394322451
       type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
       data:
         m_Params:
@@ -36962,8 +37702,10 @@ MonoBehaviour:
   m_Items:
   - rid: 1742887167292866560
   - rid: 1742887167292866562
+  - rid: 7216148963394322494
   - rid: 1742887167292866564
   - rid: 1742887167292866566
+  - rid: 7216148960718880888
   m_Preset: {fileID: 0}
   m_Anchors: []
   m_FormatVersion: 1
@@ -37038,6 +37780,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -37267,6 +38010,136 @@ MonoBehaviour:
         m_Params:
           m_Value: {x: 0, y: 0, z: 0, w: 0}
           m_Relative: 0
+    - rid: 7216148960718880888
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0.9, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148960718880889
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.7
+        m_Pitch: 1
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148960718880889
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+    - rid: 7216148963394322494
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0, y: 0.6}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148963394322495
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.35
+        m_Pitch: 1.6
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148963394322495
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
 --- !u!23 &486081569
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -37374,8 +38247,10 @@ MonoBehaviour:
   m_Items:
   - rid: 1742887167292866576
   - rid: 1742887167292866578
+  - rid: 7216148963394322490
   - rid: 1742887167292866580
   - rid: 1742887167292866582
+  - rid: 7216148960718880884
   m_Preset: {fileID: 0}
   m_Anchors: []
   m_FormatVersion: 1
@@ -37450,6 +38325,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -37674,6 +38550,136 @@ MonoBehaviour:
         m_DirectWrite: 0
         m_Count: 12
     - rid: 1742887167292866583
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+    - rid: 7216148960718880884
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0.9, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148960718880885
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.7
+        m_Pitch: 1
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148960718880885
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+    - rid: 7216148963394322490
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0, y: 0.6}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148963394322491
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.35
+        m_Pitch: 1.6
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148963394322491
       type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
       data:
         m_Params:
@@ -37912,6 +38918,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -38091,8 +39098,10 @@ MonoBehaviour:
   m_Items:
   - rid: 1742887167292866632
   - rid: 1742887167292866634
+  - rid: 7216148963394322476
   - rid: 1742887167292866636
   - rid: 1742887167292866638
+  - rid: 7216148960718880870
   m_Preset: {fileID: 0}
   m_Anchors: []
   m_FormatVersion: 1
@@ -38167,6 +39176,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -38396,6 +39406,136 @@ MonoBehaviour:
         m_Params:
           m_Value: {x: 0, y: 0, z: 0, w: 0}
           m_Relative: 0
+    - rid: 7216148960718880870
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0.9, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148960718880871
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.7
+        m_Pitch: 1
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148960718880871
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+    - rid: 7216148963394322476
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0, y: 0.6}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148963394322477
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.35
+        m_Pitch: 1.6
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148963394322477
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
 --- !u!23 &536463676
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -38503,8 +39643,10 @@ MonoBehaviour:
   m_Items:
   - rid: 1742887167292866656
   - rid: 1742887167292866658
+  - rid: 7216148963394322470
   - rid: 1742887167292866660
   - rid: 1742887167292866662
+  - rid: 7216148960718880864
   m_Preset: {fileID: 0}
   m_Anchors: []
   m_FormatVersion: 1
@@ -38579,6 +39721,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -38808,6 +39951,136 @@ MonoBehaviour:
         m_Params:
           m_Value: {x: 0, y: 0, z: 0, w: 0}
           m_Relative: 0
+    - rid: 7216148960718880864
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0.9, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148960718880865
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.7
+        m_Pitch: 1
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148960718880865
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+    - rid: 7216148963394322470
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0, y: 0.6}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148963394322471
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.35
+        m_Pitch: 1.6
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148963394322471
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
 --- !u!23 &539230626
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -39012,8 +40285,10 @@ MonoBehaviour:
   m_Items:
   - rid: 1742887167292866728
   - rid: 1742887167292866730
+  - rid: 7216148963394322452
   - rid: 1742887167292866732
   - rid: 1742887167292866734
+  - rid: 7216148960718880846
   m_Preset: {fileID: 0}
   m_Anchors: []
   m_FormatVersion: 1
@@ -39088,6 +40363,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -39312,6 +40588,136 @@ MonoBehaviour:
         m_DirectWrite: 0
         m_Count: 12
     - rid: 1742887167292866735
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+    - rid: 7216148960718880846
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0.9, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148960718880847
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.7
+        m_Pitch: 1
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148960718880847
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+    - rid: 7216148963394322452
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0, y: 0.6}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148963394322453
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.35
+        m_Pitch: 1.6
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148963394322453
       type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
       data:
         m_Params:
@@ -44350,8 +45756,10 @@ MonoBehaviour:
   m_Items:
   - rid: 1742887167292866648
   - rid: 1742887167292866650
+  - rid: 7216148963394322472
   - rid: 1742887167292866652
   - rid: 1742887167292866654
+  - rid: 7216148960718880866
   m_Preset: {fileID: 0}
   m_Anchors: []
   m_FormatVersion: 1
@@ -44426,6 +45834,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -44650,6 +46059,136 @@ MonoBehaviour:
         m_DirectWrite: 0
         m_Count: 12
     - rid: 1742887167292866655
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+    - rid: 7216148960718880866
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0.9, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148960718880867
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.7
+        m_Pitch: 1
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148960718880867
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+    - rid: 7216148963394322472
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0, y: 0.6}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148963394322473
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.35
+        m_Pitch: 1.6
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148963394322473
       type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
       data:
         m_Params:
@@ -59270,8 +60809,10 @@ MonoBehaviour:
   m_Items:
   - rid: 1742887167292866768
   - rid: 1742887167292866770
+  - rid: 7216148963394322442
   - rid: 1742887167292866772
   - rid: 1742887167292866774
+  - rid: 7216148960718880836
   m_Preset: {fileID: 0}
   m_Anchors: []
   m_FormatVersion: 1
@@ -59346,6 +60887,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -59575,6 +61117,136 @@ MonoBehaviour:
         m_Params:
           m_Value: {x: 0, y: 0, z: 0, w: 0}
           m_Relative: 0
+    - rid: 7216148960718880836
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0.9, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148960718880837
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.7
+        m_Pitch: 1
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148960718880837
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+    - rid: 7216148963394322442
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0, y: 0.6}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148963394322443
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.35
+        m_Pitch: 1.6
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148963394322443
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
 --- !u!23 &808566863
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -59793,6 +61465,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -64796,8 +66469,10 @@ MonoBehaviour:
   m_Items:
   - rid: 1742887167292866640
   - rid: 1742887167292866642
+  - rid: 7216148963394322474
   - rid: 1742887167292866644
   - rid: 1742887167292866646
+  - rid: 7216148960718880868
   m_Preset: {fileID: 0}
   m_Anchors: []
   m_FormatVersion: 1
@@ -64872,6 +66547,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -65096,6 +66772,136 @@ MonoBehaviour:
         m_DirectWrite: 0
         m_Count: 12
     - rid: 1742887167292866647
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+    - rid: 7216148960718880868
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0.9, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148960718880869
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.7
+        m_Pitch: 1
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148960718880869
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+    - rid: 7216148963394322474
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0, y: 0.6}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148963394322475
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.35
+        m_Pitch: 1.6
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148963394322475
       type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
       data:
         m_Params:
@@ -70202,8 +72008,10 @@ MonoBehaviour:
   m_Items:
   - rid: 1742887167292866608
   - rid: 1742887167292866610
+  - rid: 7216148963394322482
   - rid: 1742887167292866612
   - rid: 1742887167292866614
+  - rid: 7216148960718880876
   m_Preset: {fileID: 0}
   m_Anchors: []
   m_FormatVersion: 1
@@ -70278,6 +72086,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -70502,6 +72311,136 @@ MonoBehaviour:
         m_DirectWrite: 0
         m_Count: 12
     - rid: 1742887167292866615
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+    - rid: 7216148960718880876
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0.9, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148960718880877
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.7
+        m_Pitch: 1
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148960718880877
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+    - rid: 7216148963394322482
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0, y: 0.6}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148963394322483
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.35
+        m_Pitch: 1.6
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148963394322483
       type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
       data:
         m_Params:
@@ -89900,6 +91839,195 @@ ParticleSystem:
         m_PostInfinity: 2
         m_RotationOrder: 4
     vectorLabel1_3: W
+--- !u!1 &1022578912
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1022578914}
+  - component: {fileID: 1022578913}
+  m_Layer: 0
+  m_Name: Boss Hit Sound
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1022578913
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1022578912}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6dc1b1a00a6a44c3b159fc76ce605832, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: xpTURN.Feedback::xpTURN.Feedback.FeedbackPlayer
+  m_Items:
+  - rid: 7216148960718880820
+  m_Preset: {fileID: 0}
+  m_Anchors: []
+  m_FormatVersion: 1
+  m_Initialization: 1
+  m_Policy: 1
+  m_MaxOverlap: 4
+  m_DurationMultiplier: 1
+  m_StartDelay: 0
+  m_AutoPlay: 0
+  m_TimeMode: 0
+  m_Speed: 1
+  m_RandomizeDuration: 0
+  m_DurationRange: {x: 0.5, y: 2}
+  m_Cooldown: 0
+  m_Chance: 100
+  m_Intensity: 1
+  m_RemapIntensity: 0
+  m_IntensityRemap:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  m_UseDistanceGate: 0
+  m_GateReference: 0
+  m_GateAnchor: 
+  m_GateDistance: 5
+  m_UseGateFalloff: 0
+  m_GateFalloff:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: -1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: -1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  m_UnityEvents: []
+  m_Direction: 0
+  m_ApplyInitialState: 0
+  m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: 7216148960718880820
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 0
+          m_IntensityRange: {x: 0, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148960718880821
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 61e8b383f2f9a4b299320d71adbda5ff, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.9
+        m_Pitch: 1
+        m_PitchRandom: 0.05
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 2
+    - rid: 7216148960718880821
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+--- !u!4 &1022578914
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1022578912}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 190909523}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1026836618
 GameObject:
   m_ObjectHideFlags: 0
@@ -90048,8 +92176,10 @@ MonoBehaviour:
   m_Items:
   - rid: 1742887167292866688
   - rid: 1742887167292866690
+  - rid: 7216148963394322462
   - rid: 1742887167292866692
   - rid: 1742887167292866694
+  - rid: 7216148960718880856
   m_Preset: {fileID: 0}
   m_Anchors: []
   m_FormatVersion: 1
@@ -90124,6 +92254,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -90353,6 +92484,136 @@ MonoBehaviour:
         m_Params:
           m_Value: {x: 0, y: 0, z: 0, w: 0}
           m_Relative: 0
+    - rid: 7216148960718880856
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0.9, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148960718880857
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.7
+        m_Pitch: 1
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148960718880857
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+    - rid: 7216148963394322462
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0, y: 0.6}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148963394322463
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.35
+        m_Pitch: 1.6
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148963394322463
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
 --- !u!23 &1052406278
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -90460,8 +92721,10 @@ MonoBehaviour:
   m_Items:
   - rid: 1742887167292866704
   - rid: 1742887167292866706
+  - rid: 7216148963394322458
   - rid: 1742887167292866708
   - rid: 1742887167292866710
+  - rid: 7216148960718880852
   m_Preset: {fileID: 0}
   m_Anchors: []
   m_FormatVersion: 1
@@ -90536,6 +92799,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -90765,6 +93029,136 @@ MonoBehaviour:
         m_Params:
           m_Value: {x: 0, y: 0, z: 0, w: 0}
           m_Relative: 0
+    - rid: 7216148960718880852
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0.9, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148960718880853
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.7
+        m_Pitch: 1
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148960718880853
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+    - rid: 7216148963394322458
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0, y: 0.6}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148963394322459
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.35
+        m_Pitch: 1.6
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148963394322459
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
 --- !u!23 &1067026580
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -90872,8 +93266,10 @@ MonoBehaviour:
   m_Items:
   - rid: 1742887167292866792
   - rid: 1742887167292866794
+  - rid: 7216148963394322436
   - rid: 1742887167292866796
   - rid: 1742887167292866798
+  - rid: 7216148960718880830
   m_Preset: {fileID: 0}
   m_Anchors: []
   m_FormatVersion: 1
@@ -90948,6 +93344,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -91172,6 +93569,136 @@ MonoBehaviour:
         m_DirectWrite: 0
         m_Count: 12
     - rid: 1742887167292866799
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+    - rid: 7216148960718880830
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0.9, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148960718880831
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.7
+        m_Pitch: 1
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148960718880831
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+    - rid: 7216148963394322436
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0, y: 0.6}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148963394322437
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.35
+        m_Pitch: 1.6
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148963394322437
       type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
       data:
         m_Params:
@@ -96170,6 +98697,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 2
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -96456,8 +98984,10 @@ MonoBehaviour:
   m_Items:
   - rid: 1742887167292866696
   - rid: 1742887167292866698
+  - rid: 7216148963394322460
   - rid: 1742887167292866700
   - rid: 1742887167292866702
+  - rid: 7216148960718880854
   m_Preset: {fileID: 0}
   m_Anchors: []
   m_FormatVersion: 1
@@ -96532,6 +99062,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -96761,6 +99292,136 @@ MonoBehaviour:
         m_Params:
           m_Value: {x: 0, y: 0, z: 0, w: 0}
           m_Relative: 0
+    - rid: 7216148960718880854
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0.9, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148960718880855
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.7
+        m_Pitch: 1
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148960718880855
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+    - rid: 7216148963394322460
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0, y: 0.6}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148963394322461
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.35
+        m_Pitch: 1.6
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148963394322461
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
 --- !u!23 &1167927860
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -96958,8 +99619,10 @@ MonoBehaviour:
   m_Items:
   - rid: 1742887167292866744
   - rid: 1742887167292866746
+  - rid: 7216148963394322448
   - rid: 1742887167292866748
   - rid: 1742887167292866750
+  - rid: 7216148960718880842
   m_Preset: {fileID: 0}
   m_Anchors: []
   m_FormatVersion: 1
@@ -97034,6 +99697,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -97263,6 +99927,136 @@ MonoBehaviour:
         m_Params:
           m_Value: {x: 0, y: 0, z: 0, w: 0}
           m_Relative: 0
+    - rid: 7216148960718880842
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0.9, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148960718880843
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.7
+        m_Pitch: 1
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148960718880843
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+    - rid: 7216148963394322448
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0, y: 0.6}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148963394322449
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.35
+        m_Pitch: 1.6
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148963394322449
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
 --- !u!23 &1180164884
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -97370,8 +100164,10 @@ MonoBehaviour:
   m_Items:
   - rid: 1742887167292866712
   - rid: 1742887167292866714
+  - rid: 7216148963394322456
   - rid: 1742887167292866716
   - rid: 1742887167292866718
+  - rid: 7216148960718880850
   m_Preset: {fileID: 0}
   m_Anchors: []
   m_FormatVersion: 1
@@ -97446,6 +100242,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -97675,6 +100472,136 @@ MonoBehaviour:
         m_Params:
           m_Value: {x: 0, y: 0, z: 0, w: 0}
           m_Relative: 0
+    - rid: 7216148960718880850
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0.9, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148960718880851
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.7
+        m_Pitch: 1
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148960718880851
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+    - rid: 7216148963394322456
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0, y: 0.6}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148963394322457
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.35
+        m_Pitch: 1.6
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148963394322457
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
 --- !u!23 &1193191131
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -97782,8 +100709,10 @@ MonoBehaviour:
   m_Items:
   - rid: 1742887167292866592
   - rid: 1742887167292866594
+  - rid: 7216148963394322486
   - rid: 1742887167292866596
   - rid: 1742887167292866598
+  - rid: 7216148960718880880
   m_Preset: {fileID: 0}
   m_Anchors: []
   m_FormatVersion: 1
@@ -97858,6 +100787,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -98082,6 +101012,136 @@ MonoBehaviour:
         m_DirectWrite: 0
         m_Count: 12
     - rid: 1742887167292866599
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+    - rid: 7216148960718880880
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0.9, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148960718880881
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.7
+        m_Pitch: 1
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148960718880881
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+    - rid: 7216148963394322486
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0, y: 0.6}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148963394322487
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.35
+        m_Pitch: 1.6
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148963394322487
       type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
       data:
         m_Params:
@@ -112644,6 +115704,195 @@ ParticleSystem:
         m_PostInfinity: 2
         m_RotationOrder: 4
     vectorLabel1_3: W
+--- !u!1 &1462735673
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1462735675}
+  - component: {fileID: 1462735674}
+  m_Layer: 0
+  m_Name: Lost Sound
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1462735674
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1462735673}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6dc1b1a00a6a44c3b159fc76ce605832, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: xpTURN.Feedback::xpTURN.Feedback.FeedbackPlayer
+  m_Items:
+  - rid: 7216148960718880822
+  m_Preset: {fileID: 0}
+  m_Anchors: []
+  m_FormatVersion: 1
+  m_Initialization: 1
+  m_Policy: 1
+  m_MaxOverlap: 4
+  m_DurationMultiplier: 1
+  m_StartDelay: 0
+  m_AutoPlay: 0
+  m_TimeMode: 0
+  m_Speed: 1
+  m_RandomizeDuration: 0
+  m_DurationRange: {x: 0.5, y: 2}
+  m_Cooldown: 0
+  m_Chance: 100
+  m_Intensity: 1
+  m_RemapIntensity: 0
+  m_IntensityRemap:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  m_UseDistanceGate: 0
+  m_GateReference: 0
+  m_GateAnchor: 
+  m_GateDistance: 5
+  m_UseGateFalloff: 0
+  m_GateFalloff:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: -1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: -1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  m_UnityEvents: []
+  m_Direction: 0
+  m_ApplyInitialState: 0
+  m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: 7216148960718880822
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 0
+          m_IntensityRange: {x: 0, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148960718880823
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 1dfcd408c82514760bd6f2bb874f40e6, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.8
+        m_Pitch: 1
+        m_PitchRandom: 0
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 2
+    - rid: 7216148960718880823
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+--- !u!4 &1462735675
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1462735673}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 190909523}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1477495152
 GameObject:
   m_ObjectHideFlags: 0
@@ -122374,8 +125623,10 @@ MonoBehaviour:
   m_Items:
   - rid: 1742887167292866672
   - rid: 1742887167292866674
+  - rid: 7216148963394322466
   - rid: 1742887167292866676
   - rid: 1742887167292866678
+  - rid: 7216148960718880860
   m_Preset: {fileID: 0}
   m_Anchors: []
   m_FormatVersion: 1
@@ -122450,6 +125701,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -122679,6 +125931,136 @@ MonoBehaviour:
         m_Params:
           m_Value: {x: 0, y: 0, z: 0, w: 0}
           m_Relative: 0
+    - rid: 7216148960718880860
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0.9, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148960718880861
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.7
+        m_Pitch: 1
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148960718880861
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+    - rid: 7216148963394322466
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0, y: 0.6}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148963394322467
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.35
+        m_Pitch: 1.6
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148963394322467
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
 --- !u!23 &1489505803
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -122786,8 +126168,10 @@ MonoBehaviour:
   m_Items:
   - rid: 1742887167292866624
   - rid: 1742887167292866626
+  - rid: 7216148963394322478
   - rid: 1742887167292866628
   - rid: 1742887167292866630
+  - rid: 7216148960718880872
   m_Preset: {fileID: 0}
   m_Anchors: []
   m_FormatVersion: 1
@@ -122862,6 +126246,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -123091,6 +126476,136 @@ MonoBehaviour:
         m_Params:
           m_Value: {x: 0, y: 0, z: 0, w: 0}
           m_Relative: 0
+    - rid: 7216148960718880872
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0.9, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148960718880873
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.7
+        m_Pitch: 1
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148960718880873
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+    - rid: 7216148963394322478
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0, y: 0.6}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148963394322479
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.35
+        m_Pitch: 1.6
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148963394322479
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
 --- !u!23 &1500330498
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -123282,6 +126797,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 2
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds: []
@@ -123376,6 +126892,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 2
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -123752,6 +127269,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 2
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -123890,6 +127408,9 @@ MonoBehaviour:
           m_Frequency: 1.6
           m_Waveform: 0
           m_Phase: 0
+          m_PerAxis: 0
+          m_AxisPhase: {x: 0, y: 0, z: 0, w: 0}
+          m_AxisFrequency: {x: 1, y: 1, z: 1, w: 1}
 --- !u!114 &1517936928
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -123977,6 +127498,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 2
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds: []
@@ -124071,6 +127593,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 2
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -124576,6 +128099,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -124743,8 +128267,10 @@ MonoBehaviour:
   m_Items:
   - rid: 1742887167292866784
   - rid: 1742887167292866786
+  - rid: 7216148963394322438
   - rid: 1742887167292866788
   - rid: 1742887167292866790
+  - rid: 7216148960718880832
   m_Preset: {fileID: 0}
   m_Anchors: []
   m_FormatVersion: 1
@@ -124819,6 +128345,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -125048,6 +128575,136 @@ MonoBehaviour:
         m_Params:
           m_Value: {x: 0, y: 0, z: 0, w: 0}
           m_Relative: 0
+    - rid: 7216148960718880832
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0.9, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148960718880833
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.7
+        m_Pitch: 1
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148960718880833
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+    - rid: 7216148963394322438
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0, y: 0.6}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148963394322439
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.35
+        m_Pitch: 1.6
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148963394322439
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
 --- !u!23 &1544534694
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -125234,8 +128891,10 @@ MonoBehaviour:
   m_Items:
   - rid: 1742887167292866680
   - rid: 1742887167292866682
+  - rid: 7216148963394322464
   - rid: 1742887167292866684
   - rid: 1742887167292866686
+  - rid: 7216148960718880858
   m_Preset: {fileID: 0}
   m_Anchors: []
   m_FormatVersion: 1
@@ -125310,6 +128969,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -125534,6 +129194,136 @@ MonoBehaviour:
         m_DirectWrite: 0
         m_Count: 12
     - rid: 1742887167292866687
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+    - rid: 7216148960718880858
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0.9, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148960718880859
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.7
+        m_Pitch: 1
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148960718880859
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+    - rid: 7216148963394322464
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0, y: 0.6}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148963394322465
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.35
+        m_Pitch: 1.6
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148963394322465
       type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
       data:
         m_Params:
@@ -135455,8 +139245,10 @@ MonoBehaviour:
   m_Items:
   - rid: 1742887167292866800
   - rid: 1742887167292866802
+  - rid: 7216148963394322434
   - rid: 1742887167292866804
   - rid: 1742887167292866806
+  - rid: 7216148960718880828
   m_Preset: {fileID: 0}
   m_Anchors: []
   m_FormatVersion: 1
@@ -135531,6 +139323,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -135755,6 +139548,136 @@ MonoBehaviour:
         m_DirectWrite: 0
         m_Count: 12
     - rid: 1742887167292866807
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+    - rid: 7216148960718880828
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0.9, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148960718880829
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.7
+        m_Pitch: 1
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148960718880829
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+    - rid: 7216148963394322434
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0, y: 0.6}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148963394322435
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.35
+        m_Pitch: 1.6
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148963394322435
       type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
       data:
         m_Params:
@@ -136040,8 +139963,10 @@ MonoBehaviour:
   m_Items:
   - rid: 1742887167292866808
   - rid: 1742887167292866810
+  - rid: 7216148963394322432
   - rid: 1742887167292866812
   - rid: 1742887167292866814
+  - rid: 7216148960718880826
   m_Preset: {fileID: 0}
   m_Anchors: []
   m_FormatVersion: 1
@@ -136116,6 +140041,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -136345,6 +140271,136 @@ MonoBehaviour:
         m_Params:
           m_Value: {x: 0, y: 0, z: 0, w: 0}
           m_Relative: 0
+    - rid: 7216148960718880826
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0.9, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148960718880827
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.7
+        m_Pitch: 1
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148960718880827
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+    - rid: 7216148963394322432
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0, y: 0.6}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148963394322433
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.35
+        m_Pitch: 1.6
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148963394322433
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
 --- !u!4 &1765374687
 Transform:
   m_ObjectHideFlags: 0
@@ -136476,8 +140532,10 @@ MonoBehaviour:
   m_Items:
   - rid: 1742887167292866600
   - rid: 1742887167292866602
+  - rid: 7216148963394322484
   - rid: 1742887167292866604
   - rid: 1742887167292866606
+  - rid: 7216148960718880878
   m_Preset: {fileID: 0}
   m_Anchors: []
   m_FormatVersion: 1
@@ -136552,6 +140610,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -136781,6 +140840,136 @@ MonoBehaviour:
         m_Params:
           m_Value: {x: 0, y: 0, z: 0, w: 0}
           m_Relative: 0
+    - rid: 7216148960718880878
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0.9, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148960718880879
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.7
+        m_Pitch: 1
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148960718880879
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+    - rid: 7216148963394322484
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0, y: 0.6}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148963394322485
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.35
+        m_Pitch: 1.6
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148963394322485
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
 --- !u!23 &1791093600
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -136905,6 +141094,195 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1830416790}
   m_CullTransparentMesh: 1
+--- !u!1 &1832671467
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1832671469}
+  - component: {fileID: 1832671468}
+  m_Layer: 0
+  m_Name: Defeat Sound
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1832671468
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1832671467}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6dc1b1a00a6a44c3b159fc76ce605832, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: xpTURN.Feedback::xpTURN.Feedback.FeedbackPlayer
+  m_Items:
+  - rid: 7216148960718880818
+  m_Preset: {fileID: 0}
+  m_Anchors: []
+  m_FormatVersion: 1
+  m_Initialization: 1
+  m_Policy: 1
+  m_MaxOverlap: 4
+  m_DurationMultiplier: 1
+  m_StartDelay: 0
+  m_AutoPlay: 0
+  m_TimeMode: 0
+  m_Speed: 1
+  m_RandomizeDuration: 0
+  m_DurationRange: {x: 0.5, y: 2}
+  m_Cooldown: 0
+  m_Chance: 100
+  m_Intensity: 1
+  m_RemapIntensity: 0
+  m_IntensityRemap:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  m_UseDistanceGate: 0
+  m_GateReference: 0
+  m_GateAnchor: 
+  m_GateDistance: 5
+  m_UseGateFalloff: 0
+  m_GateFalloff:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: -1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: -1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  m_UnityEvents: []
+  m_Direction: 0
+  m_ApplyInitialState: 0
+  m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: 7216148960718880818
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 0
+          m_IntensityRange: {x: 0, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148960718880819
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: f7daf7e307a164590bc201e54d83a28a, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 1
+        m_Pitch: 1
+        m_PitchRandom: 0
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 2
+    - rid: 7216148960718880819
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+--- !u!4 &1832671469
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1832671467}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 190909523}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1835842998
 GameObject:
   m_ObjectHideFlags: 0
@@ -141874,8 +146252,10 @@ MonoBehaviour:
   m_Items:
   - rid: 1742887167292866616
   - rid: 1742887167292866618
+  - rid: 7216148963394322480
   - rid: 1742887167292866620
   - rid: 1742887167292866622
+  - rid: 7216148960718880874
   m_Preset: {fileID: 0}
   m_Anchors: []
   m_FormatVersion: 1
@@ -141950,6 +146330,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -142179,6 +146560,136 @@ MonoBehaviour:
         m_Params:
           m_Value: {x: 0, y: 0, z: 0, w: 0}
           m_Relative: 0
+    - rid: 7216148960718880874
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0.9, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148960718880875
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.7
+        m_Pitch: 1
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148960718880875
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+    - rid: 7216148963394322480
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0, y: 0.6}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148963394322481
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.35
+        m_Pitch: 1.6
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148963394322481
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
 --- !u!23 &1884097063
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -142286,8 +146797,10 @@ MonoBehaviour:
   m_Items:
   - rid: 1742887167292866584
   - rid: 1742887167292866586
+  - rid: 7216148963394322488
   - rid: 1742887167292866588
   - rid: 1742887167292866590
+  - rid: 7216148960718880882
   m_Preset: {fileID: 0}
   m_Anchors: []
   m_FormatVersion: 1
@@ -142362,6 +146875,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -142586,6 +147100,136 @@ MonoBehaviour:
         m_DirectWrite: 0
         m_Count: 12
     - rid: 1742887167292866591
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+    - rid: 7216148960718880882
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0.9, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148960718880883
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.7
+        m_Pitch: 1
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148960718880883
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+    - rid: 7216148963394322488
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0, y: 0.6}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148963394322489
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.35
+        m_Pitch: 1.6
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148963394322489
       type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
       data:
         m_Params:
@@ -157313,8 +161957,10 @@ MonoBehaviour:
   m_Items:
   - rid: 1742887167292866664
   - rid: 1742887167292866666
+  - rid: 7216148963394322468
   - rid: 1742887167292866668
   - rid: 1742887167292866670
+  - rid: 7216148960718880862
   m_Preset: {fileID: 0}
   m_Anchors: []
   m_FormatVersion: 1
@@ -157389,6 +162035,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -157613,6 +162260,136 @@ MonoBehaviour:
         m_DirectWrite: 0
         m_Count: 12
     - rid: 1742887167292866671
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+    - rid: 7216148960718880862
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0.9, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148960718880863
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.7
+        m_Pitch: 1
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148960718880863
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+    - rid: 7216148963394322468
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0, y: 0.6}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148963394322469
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.35
+        m_Pitch: 1.6
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148963394322469
       type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
       data:
         m_Params:
@@ -172312,8 +177089,10 @@ MonoBehaviour:
   m_Items:
   - rid: 1742887167292866752
   - rid: 1742887167292866754
+  - rid: 7216148963394322446
   - rid: 1742887167292866756
   - rid: 1742887167292866758
+  - rid: 7216148960718880840
   m_Preset: {fileID: 0}
   m_Anchors: []
   m_FormatVersion: 1
@@ -172388,6 +177167,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -172612,6 +177392,136 @@ MonoBehaviour:
         m_DirectWrite: 0
         m_Count: 12
     - rid: 1742887167292866759
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+    - rid: 7216148960718880840
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0.9, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148960718880841
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.7
+        m_Pitch: 1
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148960718880841
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+    - rid: 7216148963394322446
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 1
+          m_IntensityRange: {x: 0, y: 0.6}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148963394322447
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 7761155c4a78d4c6d8770f1c015db07f, type: 3}
+        m_Output: {fileID: 0}
+        m_Volume: 0.35
+        m_Pitch: 1.6
+        m_PitchRandom: 0.1
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 64
+    - rid: 7216148963394322447
       type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
       data:
         m_Params:

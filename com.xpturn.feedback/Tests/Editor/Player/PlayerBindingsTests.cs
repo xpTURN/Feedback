@@ -1202,5 +1202,65 @@ namespace xpTURN.Feedback.Tests.Editor
             Check(Skipped().Count == 5, "after the Rebuild " + Skipped().Count);
             Done();
         }
+
+        // ---- the envelope on an endless item
+
+        static OscillateMotion FadeSquare(Vector4 a) => new OscillateMotion { m_Params = new OscillateParams { m_Amplitude = a, m_Frequency = 1f, m_Waveform = Waveform.Square, m_FadeIn = 0.5f } };
+        static ShakeMotion FadeJitter(Vector4 a) => new ShakeMotion { m_Params = new ShakeParams { m_Amplitude = a, m_Frequency = 10f, m_Noise = ShakeNoise.Jitter, m_FadeIn = 0.5f } };
+
+        // Fade In 0.5 — the first frame of a finite item is exactly the base, of an endless one (the infinite flag) not: a Square
+        // from phase 0 and a Jitter shake are not 0 at 0 s, where a Sine and a Smooth shake are. Each family that starts a fade
+        // motion: a position, a Float Event, an extension target, a camera shake's position and its rotation copy
+        [Test]
+        public void NE19_AnEndlessItemTakesNoFade()
+        {
+            foreach (bool endless in new[] { false, true })
+            {
+                string at = endless ? "endless" : "finite";
+                FeedbackScheduler s = Sched();
+                GameObject moved = Go("moved");
+                var position = Item<PositionItem>(FadeSquare(new Vector4(1f, 2f, 3f, 0f)), Direct(moved.transform));
+                var values = new List<float>();
+                var floatEvent = new CustomFloatEventItem { m_Motion = FadeSquare(new Vector4(2f, 0f, 0f, 0f)) };
+                floatEvent.m_Event.AddListener(values.Add);
+                xpTURN.Feedback.Tests.Extension.ProbeLog.Clear();
+                var probe = new xpTURN.Feedback.Tests.Extension.ProbeValue { m_Motion = FadeSquare(new Vector4(3f, 0f, 0f, 0f)) };
+                GameObject cam = MainCam("cam " + at);
+                var shake = new CameraShakeItem { m_Motion = FadeJitter(new Vector4(1f, 1f, 0f, 0f)), m_RotationAmplitude = new Vector3(5f, 5f, 0f) };
+                foreach (TargetItem item in new TargetItem[] { position, floatEvent, probe, shake })
+                {
+                    item.m_Timing.m_Duration = 1f;
+                    item.m_Timing.m_Infinite = endless;
+                }
+                FeedbackPlayer p = PlayerOn(Go("owner " + at), s, position, floatEvent, probe, shake);
+                p.Play();
+                // the Play's t = 0 calls the Float Event and the extension target; a slot written first from the next frame,
+                // which a zero step keeps at t = 0
+                s.Tick(0f);
+                Vector3 pos = moved.transform.localPosition;
+                List<float> probed = xpTURN.Feedback.Tests.Extension.ProbeLog.Values;
+                Vector3 camPos = cam.transform.localPosition;
+                Quaternion camRot = cam.transform.localRotation;
+                Check(values.Count > 0 && probed.Count > 0, at + " — the Float Event and the extension target were called: " + values.Count + " · " + probed.Count);
+                if (endless)
+                {
+                    Check(Bits(pos, new Vector3(1f, 2f, 3f)), at + " position " + F(pos));
+                    Check(values.Count > 0 && values[0] == 2f, at + " Float Event " + (values.Count > 0 ? F(values[0]) : "-"));
+                    Check(probed.Count > 0 && probed[0] == 3f, at + " extension target " + (probed.Count > 0 ? F(probed[0]) : "-"));
+                    Check(camPos != Vector3.zero, at + " camera position " + F(camPos));
+                    Check(Quaternion.Angle(camRot, Quaternion.identity) > 0.01f, at + " camera rotation " + camRot.eulerAngles);
+                }
+                else
+                {
+                    Check(Bits(pos, Vector3.zero), at + " position " + F(pos));
+                    Check(values.Count > 0 && values[0] == 0f, at + " Float Event " + (values.Count > 0 ? F(values[0]) : "-"));
+                    Check(probed.Count > 0 && probed[0] == 0f, at + " extension target " + (probed.Count > 0 ? F(probed[0]) : "-"));
+                    Check(camPos.x == 0f && camPos.y == 0f && camPos.z == 0f, at + " camera position " + F(camPos));
+                    Check(Quaternion.Angle(camRot, Quaternion.identity) == 0f, at + " camera rotation " + camRot.eulerAngles);
+                }
+                Clean();
+            }
+            Done();
+        }
     }
 }

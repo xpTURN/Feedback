@@ -12,7 +12,8 @@ namespace xpTURN.Feedback.Samples.Showcase
     // list (crack · break by intensity range), one Impact a frame whose intensity is the combo tier (its hit stops and rumble by
     // range), the score and combo labels, a floating +score (TMP, when its resources are there), the boss's entrance, hits, rage
     // pulse and defeat. Before plays the same game with no feedback: every play is gated, the bar and the banner reach their end
-    // states without a motion
+    // states without a motion. A lost ball, a boss hit and the defeat play a sound player beside their own (those link a preset,
+    // and the defeat's body hides before its sound ends)
     public sealed class BrickBreakerLab : MonoBehaviour
     {
         public enum Phase { Serve, Play, BossIntro, Boss, Clear, GameOver }
@@ -47,6 +48,9 @@ namespace xpTURN.Feedback.Samples.Showcase
         [SerializeField] FeedbackPlayer m_Boom;
         [SerializeField] FeedbackPlayer m_Banner;
         [SerializeField] FeedbackPlayer m_Cheer;
+        [SerializeField] FeedbackPlayer m_LostSound;
+        [SerializeField] FeedbackPlayer m_BossHitSound;
+        [SerializeField] FeedbackPlayer m_DefeatSound;
         [SerializeField] ProgressBar m_BossBar;
         [SerializeField] GameObject m_BossBarRoot;
         [SerializeField] Text m_ScoreText;
@@ -353,6 +357,7 @@ namespace xpTURN.Feedback.Samples.Showcase
                     break;
                 case BrickBoard.Kind.BossHit:
                     Play(m_BossHit, 1f);
+                    Play(m_BossHitSound, 1f);
                     Bar((float)m_Board.BossHp / BrickBoard.BossHealth);
                     Count(BossPoints, e.At, false);
                     break;
@@ -364,6 +369,7 @@ namespace xpTURN.Feedback.Samples.Showcase
                         m_BossRage.Stop(StopMode.Revert);
                     Play(m_BossDefeat, 1f);
                     Play(m_Boom, 1f);
+                    Play(m_DefeatSound, 1f);
                     m_Phase = Phase.Clear;
                     m_BossHideAt = BossHideDelay;
                     m_CheerAt = CheerDelay;
@@ -371,6 +377,7 @@ namespace xpTURN.Feedback.Samples.Showcase
                 case BrickBoard.Kind.Lost:
                     m_Combo = m_Tier = 0;
                     Play(m_LifeLost, 1f);
+                    Play(m_LostSound, 1f);
                     m_FrameTier = Mathf.Max(m_FrameTier, 0);
                     m_Lives = Mathf.Max(0, m_Lives - 1);
                     if (m_Lives == 0)

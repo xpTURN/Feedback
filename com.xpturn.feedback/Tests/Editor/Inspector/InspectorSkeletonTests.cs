@@ -62,6 +62,7 @@ namespace xpTURN.Feedback.Tests.Editor
                 case MotionKind.Oscillate: return new OscillateMotion();
                 case MotionKind.Blink: return new BlinkMotion();
                 case MotionKind.Wiggle: return new WiggleMotion();
+                case MotionKind.Bounce: return new BounceMotion();
                 default: return new SpringMotion();
             }
         }
@@ -229,7 +230,7 @@ namespace xpTURN.Feedback.Tests.Editor
             Assert.That(counts[0], Is.GreaterThan(0));
             Assert.That(counts[1], Is.EqualTo(0));
             Assert.That(counts[2], Is.EqualTo(2));
-            Assert.That(full.m_Items.Count, Is.EqualTo(157));
+            Assert.That(full.m_Items.Count, Is.EqualTo(173));
             Assert.That(m_Errors, Is.Empty);
         }
 
@@ -243,8 +244,11 @@ namespace xpTURN.Feedback.Tests.Editor
             VisualElement settings = inspector.Q(className: "xpturn-feedback-settings");
             Assert.That(settings, Is.Not.Null, "a settings view");
             var bound = new HashSet<string>(settings.Query<PropertyField>().ToList().Select(f => f.bindingPath));
-            // the UnityEvents are a row per kind
+            // the UnityEvents are a row per kind · the Audio Output an AudioMixerGroup field (where the Audio module is on)
             bound.UnionWith(settings.Query<UnityEventListField>().ToList().Select(f => f.Path));
+            bound.UnionWith(settings.Query<ObjectField>().ToList().Select(f => f.bindingPath).Where(b => b == "m_AudioOutput"));
+            if (!OptionalAssemblyTests.Implemented(typeof(AudioPlayAtPointItem)))
+                bound.Add("m_AudioOutput");
             var so = new SerializedObject(p);
             SerializedProperty it = so.GetIterator();
             var missing = new List<string>();
@@ -252,8 +256,8 @@ namespace xpTURN.Feedback.Tests.Editor
             while (it.NextVisible(enter))
             {
                 enter = false;
-                // the link field binds m_Preset above the list
-                if (it.name != "m_Script" && it.name != "m_Items" && it.name != "m_FormatVersion" && it.name != "m_Preset" && !bound.Contains(it.propertyPath))
+                // the link field binds m_Preset above the list, the Variants their own list there
+                if (it.name != "m_Script" && it.name != "m_Items" && it.name != "m_FormatVersion" && it.name != "m_Preset" && it.name != "m_Variants" && it.name != "m_ListAlias" && !bound.Contains(it.propertyPath))
                     missing.Add(it.name);
             }
             Assert.That(missing, Is.Empty);
@@ -445,6 +449,104 @@ namespace xpTURN.Feedback.Tests.Editor
             Assert.That(((SetMotion)((SetActiveItem)p.m_Items[2]).m_Motion).m_Params.m_Value.x, Is.EqualTo(1f));
             Assert.That(rows[2].Body.Query<PropertyField>().ToList().Any(f => f.label == "Toggle"), Is.True, "SetActive's Relative is a toggle");
             Assert.That(((TweenMotion)((LightIntensityItem)p.m_Items[0]).m_Motion).m_Params.m_To, Is.EqualTo(new Vector4(2, 7, 7, 7)), "the hidden components untouched");
+        }
+
+        // an Oscillate's Per Axis — on a target of more than one component, its two fields while it is on, plain numbers on a
+        // color target (X · Y · Z · W); switching it builds the body again
+        [UnityTest]
+        public IEnumerator IX06c_PerAxisShowsItsFieldsOnVectorAndColorTargets()
+        {
+            const string PerAxis = "m_Motion.m_Params.m_PerAxis", Phase = "m_Motion.m_Params.m_AxisPhase", Frequency = "m_Motion.m_Params.m_AxisFrequency";
+            OscillateMotion Oscillate(bool on)
+            {
+                var m = new OscillateMotion();
+                m.m_Params.m_PerAxis = on;
+                return m;
+            }
+            var position = InspectorTesting.Item<PositionItem>(Oscillate(false), 1f);
+            var color = InspectorTesting.Item<MaterialColorItem>(Oscillate(true), 1f);
+            var light = InspectorTesting.Item<LightIntensityItem>(Oscillate(true), 1f);
+            FeedbackPlayer p = Player("PerAxis", position, color, light);
+            InspectorElement inspector = InspectorTesting.Inspector(m_Window, p);
+            yield return InspectorTesting.Wait(0.2);
+            foreach (ItemElement row in InspectorTesting.Rows(inspector))
+                row.Header.Fold.value = true;
+            yield return InspectorTesting.Wait(0.2);
+            List<ItemElement> rows = InspectorTesting.Rows(inspector).OrderBy(r => r.Index).ToList();
+            (bool, bool, bool) Shown(ItemElement row) => (row.Body.Fields.Contains(PerAxis), row.Body.Fields.Contains(Phase), row.Body.Fields.Contains(Frequency));
+            Assert.That(Shown(rows[0]), Is.EqualTo((true, false, false)), "a vector target, Per Axis off");
+            Assert.That(Shown(rows[1]), Is.EqualTo((true, true, true)), "a color target, Per Axis on");
+            Assert.That(Shown(rows[2]), Is.EqualTo((false, false, false)), "a float target");
+            List<ValueField> colorValues = rows[1].Body.Query<ValueField>().ToList();
+            Assert.That(colorValues.Select(v => v.ColorInput != null), Is.EqualTo(new[] { true, false, false }), "the amplitude a color, the two numbers");
+            foreach (ValueField v in colorValues.Skip(1))
+                Assert.That(v.Query<FloatField>().ToList().Select(f => f.label), Is.EqualTo(new[] { "X", "Y", "Z", "W" }));
+
+            var so = new SerializedObject(p);
+            so.FindProperty("m_Items").GetArrayElementAtIndex(0).FindPropertyRelative(PerAxis).boolValue = true;
+            so.ApplyModifiedProperties();
+            yield return InspectorTesting.Wait(0.5);
+            rows = InspectorTesting.Rows(inspector).OrderBy(r => r.Index).ToList();
+            Assert.That(Shown(rows[0]), Is.EqualTo((true, true, true)), "switched on, the body built again");
+            Assert.That(rows[0].Body.Query<ValueField>().ToList().Skip(1).Select(v => v.Query<FloatField>().ToList().Count), Is.EqualTo(new[] { 3, 3 }), "a position's three components");
+            so.FindProperty("m_Items").GetArrayElementAtIndex(0).FindPropertyRelative(PerAxis).boolValue = false;
+            so.ApplyModifiedProperties();
+            yield return InspectorTesting.Wait(0.5);
+            rows = InspectorTesting.Rows(inspector).OrderBy(r => r.Index).ToList();
+            Assert.That(Shown(rows[0]), Is.EqualTo((true, false, false)), "switched off");
+        }
+
+        // the fade motions' envelope — Oscillate and Wiggle take Fade In · Fade Out · Fade Ease, a Shake Fade In · Fade Ease —
+        // last of the motion's fields; the two shares are 0 ~ 1 sliders, the ease an ease field
+        [UnityTest]
+        public IEnumerator IX06d_TheFadeFieldsComeLast()
+        {
+            FeedbackPlayer p = Player("Fade", InspectorTesting.Item<PositionItem>(new OscillateMotion(), 1f), InspectorTesting.Item<PositionItem>(new WiggleMotion(), 1f),
+                InspectorTesting.Item<PositionItem>(new ShakeMotion(), 1f));
+            InspectorElement inspector = InspectorTesting.Inspector(m_Window, p);
+            yield return InspectorTesting.Wait(0.2);
+            foreach (ItemElement row in InspectorTesting.Rows(inspector))
+                row.Header.Fold.value = true;
+            yield return InspectorTesting.Wait(0.2);
+            List<ItemElement> rows = InspectorTesting.Rows(inspector).OrderBy(r => r.Index).ToList();
+            const string Params = "m_Motion.m_Params.";
+            List<string> Motion(ItemElement row) => row.Body.Fields.Where(f => f.StartsWith(Params, StringComparison.Ordinal)).Select(f => f.Substring(Params.Length)).ToList();
+            Assert.That(Motion(rows[0]), Is.EqualTo(new[] { "m_Amplitude", "m_Frequency", "m_Waveform", "m_Phase", "m_PerAxis", "m_FadeIn", "m_FadeOut", "m_FadeEase" }), "Oscillate");
+            Assert.That(Motion(rows[1]), Is.EqualTo(new[] { "m_Amplitude", "m_Frequency", "m_Octaves", "m_FadeIn", "m_FadeOut", "m_FadeEase" }), "Wiggle");
+            Assert.That(Motion(rows[2]), Is.EqualTo(new[] { "m_Amplitude", "m_Frequency", "m_Noise", "m_Falloff", "m_FadeIn", "m_FadeEase" }), "Shake — no Fade Out");
+            for (int i = 0; i < 3; i++)
+            {
+                List<PropertyField> shares = rows[i].Body.Query<PropertyField>().ToList().Where(f => f.label == "Fade In" || f.label == "Fade Out").ToList();
+                Assert.That(shares.Select(f => f.label), Is.EqualTo(i == 2 ? new[] { "Fade In" } : new[] { "Fade In", "Fade Out" }), $"row {i} the shares");
+                foreach (PropertyField f in shares)
+                {
+                    Slider slider = f.Q<Slider>();
+                    Assert.That(slider != null && slider.lowValue == 0f && slider.highValue == 1f, Is.True, $"row {i} {f.label} a 0 ~ 1 slider");
+                }
+                Assert.That(rows[i].Body.Query<EaseField>().ToList().Any(e => e.Q<Label>()?.text == "Fade Ease"), Is.True, $"row {i} the Fade Ease");
+            }
+        }
+
+        // Bounce's body — the amplitude, a 1 ~ 10 whole-number slider and a 0.05 ~ 1 slider; the helper makes every kind
+        [UnityTest]
+        public IEnumerator IX06e_TheBounceFields()
+        {
+            foreach (MotionKind k in Enum.GetValues(typeof(MotionKind)))
+                Assert.That(InspectorTesting.Motion(k).Kind, Is.EqualTo(k), $"the helper's {k}");
+            FeedbackPlayer p = Player("Bounce", InspectorTesting.Item<PositionItem>(new BounceMotion(), 1f));
+            InspectorElement inspector = InspectorTesting.Inspector(m_Window, p);
+            yield return InspectorTesting.Wait(0.2);
+            foreach (ItemElement row in InspectorTesting.Rows(inspector))
+                row.Header.Fold.value = true;
+            yield return InspectorTesting.Wait(0.2);
+            ItemElement bounce = InspectorTesting.Rows(inspector).Single();
+            const string Params = "m_Motion.m_Params.";
+            Assert.That(bounce.Body.Fields.Where(f => f.StartsWith(Params, StringComparison.Ordinal)).Select(f => f.Substring(Params.Length)), Is.EqualTo(new[] { "m_Amplitude", "m_Count", "m_Restitution" }));
+            List<PropertyField> fields = bounce.Body.Query<PropertyField>().ToList();
+            SliderInt count = fields.Single(f => f.label == "Count").Q<SliderInt>();
+            Assert.That(count != null && count.lowValue == 1 && count.highValue == 10, Is.True, "Count — a 1 ~ 10 whole-number slider");
+            Slider restitution = fields.Single(f => f.label == "Restitution").Q<Slider>();
+            Assert.That(restitution != null && restitution.lowValue == 0.05f && restitution.highValue == 1f, Is.True, "Restitution — a 0.05 ~ 1 slider");
         }
 
         // the rules as written

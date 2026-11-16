@@ -242,6 +242,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -660,6 +661,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -870,6 +872,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -1156,6 +1159,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -1572,6 +1576,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -1765,6 +1770,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -1981,6 +1987,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -2237,6 +2244,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -2556,6 +2564,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -2835,6 +2844,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds: []
@@ -2925,6 +2935,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds: []
@@ -3242,6 +3253,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -3686,6 +3698,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds: []
@@ -3776,6 +3789,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds: []
@@ -3866,6 +3880,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds: []
@@ -3956,6 +3971,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds: []
@@ -4046,6 +4062,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds: []
@@ -4136,6 +4153,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds: []
@@ -4226,6 +4244,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds: []
@@ -4316,6 +4335,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds: []
@@ -4406,6 +4426,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds: []
@@ -4496,6 +4517,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds: []
@@ -4586,6 +4608,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds: []
@@ -4676,6 +4699,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds: []
@@ -4766,6 +4790,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds: []
@@ -4856,6 +4881,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds: []
@@ -4946,6 +4972,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds: []
@@ -5036,6 +5063,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds: []
@@ -5126,6 +5154,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds: []
@@ -5309,6 +5338,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds: []
@@ -5552,6 +5582,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -5745,6 +5776,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -5952,6 +5984,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -6096,6 +6129,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -6252,6 +6286,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -6399,6 +6434,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -6553,6 +6589,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -6697,6 +6734,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -6754,6 +6792,9 @@ MonoBehaviour:
           m_Frequency: 1
           m_Waveform: 0
           m_Phase: 0
+          m_PerAxis: 0
+          m_AxisPhase: {x: 0, y: 0, z: 0, w: 0}
+          m_AxisFrequency: {x: 1, y: 1, z: 1, w: 1}
 --- !u!114 &126976261
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6842,6 +6883,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -7018,6 +7060,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -7164,6 +7207,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -7322,6 +7366,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -7471,6 +7516,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -7627,6 +7673,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -7773,6 +7820,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -7832,6 +7880,9 @@ MonoBehaviour:
           m_Frequency: 1
           m_Waveform: 0
           m_Phase: 0
+          m_PerAxis: 0
+          m_AxisPhase: {x: 0, y: 0, z: 0, w: 0}
+          m_AxisFrequency: {x: 1, y: 1, z: 1, w: 1}
 --- !u!114 &126976268
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7920,6 +7971,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -8098,6 +8150,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -8243,6 +8296,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -8400,6 +8454,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -8548,6 +8603,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -8703,6 +8759,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -8848,6 +8905,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -8906,6 +8964,9 @@ MonoBehaviour:
           m_Frequency: 1
           m_Waveform: 0
           m_Phase: 0
+          m_PerAxis: 0
+          m_AxisPhase: {x: 0, y: 0, z: 0, w: 0}
+          m_AxisFrequency: {x: 1, y: 1, z: 1, w: 1}
 --- !u!114 &126976275
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8994,6 +9055,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -9205,6 +9267,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -9482,6 +9545,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -10083,6 +10147,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -10261,6 +10326,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -10405,6 +10471,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: xpTURN.Feedback.Samples.Basics.Gallery::xpTURN.Feedback.Samples.Basics.FeedbackGallery
   m_Tabs:
   - Animation
+  - Audio
   - Camera
   - Custom
   - Flow
@@ -10476,6 +10543,146 @@ MonoBehaviour:
     Reset: 0
     Clear: {fileID: 0}
     NeedsTmp: 0
+  - Tab: Audio
+    Label: "Distortion Level \xB7 Curve"
+    Note: "Distorts the tone a moment.  \u2014  Audio/Distortion Level \xB7 Curve
+      \xB7 category Audio"
+    Player: {fileID: 1752045691}
+    PlayerPath: 
+    Target: {fileID: 1752045673}
+    Reset: 0
+    Clear: {fileID: 0}
+    NeedsTmp: 0
+  - Tab: Audio
+    Label: "Echo Wet Mix \xB7 Curve"
+    Note: "Brings the tone's echo in and out.  \u2014  Audio/Echo Wet Mix \xB7 Curve
+      \xB7 category Audio"
+    Player: {fileID: 1752045684}
+    PlayerPath: 
+    Target: {fileID: 1752045673}
+    Reset: 0
+    Clear: {fileID: 0}
+    NeedsTmp: 0
+  - Tab: Audio
+    Label: "High Pass Cutoff \xB7 Curve"
+    Note: "Thins the tone and fills it again.  \u2014  Audio/High Pass Cutoff \xB7
+      Curve \xB7 category Audio"
+    Player: {fileID: 1752045683}
+    PlayerPath: 
+    Target: {fileID: 1752045673}
+    Reset: 0
+    Clear: {fileID: 0}
+    NeedsTmp: 0
+  - Tab: Audio
+    Label: "Listener Volume \xB7 Curve"
+    Note: "Dips every sound of the game.  \u2014  Audio/Listener Volume \xB7 Curve
+      \xB7 category Audio"
+    Player: {fileID: 1752045682}
+    PlayerPath: 
+    Target: {fileID: 1752045673}
+    Reset: 0
+    Clear: {fileID: 0}
+    NeedsTmp: 0
+  - Tab: Audio
+    Label: "Low Pass Cutoff \xB7 Curve"
+    Note: "Muffles the tone and opens it again.  \u2014  Audio/Low Pass Cutoff \xB7
+      Curve \xB7 category Audio"
+    Player: {fileID: 1752045681}
+    PlayerPath: 
+    Target: {fileID: 1752045673}
+    Reset: 0
+    Clear: {fileID: 0}
+    NeedsTmp: 0
+  - Tab: Audio
+    Label: "Mixer Parameter \xB7 Curve"
+    Note: "Dips the gallery mixer's exposed volume.  \u2014  Audio/Mixer Parameter
+      \xB7 Curve \xB7 category Audio"
+    Player: {fileID: 1752045680}
+    PlayerPath: 
+    Target: {fileID: 1752045673}
+    Reset: 0
+    Clear: {fileID: 0}
+    NeedsTmp: 0
+  - Tab: Audio
+    Label: "Mixer Snapshot \xB7 Set"
+    Note: "Moves the gallery mixer to its Quiet snapshot, then back to Default. 
+      \u2014  Audio/Mixer Snapshot \xB7 Set \xB7 category Audio"
+    Player: {fileID: 1752045679}
+    PlayerPath: 
+    Target: {fileID: 1752045673}
+    Reset: 0
+    Clear: {fileID: 0}
+    NeedsTmp: 0
+  - Tab: Audio
+    Label: "Pitch \xB7 Punch"
+    Note: "Bends the tone's pitch.  \u2014  Audio/Pitch \xB7 Punch \xB7 category
+      Audio"
+    Player: {fileID: 1752045678}
+    PlayerPath: 
+    Target: {fileID: 1752045673}
+    Reset: 0
+    Clear: {fileID: 0}
+    NeedsTmp: 0
+  - Tab: Audio
+    Label: "Play At Point \xB7 Set"
+    Note: "Plays a sound from the pool where the hit stands \u2014 no Audio Source. 
+      \u2014  Audio/Play At Point \xB7 Set \xB7 category Audio"
+    Player: {fileID: 2000137886}
+    PlayerPath: 
+    Target: {fileID: 2000137881}
+    Reset: 0
+    Clear: {fileID: 0}
+    NeedsTmp: 0
+  - Tab: Audio
+    Label: "Play Clip \xB7 Set"
+    Note: "Plays a clip once on the hit's Audio Source.  \u2014  Audio/Play Clip
+      \xB7 Set \xB7 category Audio"
+    Player: {fileID: 2000137884}
+    PlayerPath: 
+    Target: {fileID: 2000137881}
+    Reset: 0
+    Clear: {fileID: 0}
+    NeedsTmp: 0
+  - Tab: Audio
+    Label: "Reverb Level \xB7 Curve"
+    Note: "Lets the tone ring in a room.  \u2014  Audio/Reverb Level \xB7 Curve \xB7
+      category Audio"
+    Player: {fileID: 1752045677}
+    PlayerPath: 
+    Target: {fileID: 1752045673}
+    Reset: 0
+    Clear: {fileID: 0}
+    NeedsTmp: 0
+  - Tab: Audio
+    Label: "Source Control \xB7 Set"
+    Note: "Plays the hit's Audio Source.  \u2014  Audio/Source Control \xB7 Set (Play)
+      \xB7 category Audio"
+    Player: {fileID: 2000137883}
+    PlayerPath: 
+    Target: {fileID: 2000137881}
+    Reset: 0
+    Clear: {fileID: 0}
+    NeedsTmp: 0
+  - Tab: Audio
+    Label: "Stereo Pan \xB7 Punch"
+    Note: "Pans the tone left and right.  \u2014  Audio/Stereo Pan \xB7 Punch \xB7
+      category Audio"
+    Player: {fileID: 1752045676}
+    PlayerPath: 
+    Target: {fileID: 1752045673}
+    Reset: 0
+    Clear: {fileID: 0}
+    NeedsTmp: 0
+  - Tab: Audio
+    Label: "Volume \xB7 Punch"
+    Note: "Swings the tone's volume.  \u2014  Audio/Volume \xB7 Punch \xB7 category
+      Audio"
+    Player: {fileID: 1752045675}
+    PlayerPath: 
+    Target: {fileID: 1752045673}
+    Reset: 0
+    Clear: {fileID: 0}
+    NeedsTmp: 0
   - Tab: Camera
     Label: "Background Color \xB7 Flash"
     Note: "Tints the camera's background color.  \u2014  Camera/Background Color
@@ -10523,6 +10730,15 @@ MonoBehaviour:
     Player: {fileID: 302966496}
     PlayerPath: 
     Target: {fileID: 302966494}
+    Reset: 0
+    Clear: {fileID: 0}
+    NeedsTmp: 0
+  - Tab: Camera
+    Label: "Trauma \xB7 Set"
+    Note: "Adds to the main camera's trauma \u2014 hits stack up to a ceiling and fade.  \u2014  Camera/Trauma \xB7 Set \xB7 category Camera"
+    Player: {fileID: 1891103376}
+    PlayerPath: 
+    Target: {fileID: 483651387}
     Reset: 0
     Clear: {fileID: 0}
     NeedsTmp: 0
@@ -11701,6 +11917,15 @@ MonoBehaviour:
     Reset: 0
     Clear: {fileID: 0}
     NeedsTmp: 0
+  - Tab: Transform
+    Label: "Trauma \xB7 Set"
+    Note: "Adds to the target's trauma \u2014 hits stack up to a ceiling and fade.  \u2014  Transform/Trauma \xB7 Set \xB7 category Motion"
+    Player: {fileID: 241073580}
+    PlayerPath: 
+    Target: {fileID: 2073734099}
+    Reset: 0
+    Clear: {fileID: 0}
+    NeedsTmp: 0
   - Tab: UI
     Label: "Alpha \xB7 Punch"
     Note: "Fades a UI graphic.  \u2014  UI/Alpha \xB7 Punch \xB7 category None (plays
@@ -12412,6 +12637,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -13124,6 +13350,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -13327,6 +13554,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds: []
@@ -13638,6 +13866,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -13696,6 +13925,9 @@ MonoBehaviour:
           m_Frequency: 1
           m_Waveform: 0
           m_Phase: 0
+          m_PerAxis: 0
+          m_AxisPhase: {x: 0, y: 0, z: 0, w: 0}
+          m_AxisFrequency: {x: 1, y: 1, z: 1, w: 1}
 --- !u!1 &252002485
 GameObject:
   m_ObjectHideFlags: 0
@@ -13818,6 +14050,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -14141,6 +14374,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -14702,6 +14936,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -14983,6 +15218,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -15162,6 +15398,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -15347,6 +15584,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -15618,6 +15856,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -15938,6 +16177,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -16708,6 +16948,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -16885,6 +17126,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -17585,6 +17827,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -17763,6 +18006,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -18027,6 +18271,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -18553,6 +18798,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -18622,6 +18868,9 @@ MonoBehaviour:
           m_Frequency: 1
           m_Waveform: 0
           m_Phase: 0
+          m_PerAxis: 0
+          m_AxisPhase: {x: 0, y: 0, z: 0, w: 0}
+          m_AxisFrequency: {x: 1, y: 1, z: 1, w: 1}
 --- !u!1 &503737306
 GameObject:
   m_ObjectHideFlags: 0
@@ -19118,6 +19367,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 2
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -19797,6 +20047,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -19990,6 +20241,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -20185,6 +20437,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -20424,6 +20677,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -20797,6 +21051,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -26372,6 +26627,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -31574,6 +31830,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -31988,6 +32245,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -32546,6 +32804,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -32791,6 +33050,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -32997,6 +33257,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -33548,6 +33809,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -38529,6 +38791,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -38722,6 +38985,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -39335,6 +39599,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -39395,6 +39660,9 @@ MonoBehaviour:
           m_Frequency: 1
           m_Waveform: 0
           m_Phase: 0
+          m_PerAxis: 0
+          m_AxisPhase: {x: 0, y: 0, z: 0, w: 0}
+          m_AxisFrequency: {x: 1, y: 1, z: 1, w: 1}
 --- !u!1 &885447084
 GameObject:
   m_ObjectHideFlags: 0
@@ -39598,6 +39866,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -39868,6 +40137,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -40046,6 +40316,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -40404,6 +40675,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -40639,6 +40911,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -40978,6 +41251,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -41239,6 +41513,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -41509,6 +41784,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -41999,6 +42275,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -42337,6 +42614,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -42849,6 +43127,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -43378,6 +43657,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -43569,6 +43849,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -43757,6 +44038,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -43815,6 +44097,9 @@ MonoBehaviour:
           m_Frequency: 1
           m_Waveform: 0
           m_Phase: 0
+          m_PerAxis: 0
+          m_AxisPhase: {x: 0, y: 0, z: 0, w: 0}
+          m_AxisFrequency: {x: 1, y: 1, z: 1, w: 1}
 --- !u!1 &1073477785
 GameObject:
   m_ObjectHideFlags: 0
@@ -44278,6 +44563,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -44536,6 +44822,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -44825,6 +45112,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -45004,6 +45292,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -45199,6 +45488,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -45388,6 +45678,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -45839,6 +46130,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -46086,6 +46378,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -46274,6 +46567,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -46618,6 +46912,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -47006,6 +47301,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -47187,6 +47483,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -47806,6 +48103,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -48341,6 +48639,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -48519,6 +48818,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -48940,6 +49240,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -49125,6 +49426,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 2
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -49378,6 +49680,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -49685,6 +49988,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -50019,6 +50323,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -50209,6 +50514,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -50390,6 +50696,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -50579,6 +50886,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -50771,6 +51079,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -51083,6 +51392,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -51464,6 +51774,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -51830,6 +52141,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -52118,6 +52430,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -52443,6 +52756,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -52621,6 +52935,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -52830,6 +53145,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -53185,6 +53501,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -53459,6 +53776,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -53642,6 +53960,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -53700,6 +54019,9 @@ MonoBehaviour:
           m_Frequency: 1
           m_Waveform: 0
           m_Phase: 0
+          m_PerAxis: 0
+          m_AxisPhase: {x: 0, y: 0, z: 0, w: 0}
+          m_AxisFrequency: {x: 1, y: 1, z: 1, w: 1}
 --- !u!1 &1474360462
 GameObject:
   m_ObjectHideFlags: 0
@@ -58625,6 +58947,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -63932,6 +64255,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -64191,6 +64515,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -64463,6 +64788,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -69686,6 +70012,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -69900,6 +70227,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -70194,6 +70522,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -70604,6 +70933,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -71012,6 +71342,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -71281,6 +71612,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -72108,6 +72440,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -72549,6 +72882,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -72847,6 +73181,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -73105,6 +73440,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -73303,6 +73639,10 @@ Transform:
   - {fileID: 126976254}
   - {fileID: 113115342}
   - {fileID: 224080504}
+  - {fileID: 1752045674}
+  - {fileID: 2000137882}
+  - {fileID: 139184085}
+  - {fileID: 1468891951}
   m_Father: {fileID: 163808050}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1728636721
@@ -73582,6 +73922,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -73776,6 +74117,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -73969,6 +74311,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -74036,6 +74379,2111 @@ MonoBehaviour:
               m_PreInfinity: 2
               m_PostInfinity: 2
               m_RotationOrder: 4
+--- !u!1 &1752045673
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1752045674}
+  - component: {fileID: 1752045690}
+  - component: {fileID: 1752045689}
+  - component: {fileID: 1752045688}
+  - component: {fileID: 1752045687}
+  - component: {fileID: 1752045686}
+  - component: {fileID: 1752045685}
+  - component: {fileID: 1752045691}
+  - component: {fileID: 1752045684}
+  - component: {fileID: 1752045683}
+  - component: {fileID: 1752045682}
+  - component: {fileID: 1752045681}
+  - component: {fileID: 1752045680}
+  - component: {fileID: 1752045679}
+  - component: {fileID: 1752045678}
+  - component: {fileID: 1752045677}
+  - component: {fileID: 1752045676}
+  - component: {fileID: 1752045675}
+  m_Layer: 0
+  m_Name: Audio Stage
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &1752045674
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1752045673}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 2069008866}
+  m_Father: {fileID: 1727745620}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1752045675
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1752045673}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6dc1b1a00a6a44c3b159fc76ce605832, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: xpTURN.Feedback::xpTURN.Feedback.FeedbackPlayer
+  m_Items:
+  - rid: 7216148960718880768
+  m_Preset: {fileID: 0}
+  m_Anchors: []
+  m_FormatVersion: 1
+  m_Initialization: 1
+  m_Policy: 1
+  m_MaxOverlap: 4
+  m_DurationMultiplier: 1
+  m_StartDelay: 0
+  m_AutoPlay: 0
+  m_TimeMode: 0
+  m_Speed: 1
+  m_RandomizeDuration: 0
+  m_DurationRange: {x: 0.5, y: 2}
+  m_Cooldown: 0
+  m_Chance: 100
+  m_Intensity: 1
+  m_RemapIntensity: 0
+  m_IntensityRemap:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  m_UseDistanceGate: 0
+  m_GateReference: 0
+  m_GateAnchor: 
+  m_GateDistance: 5
+  m_UseGateFalloff: 0
+  m_GateFalloff:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: -1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: -1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  m_UnityEvents: []
+  m_Direction: 0
+  m_ApplyInitialState: 0
+  m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: 7216148960718880768
+      type: {class: AudioVolumeItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 1.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 0
+          m_IntensityRange: {x: 0, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148960718880769
+        m_DirectWrite: 0
+    - rid: 7216148960718880769
+      type: {class: PunchMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Amplitude: {x: -0.5, y: -0.5, z: -0.5, w: -0.5}
+          m_Vibrato: 5
+          m_Decay: 1
+--- !u!114 &1752045676
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1752045673}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6dc1b1a00a6a44c3b159fc76ce605832, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: xpTURN.Feedback::xpTURN.Feedback.FeedbackPlayer
+  m_Items:
+  - rid: 7216148960718880770
+  m_Preset: {fileID: 0}
+  m_Anchors: []
+  m_FormatVersion: 1
+  m_Initialization: 1
+  m_Policy: 1
+  m_MaxOverlap: 4
+  m_DurationMultiplier: 1
+  m_StartDelay: 0
+  m_AutoPlay: 0
+  m_TimeMode: 0
+  m_Speed: 1
+  m_RandomizeDuration: 0
+  m_DurationRange: {x: 0.5, y: 2}
+  m_Cooldown: 0
+  m_Chance: 100
+  m_Intensity: 1
+  m_RemapIntensity: 0
+  m_IntensityRemap:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  m_UseDistanceGate: 0
+  m_GateReference: 0
+  m_GateAnchor: 
+  m_GateDistance: 5
+  m_UseGateFalloff: 0
+  m_GateFalloff:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: -1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: -1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  m_UnityEvents: []
+  m_Direction: 0
+  m_ApplyInitialState: 0
+  m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: 7216148960718880770
+      type: {class: AudioStereoPanItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 1.5
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 0
+          m_IntensityRange: {x: 0, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148960718880771
+        m_DirectWrite: 0
+    - rid: 7216148960718880771
+      type: {class: PunchMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Amplitude: {x: 1, y: 1, z: 1, w: 1}
+          m_Vibrato: 3
+          m_Decay: 1
+--- !u!114 &1752045677
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1752045673}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6dc1b1a00a6a44c3b159fc76ce605832, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: xpTURN.Feedback::xpTURN.Feedback.FeedbackPlayer
+  m_Items:
+  - rid: 7216148960718880774
+  m_Preset: {fileID: 0}
+  m_Anchors: []
+  m_FormatVersion: 1
+  m_Initialization: 1
+  m_Policy: 1
+  m_MaxOverlap: 4
+  m_DurationMultiplier: 1
+  m_StartDelay: 0
+  m_AutoPlay: 0
+  m_TimeMode: 0
+  m_Speed: 1
+  m_RandomizeDuration: 0
+  m_DurationRange: {x: 0.5, y: 2}
+  m_Cooldown: 0
+  m_Chance: 100
+  m_Intensity: 1
+  m_RemapIntensity: 0
+  m_IntensityRemap:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  m_UseDistanceGate: 0
+  m_GateReference: 0
+  m_GateAnchor: 
+  m_GateDistance: 5
+  m_UseGateFalloff: 0
+  m_GateFalloff:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: -1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: -1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  m_UnityEvents: []
+  m_Direction: 0
+  m_ApplyInitialState: 0
+  m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: 7216148960718880774
+      type: {class: AudioReverbLevelItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 0
+          m_IntensityRange: {x: 0, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148960718880775
+        m_DirectWrite: 0
+    - rid: 7216148960718880775
+      type: {class: CurveMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Curve:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 3
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            - serializedVersion: 3
+              time: 0.3
+              value: 1
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            - serializedVersion: 3
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 4
+          m_RemapZero: {x: 0, y: 0, z: 0, w: 0}
+          m_RemapOne: {x: 9000, y: 9000, z: 9000, w: 9000}
+--- !u!114 &1752045678
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1752045673}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6dc1b1a00a6a44c3b159fc76ce605832, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: xpTURN.Feedback::xpTURN.Feedback.FeedbackPlayer
+  m_Items:
+  - rid: 7216148960718880780
+  m_Preset: {fileID: 0}
+  m_Anchors: []
+  m_FormatVersion: 1
+  m_Initialization: 1
+  m_Policy: 1
+  m_MaxOverlap: 4
+  m_DurationMultiplier: 1
+  m_StartDelay: 0
+  m_AutoPlay: 0
+  m_TimeMode: 0
+  m_Speed: 1
+  m_RandomizeDuration: 0
+  m_DurationRange: {x: 0.5, y: 2}
+  m_Cooldown: 0
+  m_Chance: 100
+  m_Intensity: 1
+  m_RemapIntensity: 0
+  m_IntensityRemap:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  m_UseDistanceGate: 0
+  m_GateReference: 0
+  m_GateAnchor: 
+  m_GateDistance: 5
+  m_UseGateFalloff: 0
+  m_GateFalloff:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: -1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: -1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  m_UnityEvents: []
+  m_Direction: 0
+  m_ApplyInitialState: 0
+  m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: 7216148960718880780
+      type: {class: AudioPitchItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 1.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 0
+          m_IntensityRange: {x: 0, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148960718880781
+        m_DirectWrite: 0
+    - rid: 7216148960718880781
+      type: {class: PunchMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Amplitude: {x: 0.5, y: 0.5, z: 0.5, w: 0.5}
+          m_Vibrato: 5
+          m_Decay: 1
+--- !u!114 &1752045679
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1752045673}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6dc1b1a00a6a44c3b159fc76ce605832, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: xpTURN.Feedback::xpTURN.Feedback.FeedbackPlayer
+  m_Items:
+  - rid: 7216148960718880782
+  - rid: 7216148960718880783
+  m_Preset: {fileID: 0}
+  m_Anchors: []
+  m_FormatVersion: 1
+  m_Initialization: 1
+  m_Policy: 1
+  m_MaxOverlap: 4
+  m_DurationMultiplier: 1
+  m_StartDelay: 0
+  m_AutoPlay: 0
+  m_TimeMode: 0
+  m_Speed: 1
+  m_RandomizeDuration: 0
+  m_DurationRange: {x: 0.5, y: 2}
+  m_Cooldown: 0
+  m_Chance: 100
+  m_Intensity: 1
+  m_RemapIntensity: 0
+  m_IntensityRemap:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  m_UseDistanceGate: 0
+  m_GateReference: 0
+  m_GateAnchor: 
+  m_GateDistance: 5
+  m_UseGateFalloff: 0
+  m_GateFalloff:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: -1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: -1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  m_UnityEvents: []
+  m_Direction: 0
+  m_ApplyInitialState: 0
+  m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: 7216148960718880782
+      type: {class: AudioMixerSnapshotItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 1.2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 0
+          m_IntensityRange: {x: 0, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 0
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148960718880784
+        m_DirectWrite: 0
+        m_Snapshot: {fileID: 5904256743034501664, guid: 77a47c0e9d274feb9addaa94ee5b0603, type: 2}
+        m_TransitionTime: 0.3
+        m_BackTo: {fileID: 24500006, guid: 77a47c0e9d274feb9addaa94ee5b0603, type: 2}
+    - rid: 7216148960718880783
+      type: {class: AudioMixerSnapshotItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 1.2
+          m_Duration: 0.4
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 0
+          m_IntensityRange: {x: 0, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 0
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148960718880785
+        m_DirectWrite: 0
+        m_Snapshot: {fileID: 24500006, guid: 77a47c0e9d274feb9addaa94ee5b0603, type: 2}
+        m_TransitionTime: 0.3
+        m_BackTo: {fileID: 0}
+    - rid: 7216148960718880784
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+    - rid: 7216148960718880785
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+--- !u!114 &1752045680
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1752045673}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6dc1b1a00a6a44c3b159fc76ce605832, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: xpTURN.Feedback::xpTURN.Feedback.FeedbackPlayer
+  m_Items:
+  - rid: 7216148960718880786
+  m_Preset: {fileID: 0}
+  m_Anchors: []
+  m_FormatVersion: 1
+  m_Initialization: 1
+  m_Policy: 1
+  m_MaxOverlap: 4
+  m_DurationMultiplier: 1
+  m_StartDelay: 0
+  m_AutoPlay: 0
+  m_TimeMode: 0
+  m_Speed: 1
+  m_RandomizeDuration: 0
+  m_DurationRange: {x: 0.5, y: 2}
+  m_Cooldown: 0
+  m_Chance: 100
+  m_Intensity: 1
+  m_RemapIntensity: 0
+  m_IntensityRemap:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  m_UseDistanceGate: 0
+  m_GateReference: 0
+  m_GateAnchor: 
+  m_GateDistance: 5
+  m_UseGateFalloff: 0
+  m_GateFalloff:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: -1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: -1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  m_UnityEvents: []
+  m_Direction: 0
+  m_ApplyInitialState: 0
+  m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: 7216148960718880786
+      type: {class: AudioMixerParameterItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 1.5
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 0
+          m_IntensityRange: {x: 0, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 0
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148960718880787
+        m_DirectWrite: 0
+        m_Mixer: {fileID: 24100000, guid: 77a47c0e9d274feb9addaa94ee5b0603, type: 2}
+        m_Parameter: GalleryVolume
+    - rid: 7216148960718880787
+      type: {class: CurveMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Curve:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 3
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            - serializedVersion: 3
+              time: 0.3
+              value: 1
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            - serializedVersion: 3
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 4
+          m_RemapZero: {x: 0, y: 0, z: 0, w: 0}
+          m_RemapOne: {x: -30, y: -30, z: -30, w: -30}
+--- !u!114 &1752045681
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1752045673}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6dc1b1a00a6a44c3b159fc76ce605832, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: xpTURN.Feedback::xpTURN.Feedback.FeedbackPlayer
+  m_Items:
+  - rid: 7216148960718880788
+  m_Preset: {fileID: 0}
+  m_Anchors: []
+  m_FormatVersion: 1
+  m_Initialization: 1
+  m_Policy: 1
+  m_MaxOverlap: 4
+  m_DurationMultiplier: 1
+  m_StartDelay: 0
+  m_AutoPlay: 0
+  m_TimeMode: 0
+  m_Speed: 1
+  m_RandomizeDuration: 0
+  m_DurationRange: {x: 0.5, y: 2}
+  m_Cooldown: 0
+  m_Chance: 100
+  m_Intensity: 1
+  m_RemapIntensity: 0
+  m_IntensityRemap:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  m_UseDistanceGate: 0
+  m_GateReference: 0
+  m_GateAnchor: 
+  m_GateDistance: 5
+  m_UseGateFalloff: 0
+  m_GateFalloff:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: -1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: -1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  m_UnityEvents: []
+  m_Direction: 0
+  m_ApplyInitialState: 0
+  m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: 7216148960718880788
+      type: {class: AudioLowPassCutoffItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 1.5
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 0
+          m_IntensityRange: {x: 0, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148960718880789
+        m_DirectWrite: 0
+    - rid: 7216148960718880789
+      type: {class: CurveMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Curve:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 3
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            - serializedVersion: 3
+              time: 0.3
+              value: 1
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            - serializedVersion: 3
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 4
+          m_RemapZero: {x: 0, y: 0, z: 0, w: 0}
+          m_RemapOne: {x: -21500, y: -21500, z: -21500, w: -21500}
+--- !u!114 &1752045682
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1752045673}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6dc1b1a00a6a44c3b159fc76ce605832, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: xpTURN.Feedback::xpTURN.Feedback.FeedbackPlayer
+  m_Items:
+  - rid: 7216148960718880790
+  m_Preset: {fileID: 0}
+  m_Anchors: []
+  m_FormatVersion: 1
+  m_Initialization: 1
+  m_Policy: 1
+  m_MaxOverlap: 4
+  m_DurationMultiplier: 1
+  m_StartDelay: 0
+  m_AutoPlay: 0
+  m_TimeMode: 0
+  m_Speed: 1
+  m_RandomizeDuration: 0
+  m_DurationRange: {x: 0.5, y: 2}
+  m_Cooldown: 0
+  m_Chance: 100
+  m_Intensity: 1
+  m_RemapIntensity: 0
+  m_IntensityRemap:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  m_UseDistanceGate: 0
+  m_GateReference: 0
+  m_GateAnchor: 
+  m_GateDistance: 5
+  m_UseGateFalloff: 0
+  m_GateFalloff:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: -1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: -1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  m_UnityEvents: []
+  m_Direction: 0
+  m_ApplyInitialState: 0
+  m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: 7216148960718880790
+      type: {class: AudioListenerVolumeItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 1.5
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 0
+          m_IntensityRange: {x: 0, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 0
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148960718880791
+        m_DirectWrite: 0
+    - rid: 7216148960718880791
+      type: {class: CurveMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Curve:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 3
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            - serializedVersion: 3
+              time: 0.3
+              value: 1
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            - serializedVersion: 3
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 4
+          m_RemapZero: {x: 0, y: 0, z: 0, w: 0}
+          m_RemapOne: {x: -0.8, y: -0.8, z: -0.8, w: -0.8}
+--- !u!114 &1752045683
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1752045673}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6dc1b1a00a6a44c3b159fc76ce605832, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: xpTURN.Feedback::xpTURN.Feedback.FeedbackPlayer
+  m_Items:
+  - rid: 7216148960718880792
+  m_Preset: {fileID: 0}
+  m_Anchors: []
+  m_FormatVersion: 1
+  m_Initialization: 1
+  m_Policy: 1
+  m_MaxOverlap: 4
+  m_DurationMultiplier: 1
+  m_StartDelay: 0
+  m_AutoPlay: 0
+  m_TimeMode: 0
+  m_Speed: 1
+  m_RandomizeDuration: 0
+  m_DurationRange: {x: 0.5, y: 2}
+  m_Cooldown: 0
+  m_Chance: 100
+  m_Intensity: 1
+  m_RemapIntensity: 0
+  m_IntensityRemap:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  m_UseDistanceGate: 0
+  m_GateReference: 0
+  m_GateAnchor: 
+  m_GateDistance: 5
+  m_UseGateFalloff: 0
+  m_GateFalloff:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: -1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: -1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  m_UnityEvents: []
+  m_Direction: 0
+  m_ApplyInitialState: 0
+  m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: 7216148960718880792
+      type: {class: AudioHighPassCutoffItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 1.5
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 0
+          m_IntensityRange: {x: 0, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148960718880793
+        m_DirectWrite: 0
+    - rid: 7216148960718880793
+      type: {class: CurveMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Curve:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 3
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            - serializedVersion: 3
+              time: 0.3
+              value: 1
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            - serializedVersion: 3
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 4
+          m_RemapZero: {x: 0, y: 0, z: 0, w: 0}
+          m_RemapOne: {x: 3000, y: 3000, z: 3000, w: 3000}
+--- !u!114 &1752045684
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1752045673}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6dc1b1a00a6a44c3b159fc76ce605832, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: xpTURN.Feedback::xpTURN.Feedback.FeedbackPlayer
+  m_Items:
+  - rid: 7216148960718880794
+  m_Preset: {fileID: 0}
+  m_Anchors: []
+  m_FormatVersion: 1
+  m_Initialization: 1
+  m_Policy: 1
+  m_MaxOverlap: 4
+  m_DurationMultiplier: 1
+  m_StartDelay: 0
+  m_AutoPlay: 0
+  m_TimeMode: 0
+  m_Speed: 1
+  m_RandomizeDuration: 0
+  m_DurationRange: {x: 0.5, y: 2}
+  m_Cooldown: 0
+  m_Chance: 100
+  m_Intensity: 1
+  m_RemapIntensity: 0
+  m_IntensityRemap:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  m_UseDistanceGate: 0
+  m_GateReference: 0
+  m_GateAnchor: 
+  m_GateDistance: 5
+  m_UseGateFalloff: 0
+  m_GateFalloff:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: -1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: -1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  m_UnityEvents: []
+  m_Direction: 0
+  m_ApplyInitialState: 0
+  m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: 7216148960718880794
+      type: {class: AudioEchoWetMixItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 2
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 0
+          m_IntensityRange: {x: 0, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148960718880795
+        m_DirectWrite: 0
+    - rid: 7216148960718880795
+      type: {class: CurveMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Curve:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 3
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            - serializedVersion: 3
+              time: 0.3
+              value: 1
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            - serializedVersion: 3
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 4
+          m_RemapZero: {x: 0, y: 0, z: 0, w: 0}
+          m_RemapOne: {x: 1, y: 1, z: 1, w: 1}
+--- !u!164 &1752045685
+AudioReverbFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1752045673}
+  m_Enabled: 1
+  m_DryLevel: 0
+  m_Room: 0
+  m_RoomHF: 0
+  m_DecayTime: 1.5
+  m_DecayHFRatio: 0.5
+  m_ReflectionsLevel: -10000
+  m_ReverbLevel: -10000
+  m_ReverbDelay: 0.04
+  m_Diffusion: 100
+  m_Density: 100
+  m_HFReference: 5000
+  m_RoomLF: 0
+  m_LFReference: 250
+  m_ReflectionsDelay: 0
+  m_ReverbPreset: 27
+--- !u!170 &1752045686
+AudioDistortionFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1752045673}
+  m_Enabled: 1
+  m_DistortionLevel: 0
+--- !u!168 &1752045687
+AudioEchoFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1752045673}
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Delay: 500
+  m_DecayRatio: 0.5
+  m_WetMix: 0
+  m_DryMix: 1
+--- !u!165 &1752045688
+AudioHighPassFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1752045673}
+  m_Enabled: 1
+  m_CutoffFrequency: 10
+  m_HighpassResonanceQ: 1
+--- !u!169 &1752045689
+AudioLowPassFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1752045673}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_LowpassResonanceQ: 1
+  lowpassLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!82 &1752045690
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1752045673}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 24300002, guid: 77a47c0e9d274feb9addaa94ee5b0603, type: 2}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 8300000, guid: a1d35e47fb1ca483b91701e1aecaecf0, type: 3}
+  m_PlayOnAwake: 1
+  m_Volume: 0.5
+  m_Pitch: 1
+  Loop: 1
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!114 &1752045691
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1752045673}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6dc1b1a00a6a44c3b159fc76ce605832, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: xpTURN.Feedback::xpTURN.Feedback.FeedbackPlayer
+  m_Items:
+  - rid: 7216148960718880796
+  m_Preset: {fileID: 0}
+  m_Anchors: []
+  m_FormatVersion: 1
+  m_Initialization: 1
+  m_Policy: 1
+  m_MaxOverlap: 4
+  m_DurationMultiplier: 1
+  m_StartDelay: 0
+  m_AutoPlay: 0
+  m_TimeMode: 0
+  m_Speed: 1
+  m_RandomizeDuration: 0
+  m_DurationRange: {x: 0.5, y: 2}
+  m_Cooldown: 0
+  m_Chance: 100
+  m_Intensity: 1
+  m_RemapIntensity: 0
+  m_IntensityRemap:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  m_UseDistanceGate: 0
+  m_GateReference: 0
+  m_GateAnchor: 
+  m_GateDistance: 5
+  m_UseGateFalloff: 0
+  m_GateFalloff:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: -1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: -1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  m_UnityEvents: []
+  m_Direction: 0
+  m_ApplyInitialState: 0
+  m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: 7216148960718880796
+      type: {class: AudioDistortionLevelItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 1.5
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 0
+          m_IntensityRange: {x: 0, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148960718880797
+        m_DirectWrite: 0
+    - rid: 7216148960718880797
+      type: {class: CurveMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Curve:
+            serializedVersion: 2
+            m_Curve:
+            - serializedVersion: 3
+              time: 0
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            - serializedVersion: 3
+              time: 0.3
+              value: 1
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            - serializedVersion: 3
+              time: 1
+              value: 0
+              inSlope: 0
+              outSlope: 0
+              tangentMode: 0
+              weightedMode: 0
+              inWeight: 0
+              outWeight: 0
+            m_PreInfinity: 2
+            m_PostInfinity: 2
+            m_RotationOrder: 4
+          m_RemapZero: {x: 0, y: 0, z: 0, w: 0}
+          m_RemapOne: {x: 0.85, y: 0.85, z: 0.85, w: 0.85}
 --- !u!1 &1762805870
 GameObject:
   m_ObjectHideFlags: 0
@@ -74250,6 +76698,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -74509,6 +76958,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -74835,6 +77285,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -74895,6 +77346,9 @@ MonoBehaviour:
           m_Frequency: 1
           m_Waveform: 0
           m_Phase: 0
+          m_PerAxis: 0
+          m_AxisPhase: {x: 0, y: 0, z: 0, w: 0}
+          m_AxisFrequency: {x: 1, y: 1, z: 1, w: 1}
 --- !u!1 &1772282510
 GameObject:
   m_ObjectHideFlags: 0
@@ -75227,6 +77681,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -75640,6 +78095,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -76019,6 +78475,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -76367,6 +78824,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -76427,6 +78885,9 @@ MonoBehaviour:
           m_Frequency: 1
           m_Waveform: 0
           m_Phase: 0
+          m_PerAxis: 0
+          m_AxisPhase: {x: 0, y: 0, z: 0, w: 0}
+          m_AxisFrequency: {x: 1, y: 1, z: 1, w: 1}
 --- !u!1 &1852524414
 GameObject:
   m_ObjectHideFlags: 0
@@ -76549,6 +79010,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -76867,6 +79329,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -77467,6 +79930,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -77764,6 +80228,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -78293,6 +80758,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -78477,6 +80943,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -78878,6 +81345,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 2
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -79237,6 +81705,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -79309,6 +81778,587 @@ MonoBehaviour:
               m_RotationOrder: 4
           m_Loops: 1
           m_Yoyo: 0
+--- !u!1 &2000137881
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2000137882}
+  - component: {fileID: 2000137885}
+  - component: {fileID: 2000137886}
+  - component: {fileID: 2000137884}
+  - component: {fileID: 2000137883}
+  m_Layer: 0
+  m_Name: Audio Hit
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &2000137882
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2000137881}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 2078488135}
+  m_Father: {fileID: 1727745620}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2000137883
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2000137881}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6dc1b1a00a6a44c3b159fc76ce605832, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: xpTURN.Feedback::xpTURN.Feedback.FeedbackPlayer
+  m_Items:
+  - rid: 7216148960718880772
+  m_Preset: {fileID: 0}
+  m_Anchors: []
+  m_FormatVersion: 1
+  m_Initialization: 1
+  m_Policy: 1
+  m_MaxOverlap: 4
+  m_DurationMultiplier: 1
+  m_StartDelay: 0
+  m_AutoPlay: 0
+  m_TimeMode: 0
+  m_Speed: 1
+  m_RandomizeDuration: 0
+  m_DurationRange: {x: 0.5, y: 2}
+  m_Cooldown: 0
+  m_Chance: 100
+  m_Intensity: 1
+  m_RemapIntensity: 0
+  m_IntensityRemap:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  m_UseDistanceGate: 0
+  m_GateReference: 0
+  m_GateAnchor: 
+  m_GateDistance: 5
+  m_UseGateFalloff: 0
+  m_GateFalloff:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: -1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: -1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  m_UnityEvents: []
+  m_Direction: 0
+  m_ApplyInitialState: 0
+  m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: 7216148960718880772
+      type: {class: AudioSourceControlItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.3
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 0
+          m_IntensityRange: {x: 0, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148960718880773
+        m_DirectWrite: 0
+        m_Action: 0
+    - rid: 7216148960718880773
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+--- !u!114 &2000137884
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2000137881}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6dc1b1a00a6a44c3b159fc76ce605832, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: xpTURN.Feedback::xpTURN.Feedback.FeedbackPlayer
+  m_Items:
+  - rid: 7216148960718880776
+  m_Preset: {fileID: 0}
+  m_Anchors: []
+  m_FormatVersion: 1
+  m_Initialization: 1
+  m_Policy: 1
+  m_MaxOverlap: 4
+  m_DurationMultiplier: 1
+  m_StartDelay: 0
+  m_AutoPlay: 0
+  m_TimeMode: 0
+  m_Speed: 1
+  m_RandomizeDuration: 0
+  m_DurationRange: {x: 0.5, y: 2}
+  m_Cooldown: 0
+  m_Chance: 100
+  m_Intensity: 1
+  m_RemapIntensity: 0
+  m_IntensityRemap:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  m_UseDistanceGate: 0
+  m_GateReference: 0
+  m_GateAnchor: 
+  m_GateDistance: 5
+  m_UseGateFalloff: 0
+  m_GateFalloff:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: -1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: -1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  m_UnityEvents: []
+  m_Direction: 0
+  m_ApplyInitialState: 0
+  m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: 7216148960718880776
+      type: {class: AudioPlayClipItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.25
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 0
+          m_IntensityRange: {x: 0, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148960718880777
+        m_DirectWrite: 0
+        m_Clip: {fileID: 8300000, guid: 4c0ae0eec116142fa845fe399117d4e0, type: 3}
+        m_Volume: 1
+    - rid: 7216148960718880777
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
+--- !u!82 &2000137885
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2000137881}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 24300002, guid: 77a47c0e9d274feb9addaa94ee5b0603, type: 2}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 8300000, guid: 4c0ae0eec116142fa845fe399117d4e0, type: 3}
+  m_PlayOnAwake: 0
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!114 &2000137886
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2000137881}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6dc1b1a00a6a44c3b159fc76ce605832, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: xpTURN.Feedback::xpTURN.Feedback.FeedbackPlayer
+  m_Items:
+  - rid: 7216148960718880778
+  m_Preset: {fileID: 0}
+  m_Anchors: []
+  m_FormatVersion: 1
+  m_Initialization: 1
+  m_Policy: 1
+  m_MaxOverlap: 4
+  m_DurationMultiplier: 1
+  m_StartDelay: 0
+  m_AutoPlay: 0
+  m_TimeMode: 0
+  m_Speed: 1
+  m_RandomizeDuration: 0
+  m_DurationRange: {x: 0.5, y: 2}
+  m_Cooldown: 0
+  m_Chance: 100
+  m_Intensity: 1
+  m_RemapIntensity: 0
+  m_IntensityRemap:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  m_UseDistanceGate: 0
+  m_GateReference: 0
+  m_GateAnchor: 
+  m_GateDistance: 5
+  m_UseGateFalloff: 0
+  m_GateFalloff:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: -1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: -1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  m_UnityEvents: []
+  m_Direction: 0
+  m_ApplyInitialState: 0
+  m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: 7216148960718880778
+      type: {class: AudioPlayAtPointItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.25
+          m_Infinite: 0
+          m_Clock: 2
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 0
+          m_IntensityRange: {x: 0, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 7216148960718880779
+        m_DirectWrite: 0
+        m_Resource: {fileID: 8300000, guid: 87ac546532755411592727c2e5fde8d4, type: 3}
+        m_Output: {fileID: 24300002, guid: 77a47c0e9d274feb9addaa94ee5b0603, type: 2}
+        m_Volume: 1
+        m_Pitch: 1
+        m_PitchRandom: 0
+        m_SpatialBlend: 0
+        m_MinDistance: 1
+        m_MaxDistance: 500
+        m_Offset: {x: 0, y: 0, z: 0}
+        m_StopAfter: 0
+        m_FadeOut: 0.1
+        m_IgnoreListenerPause: 0
+        m_PoolSize: 2
+    - rid: 7216148960718880779
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 0, y: 0, z: 0, w: 0}
+          m_Relative: 0
 --- !u!1 &2006791444
 GameObject:
   m_ObjectHideFlags: 0
@@ -79435,6 +82485,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -79841,6 +82892,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -80035,6 +83087,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -80224,6 +83277,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -80457,6 +83511,96 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2066537288}
   m_CullTransparentMesh: 1
+--- !u!1 &2069008865
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2069008866}
+  - component: {fileID: 2069008868}
+  - component: {fileID: 2069008867}
+  m_Layer: 0
+  m_Name: Speaker
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2069008866
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2069008865}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.6, y: 0.6, z: 0.6}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1752045674}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!23 &2069008867
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2069008865}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: ff060039b1b4d45629a2d70b475d2178, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 1
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &2069008868
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2069008865}
+  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &2077369882
 GameObject:
   m_ObjectHideFlags: 0
@@ -80661,6 +83805,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -80811,6 +83956,96 @@ MonoBehaviour:
           m_Amplitude: {x: 0.3, y: 0.3, z: 0.3, w: 0}
           m_Vibrato: 5
           m_Decay: 1
+--- !u!1 &2078488134
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2078488135}
+  - component: {fileID: 2078488137}
+  - component: {fileID: 2078488136}
+  m_Layer: 0
+  m_Name: Speaker
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2078488135
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2078488134}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.4, y: 0.4, z: 0.4}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2000137882}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!23 &2078488136
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2078488134}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: ff060039b1b4d45629a2d70b475d2178, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 1
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &2078488137
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2078488134}
+  m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &2097031163
 GameObject:
   m_ObjectHideFlags: 0
@@ -81389,6 +84624,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -81567,6 +84803,7 @@ MonoBehaviour:
   m_Direction: 0
   m_ApplyInitialState: 0
   m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
   references:
     version: 2
     RefIds:
@@ -81693,3 +84930,438 @@ SceneRoots:
   - {fileID: 513836437}
   - {fileID: 1992022972}
   - {fileID: 1124371632}
+--- !u!1 &483651387
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 139184085}
+  - component: {fileID: 1891103376}
+  m_Layer: 0
+  m_Name: Camera/Trauma
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &139184085
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 483651387}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1727745620}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1891103376
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 483651387}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6dc1b1a00a6a44c3b159fc76ce605832, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: xpTURN.Feedback::xpTURN.Feedback.FeedbackPlayer
+  m_Items:
+  - rid: 1742887028403095753
+  m_Preset: {fileID: 0}
+  m_Anchors: []
+  m_FormatVersion: 1
+  m_Initialization: 1
+  m_Policy: 1
+  m_MaxOverlap: 4
+  m_DurationMultiplier: 1
+  m_StartDelay: 0
+  m_AutoPlay: 0
+  m_TimeMode: 0
+  m_Speed: 1
+  m_RandomizeDuration: 0
+  m_DurationRange: {x: 0.5, y: 2}
+  m_Cooldown: 0
+  m_Chance: 100
+  m_Intensity: 1
+  m_RemapIntensity: 0
+  m_IntensityRemap:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  m_UseDistanceGate: 0
+  m_GateReference: 0
+  m_GateAnchor: 
+  m_GateDistance: 5
+  m_UseGateFalloff: 0
+  m_GateFalloff:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: -1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: -1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  m_UnityEvents: []
+  m_Direction: 0
+  m_ApplyInitialState: 0
+  m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: 1742887028403095753
+      type: {class: CameraTraumaItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.3
+          m_Infinite: 0
+          m_Clock: 0
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 0
+          m_IntensityRange: {x: 0, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 5
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 1742887028405054107
+        m_DirectWrite: 0
+        m_Amount: 0.6
+    - rid: 1742887028405054107
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 1, y: 1, z: 1, w: 1}
+          m_Relative: 0
+--- !u!1 &2073734099
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1468891951}
+  - component: {fileID: 2057967351}
+  - component: {fileID: 120663117}
+  - component: {fileID: 1083410646}
+  - component: {fileID: 241073580}
+  m_Layer: 0
+  m_Name: Transform/Trauma
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &1468891951
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2073734099}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1727745620}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &2057967351
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2073734099}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!65 &120663117
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2073734099}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!23 &1083410646
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2073734099}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 5fad7132e17224bbaba1ab97cb8aab03, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 1
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &241073580
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2073734099}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6dc1b1a00a6a44c3b159fc76ce605832, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: xpTURN.Feedback::xpTURN.Feedback.FeedbackPlayer
+  m_Items:
+  - rid: 1742887028406323189
+  m_Preset: {fileID: 0}
+  m_Anchors: []
+  m_FormatVersion: 1
+  m_Initialization: 1
+  m_Policy: 1
+  m_MaxOverlap: 4
+  m_DurationMultiplier: 1
+  m_StartDelay: 0
+  m_AutoPlay: 0
+  m_TimeMode: 0
+  m_Speed: 1
+  m_RandomizeDuration: 0
+  m_DurationRange: {x: 0.5, y: 2}
+  m_Cooldown: 0
+  m_Chance: 100
+  m_Intensity: 1
+  m_RemapIntensity: 0
+  m_IntensityRemap:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  m_UseDistanceGate: 0
+  m_GateReference: 0
+  m_GateAnchor: 
+  m_GateDistance: 5
+  m_UseGateFalloff: 0
+  m_GateFalloff:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: -1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: -1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  m_UnityEvents: []
+  m_Direction: 0
+  m_ApplyInitialState: 0
+  m_DisableBehavior: 0
+  m_AudioOutput: {fileID: 0}
+  references:
+    version: 2
+    RefIds:
+    - rid: 1742887028406323189
+      type: {class: TransformTraumaItem, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Active: 1
+        m_Label: 
+        m_Timing:
+          m_Rule: 0
+          m_Delay: 0
+          m_Duration: 0.3
+          m_Infinite: 0
+          m_Clock: 0
+          m_RepeatCount: 0
+          m_RepeatForever: 0
+          m_RepeatGap: 0
+          m_Background: 0
+        m_Conditions:
+          m_Chance: 100
+          m_Cooldown: 0
+          m_MaxPlays: 0
+          m_Direction: 0
+          m_UseIntensityRange: 0
+          m_IntensityRange: {x: 0, y: 1}
+        m_PlayDirection: 0
+        m_Random:
+          m_RandomizeOutput: 0
+          m_OutputRange: {x: 0.8, y: 1}
+          m_RandomizeDuration: 0
+          m_DurationRange: {x: 0.5, y: 2}
+        m_Intensity: 0
+        m_Category:
+          m_Override: 0
+          m_Category: 0
+        m_Target:
+          m_Mode: 1
+          m_Object: {fileID: 0}
+          m_Path: 
+          m_Index: 0
+          m_ChildLookup: 0
+          m_Anchor: 
+          m_Channel:
+            m_Mode: 0
+            m_Id: 0
+            m_Asset: {fileID: 0}
+        m_Motion:
+          rid: 1742887028403111541
+        m_DirectWrite: 0
+        m_Amount: 0.8
+    - rid: 1742887028403111541
+      type: {class: SetMotion, ns: xpTURN.Feedback, asm: xpTURN.Feedback}
+      data:
+        m_Params:
+          m_Value: {x: 1, y: 1, z: 1, w: 1}
+          m_Relative: 0

@@ -58,7 +58,7 @@ namespace xpTURN.Feedback.Editor
             Thumb.Type = type;
             bool parametric = Parametric(type);
             P1.style.display = parametric ? DisplayStyle.Flex : DisplayStyle.None;
-            P1.label = type >= EaseType.ElasticIn && type <= EaseType.ElasticInOut ? "Amplitude" : "Overshoot";
+            P1.label = type >= EaseType.ElasticIn && type <= EaseType.ElasticInOut ? "Amplitude" : type == EaseType.Steps ? "Steps" : "Overshoot";
             P2.style.display = parametric && type >= EaseType.ElasticIn && type <= EaseType.ElasticInOut ? DisplayStyle.Flex : DisplayStyle.None;
             P2.label = "Period";
             Curve.style.display = type == EaseType.Custom ? DisplayStyle.Flex : DisplayStyle.None;
@@ -89,9 +89,9 @@ namespace xpTURN.Feedback.Editor
             return points;
         }
 
-        // Back (overshoot) and Elastic (amplitude, period) read P1 · P2
+        // Back (overshoot) and Elastic (amplitude, period) read P1 · P2, Steps (its count) P1
         internal static bool Parametric(EaseType type)
-            => type >= EaseType.BackIn && type <= EaseType.ElasticInOut;
+            => (type >= EaseType.BackIn && type <= EaseType.ElasticInOut) || type == EaseType.Steps;
 
         // the type with its own parameters — the curve stays
         internal static void Set(SerializedProperty ease, EaseType type)

@@ -3,12 +3,14 @@ using System;
 namespace xpTURN.Feedback
 {
     // the standard easing equations with exact ends — Expo is normalized and Elastic takes its ends apart. Custom is
-    // the curve Core's Ease evaluates; here it is Linear, as is an unknown value
+    // the curve Core's Ease evaluates; here it is Linear, as is an unknown value. Steps jumps at each step's end
     internal static class Easing
     {
         internal static float Evaluate(EaseType type, float p1, float p2, float t)
         {
             t = MotionKernels.Clamp01(t);
+            if (type == EaseType.Steps)
+                return Steps(p1, t);
             int index = (int)type - 1;
             if ((uint)index >= 30u)
                 return t;
@@ -22,6 +24,15 @@ namespace xpTURN.Feedback
                 default:
                     return t < 0.5f ? 0.5f * In(family, p1, p2, 2f * t) : 1f - 0.5f * In(family, p1, p2, 2f - 2f * t);
             }
+        }
+
+        // n even steps, each jump at its step's end and t = 1 the last: n is P1 rounded half up, 1 ~ 1000 (NaN 1 · +∞ 1000)
+        static float Steps(float p1, float t)
+        {
+            if (t >= 1f)
+                return 1f;
+            float n = !(p1 >= 1.5f) ? 1f : p1 >= 999.5f ? 1000f : MathF.Floor(p1 + 0.5f);
+            return MathF.Floor(t * n) / n;
         }
 
         static float In(int family, float p1, float p2, float t)

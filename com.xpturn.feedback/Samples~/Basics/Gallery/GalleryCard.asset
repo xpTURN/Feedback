@@ -20,10 +20,12 @@ MonoBehaviour:
     line at the bottom says what it does, its motion and its category (an item of
     category None plays in Before too). Short flashes are easier to see at a lower
     time scale. Hit Stop and Time Scale act on game time \u2014 watch the turning
-    cube stop or slow down."
+    cube stop or slow down. The Audio tab plays on a looping tone through the gallery's
+    own mixer \u2014 its motions reach farther than the add menu's, to be heard;
+    the tone is the scene's sound and plays in Before too."
   Controls: "Mouse \u2014 tabs and buttons \xB7 Gamepad \u2014 D-pad and South"
   SceneGuid: de80cf4368503402ba9c24f30696341b
   SceneName: FeedbackGallery
   RequiredType: xpTURN.Feedback.Samples.Basics.FeedbackGallery, xpTURN.Feedback.Samples.Basics.Gallery
-  RequiresText: the Particle System, Physics, Physics 2D and Animation modules
+  RequiresText: the Particle System, Physics, Physics 2D, Animation and Audio modules
   OpenInEditor: 0

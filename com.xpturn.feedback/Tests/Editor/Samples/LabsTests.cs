@@ -52,6 +52,9 @@ namespace xpTURN.Feedback.Tests.Editor.Samples
 
         static int Plays(FeedbackPlayer p) => p != null && s_Plays.TryGetValue(p, out int n) ? n : 0;
 
+        // the playing sources of a clip — a pooled voice takes the item's clip
+        static int Voices(AudioClip clip) => Resources.FindObjectsOfTypeAll<AudioSource>().Count(s => s != null && s.isPlaying && s.clip == clip);
+
         static void Count(params FeedbackPlayer[] players)
         {
             s_Plays.Clear();
@@ -271,7 +274,10 @@ namespace xpTURN.Feedback.Tests.Editor.Samples
             (int e0, int w0) = Counts();
             Component lab = Lab("CombatHitLab");
             FeedbackPlayer[] hits = { F<FeedbackPlayer>(lab, "m_Light"), F<FeedbackPlayer>(lab, "m_Heavy"), F<FeedbackPlayer>(lab, "m_Critical") };
-            Count(hits);
+            FeedbackPlayer[] sounds = { F<FeedbackPlayer>(lab, "m_LightSound"), F<FeedbackPlayer>(lab, "m_HeavySound"), F<FeedbackPlayer>(lab, "m_CriticalSound") };
+            Count(hits.Concat(sounds).ToArray());
+            AudioLowPassFilter duck = GameObject.Find("Ambience").GetComponent<AudioLowPassFilter>();
+            float open = duck.cutoffFrequency, least = open;
             Transform body = hits[2].transform;
             MethodInfo attack = lab.GetType().GetMethod("Attack");
             attack.Invoke(lab, new object[] { 0 });
@@ -287,6 +293,7 @@ namespace xpTURN.Feedback.Tests.Editor.Samples
                 // the punch swings both ways — its first clear move tells the side
                 if (firstMove == 0f && Mathf.Abs(body.position.z - z0) > 0.05f)
                     firstMove = body.position.z - z0;
+                least = Mathf.Min(least, duck.cutoffFrequency);
                 yield return null;
             }
             List<string> afterCritical = NumberTexts();
@@ -294,11 +301,28 @@ namespace xpTURN.Feedback.Tests.Editor.Samples
             attack.Invoke(lab, new object[] { 1 });
             yield return Real(0.3f);
             int[] plays = { Plays(hits[0]), Plays(hits[1]), Plays(hits[2]) };
+            int[] soundPlays = { Plays(sounds[0]), Plays(sounds[1]), Plays(sounds[2]) };
             yield return Real(1.5f);
+            float rest = duck.cutoffFrequency;
+            // Before: the sound players play gated — no voice; After: the light hit's voice
+            var clip = (AudioClip)F<UnityEngine.Object>(F<List<FeedbackItem>>(sounds[0], "m_Items")[0], "m_Resource");
+            SampleState.SetAfter(false);
+            attack.Invoke(lab, new object[] { 0 });
+            yield return Frames(2);
+            int before = Voices(clip);
+            SampleState.SetAfter(true);
+            yield return Real(0.3f);
+            attack.Invoke(lab, new object[] { 0 });
+            yield return Frames(2);
+            int after = Voices(clip);
+            yield return Real(0.5f);
             (int e1, int w1) = Counts();
             labType.GetField("s_DamageOf", All).SetValue(null, null);
             yield return new ExitPlayMode();
             Assert.That(plays, Is.EqualTo(new[] { 1, 1, 1 }), "a tier plays its preset");
+            Assert.That(soundPlays, Is.EqualTo(new[] { 1, 1, 1 }), "a tier plays its sound player");
+            Assert.That((least < 5000f, Mathf.Abs(rest - open) < 1f, before, after), Is.EqualTo((true, true, 0, 1)),
+                $"the duck — open {open:0} · least {least:0} · after {rest:0} Hz · the light's voices in Before {before} · After {after}");
             // the expectation from the seam's damage — the number reads intensity × 100
             Assert.That(afterLight, Is.EquivalentTo(new[] { Damage(0).ToString() }), "the light hit's number");
             Assert.That(afterCritical, Has.Member(Damage(2).ToString()), "the critical's number");

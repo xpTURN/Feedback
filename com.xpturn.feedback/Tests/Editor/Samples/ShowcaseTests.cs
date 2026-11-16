@@ -129,6 +129,9 @@ namespace xpTURN.Feedback.Tests.Editor.Samples
 
         static string Label(object item) => (string)item.GetType().GetField("m_Label", All).GetValue(item);
 
+        // a Play At Point with its sound
+        static bool Sounds(object item) => item.GetType().Name == "AudioPlayAtPointItem" && item.GetType().GetField("m_Resource", All).GetValue(item) as UnityEngine.Object != null;
+
         static object Conditions(object item) => item.GetType().GetField("m_Conditions", All).GetValue(item);
 
         static Vector2? RangeOf(object item)
@@ -143,7 +146,7 @@ namespace xpTURN.Feedback.Tests.Editor.Samples
             return (int)timing.GetType().GetField("m_Clock", All).GetValue(timing);
         }
 
-        // ---- the bundle: catalog · samples entry · asmdef (the particle system condition) · the card's keys bound
+        // ---- the bundle: catalog · samples entry · asmdef (the particle system and audio conditions) · the card's keys bound
 
         static readonly Dictionary<string, string> s_KeyPaths = new Dictionary<string, string>
         {
@@ -173,10 +176,10 @@ namespace xpTURN.Feedback.Tests.Editor.Samples
             string text = File.ReadAllText(files[0]);
             var asmdef = JsonUtility.FromJson<Asmdef>(text);
             Assert.That(asmdef.name, Is.EqualTo("xpTURN.Feedback.Samples.Showcase.BrickBreaker"));
-            Assert.That(asmdef.defineConstraints, Does.Contain("XPTURN_FEEDBACK_SAMPLES_PARTICLES"));
-            Assert.That(text.Contains("com.unity.modules.particlesystem") && !text.Contains("Unity.TextMeshPro"), Is.True, "the module's version define · no TMP reference");
+            Assert.That(asmdef.defineConstraints, Does.Contain("XPTURN_FEEDBACK_SAMPLES_PARTICLES").And.Contain("XPTURN_FEEDBACK_SAMPLES_AUDIO"));
+            Assert.That(text.Contains("com.unity.modules.particlesystem") && text.Contains("com.unity.modules.audio") && !text.Contains("Unity.TextMeshPro"), Is.True, "the modules' version defines · no TMP reference");
             SampleCard card = catalog.Cards[0];
-            Assert.That(card.RequiresText, Is.EqualTo("the Particle System module"));
+            Assert.That(card.RequiresText, Is.EqualTo("the Particle System and Audio modules"));
             var asset = AssetDatabase.LoadAssetAtPath<InputActionAsset>(ActionsPath);
             var bound = new HashSet<string>(asset.FindActionMap("Sample", true).bindings.Select(b => b.path));
             var problems = new List<string>();
@@ -190,8 +193,8 @@ namespace xpTURN.Feedback.Tests.Editor.Samples
             Assert.That(problems, Is.Empty, "card keys not in the Sample map");
         }
 
-        // ---- the scene: bricks (crack · break by range, no flash) · Impact (stops by ranges that don't overlap · rumble) · the
-        // players with a time item StopRevert · the boss's lists · the volume · no physics
+        // ---- the scene: bricks (crack · break by range, no flash · a crack and a break sound) · Impact (stops by ranges that don't overlap ·
+        // rumble) · the players with a time item StopRevert · the boss's lists · the sounds · the volume · no physics
 
         [Test]
         public void WQ02_TheScene()
@@ -211,9 +214,16 @@ namespace xpTURN.Feedback.Tests.Editor.Samples
                         problems.Add(b.name + ": a flash");
                 }
                 Vector2?[] ranges = items.Select(RangeOf).ToArray();
-                if (!(ranges.Length == 4 && ranges.Take(2).All(r => r == new Vector2(0f, 0.6f)) && ranges.Skip(2).All(r => r == new Vector2(0.9f, 1f))))
+                if (!(ranges.Length == 6 && ranges.Take(3).All(r => r == new Vector2(0f, 0.6f)) && ranges.Skip(3).All(r => r == new Vector2(0.9f, 1f))))
                     problems.Add(b.name + ": crack · break ranges");
+                if (items.Count < 6 || !Sounds(items[2]) || !Sounds(items.Last()))
+                    problems.Add(b.name + ": no crack or break sound");
             }
+            if (!Items(Field(lab, "m_PaddleHit")).Any(Sounds))
+                problems.Add("m_PaddleHit: no sound");
+            foreach (string name in new[] { "m_LostSound", "m_BossHitSound", "m_DefeatSound" })
+                if (Field(lab, name) == null || Items(Field(lab, name)).Count != 1 || !Sounds(Items(Field(lab, name))[0]))
+                    problems.Add(name + ": not one sound");
             FeedbackPlayer impact = Field(lab, "m_Impact");
             var stops = Items(impact).Where(i => i.GetType().Name == "HitStopItem").Select(i => RangeOf(i) ?? Vector2.zero).OrderBy(r => r.x).ToArray();
             object rumble = Items(impact).FirstOrDefault(i => i.GetType().Name == "GamepadRumbleItem");

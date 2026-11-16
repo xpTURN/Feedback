@@ -15,6 +15,11 @@ namespace xpTURN.Feedback
         [SerializeField] internal bool m_AdjustFixedDeltaTime;
         [SerializeField] internal int m_ShakeReceiversPerPlay = 4;
         [SerializeField] internal int m_ReceiverContributions = 8;
+        // the soft cap on a camera's shakes summed — world units and degrees, 0 (or below, or NaN) leaves them uncapped
+        [SerializeField] internal float m_MaximumShakeOffset;
+        [SerializeField] internal float m_MaximumShakeAngle;
+        // the transforms that hold a trauma at once — when full, the one with the least trauma goes
+        [SerializeField] internal int m_TraumaCapacity = 16;
         // 0 (or below, or NaN) follows the engine's Time.maximumDeltaTime
         [SerializeField] internal float m_MaximumUnscaledDelta;
         // the screen overlay canvas's sorting order — a 16-bit value
@@ -23,6 +28,9 @@ namespace xpTURN.Feedback
         // is above it by its preparation's order
         [SerializeField] internal int m_PostFXLayer;
         [SerializeField] internal float m_PostFXPriority = 1000f;
+        // the output group of the Play At Point sounds whose item and player name none — an AudioMixerGroup (the module's
+        // type Core can't name)
+        [SerializeField] internal UnityEngine.Object m_AudioOutput;
     }
 
     // one category's start state — a category the list leaves out starts on at scale 1
@@ -37,7 +45,7 @@ namespace xpTURN.Feedback
     // the values a context took — from the asset or the defaults (a test sets its own)
     internal sealed class SettingsValues
     {
-        internal const int CategoryCount = 9;
+        internal const int CategoryCount = 10;
 
         internal readonly bool[] Enabled = new bool[CategoryCount];
         internal readonly float[] Scale = new float[CategoryCount];
@@ -46,10 +54,14 @@ namespace xpTURN.Feedback
         internal bool AdjustFixedDeltaTime;
         internal int ShakeReceiversPerPlay = 4;
         internal int ReceiverContributions = 8;
+        internal float MaximumShakeOffset;
+        internal float MaximumShakeAngle;
+        internal int TraumaCapacity = 16;
         internal float MaximumUnscaledDelta;
         internal int OverlaySortingOrder = 32000;
         internal int PostFXLayer;
         internal float PostFXPriority = 1000f;
+        internal UnityEngine.Object AudioOutput;
 
         internal SettingsValues()
         {
@@ -82,12 +94,16 @@ namespace xpTURN.Feedback
             values.TimeScaleCapacity = asset.m_TimeScaleCapacity >= 1 ? asset.m_TimeScaleCapacity : 8;
             values.ShakeReceiversPerPlay = asset.m_ShakeReceiversPerPlay >= 1 ? asset.m_ShakeReceiversPerPlay : 4;
             values.ReceiverContributions = asset.m_ReceiverContributions >= 1 ? asset.m_ReceiverContributions : 8;
+            values.MaximumShakeOffset = asset.m_MaximumShakeOffset > 0f && asset.m_MaximumShakeOffset < float.PositiveInfinity ? asset.m_MaximumShakeOffset : 0f;
+            values.MaximumShakeAngle = asset.m_MaximumShakeAngle > 0f && asset.m_MaximumShakeAngle < float.PositiveInfinity ? asset.m_MaximumShakeAngle : 0f;
+            values.TraumaCapacity = asset.m_TraumaCapacity >= 1 ? asset.m_TraumaCapacity : 16;
             values.MaximumUnscaledDelta = asset.m_MaximumUnscaledDelta > 0f && asset.m_MaximumUnscaledDelta < float.PositiveInfinity ? asset.m_MaximumUnscaledDelta : 0f;
             values.AdjustFixedDeltaTime = asset.m_AdjustFixedDeltaTime;
             // a Canvas wraps a value past 16 bits without a word (40000 → −25536)
             values.OverlaySortingOrder = asset.m_OverlaySortingOrder >= short.MinValue && asset.m_OverlaySortingOrder <= short.MaxValue ? asset.m_OverlaySortingOrder : 32000;
             values.PostFXLayer = asset.m_PostFXLayer >= 0 && asset.m_PostFXLayer <= 31 ? asset.m_PostFXLayer : 0;
             values.PostFXPriority = asset.m_PostFXPriority > float.NegativeInfinity && asset.m_PostFXPriority < float.PositiveInfinity ? asset.m_PostFXPriority : 1000f;
+            values.AudioOutput = asset.m_AudioOutput;
             return values;
         }
 

@@ -6,6 +6,7 @@ using UnityEditor;
 using UnityEditor.Animations;
 using UnityEditor.Events;
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.Rendering;
 using UnityEngine.TestTools;
 using Object = UnityEngine.Object;
@@ -104,6 +105,149 @@ namespace xpTURN.Feedback.Tests.Editor
         public void Cleanup() => AssetDatabase.DeleteAsset(Folder);
     }
 
+    // a Resources prefab: a player whose UnityEvent item calls another player's PlayFromEvent(FeedbackPreset) — once with the
+    // preset of its Variants, once with a preset it does not list (persistent calls in Object mode, the preset the argument)
+    public sealed class FeedbackVariantEventAssets : IPrebuildSetup, IPostBuildCleanup
+    {
+        internal const string Folder = "Assets/FeedbackVariantEventAssets";
+
+        public void Setup()
+        {
+            string prefabPath = Folder + "/Resources/" + PlayerVariantEventPlayTests.PrefabName + ".prefab";
+            if (AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath) != null)
+                return;
+            if (!AssetDatabase.IsValidFolder(Folder))
+                AssetDatabase.CreateFolder("Assets", "FeedbackVariantEventAssets");
+            if (!AssetDatabase.IsValidFolder(Folder + "/Resources"))
+                AssetDatabase.CreateFolder(Folder, "Resources");
+            var variant = ScriptableObject.CreateInstance<FeedbackPreset>();
+            variant.m_Items.Add(Moving("v"));
+            AssetDatabase.CreateAsset(variant, Folder + "/Resources/" + PlayerVariantEventPlayTests.PresetName + ".asset");
+            var stranger = ScriptableObject.CreateInstance<FeedbackPreset>();
+            stranger.m_Items.Add(Moving("v"));
+            AssetDatabase.CreateAsset(stranger, Folder + "/Resources/" + PlayerVariantEventPlayTests.StrangerName + ".asset");
+            var go = new GameObject("variant event caller");
+            var target = new GameObject("target");
+            target.transform.SetParent(go.transform, false);
+            new GameObject("o").transform.SetParent(target.transform, false);
+            new GameObject("v").transform.SetParent(target.transform, false);
+            FeedbackPlayer player = target.AddComponent<FeedbackPlayer>();
+            player.m_Items.Add(Moving("o"));
+            player.m_Variants = new List<FeedbackPreset> { variant };
+            var call = new UnityEventItem();
+            UnityEventTools.AddObjectPersistentListener<FeedbackPreset>(call.m_Event, player.PlayFromEvent, variant);
+            UnityEventTools.AddObjectPersistentListener<FeedbackPreset>(call.m_Event, player.PlayFromEvent, stranger);
+            go.AddComponent<FeedbackPlayer>().m_Items.Add(call);
+            PrefabUtility.SaveAsPrefabAsset(go, prefabPath);
+            Object.DestroyImmediate(go);
+        }
+
+        // a tween of a child's position, by its path
+        static PositionItem Moving(string child)
+        {
+            var item = new PositionItem { m_Motion = new TweenMotion { m_Params = new TweenParams { m_To = new Vector4(2f, 0f, 0f, 0f), m_Loops = 1 } } };
+            item.m_Target = new TargetRef { m_Mode = TargetRefMode.Child, m_ChildLookup = ChildLookup.Path, m_Path = child, m_Anchor = "" };
+            item.m_Timing.m_Duration = 0.3f;
+            return item;
+        }
+
+        public void Cleanup() => AssetDatabase.DeleteAsset(Folder);
+    }
+
+    // a Resources prefab: a player whose UnityEvent item sets another player's Intensity and VariantKey — persistent calls of
+    // the two property setters — and that player's Variant of the key
+    public sealed class FeedbackSetterEventAssets : IPrebuildSetup, IPostBuildCleanup
+    {
+        internal const string Folder = "Assets/FeedbackSetterEventAssets";
+
+        public void Setup()
+        {
+            string prefabPath = Folder + "/Resources/" + PlayerSetterEventPlayTests.PrefabName + ".prefab";
+            if (AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath) != null)
+                return;
+            if (!AssetDatabase.IsValidFolder(Folder))
+                AssetDatabase.CreateFolder("Assets", "FeedbackSetterEventAssets");
+            if (!AssetDatabase.IsValidFolder(Folder + "/Resources"))
+                AssetDatabase.CreateFolder(Folder, "Resources");
+            var variant = ScriptableObject.CreateInstance<FeedbackPreset>();
+            variant.m_Alias = PlayerSetterEventPlayTests.Key;
+            variant.m_Items.Add(Moving("v"));
+            AssetDatabase.CreateAsset(variant, Folder + "/Resources/" + PlayerSetterEventPlayTests.PresetName + ".asset");
+            var go = new GameObject("setter event caller");
+            var target = new GameObject("target");
+            target.transform.SetParent(go.transform, false);
+            new GameObject("o").transform.SetParent(target.transform, false);
+            new GameObject("v").transform.SetParent(target.transform, false);
+            FeedbackPlayer player = target.AddComponent<FeedbackPlayer>();
+            player.m_Items.Add(Moving("o"));
+            player.m_Variants = new List<FeedbackPreset> { variant };
+            var call = new UnityEventItem();
+            var intensity = (UnityEngine.Events.UnityAction<float>)Delegate.CreateDelegate(typeof(UnityEngine.Events.UnityAction<float>), player, typeof(FeedbackPlayer).GetProperty("Intensity").GetSetMethod());
+            var key = (UnityEngine.Events.UnityAction<string>)Delegate.CreateDelegate(typeof(UnityEngine.Events.UnityAction<string>), player, typeof(FeedbackPlayer).GetProperty("VariantKey").GetSetMethod());
+            UnityEventTools.AddFloatPersistentListener(call.m_Event, intensity, PlayerSetterEventPlayTests.Intensity);
+            UnityEventTools.AddStringPersistentListener(call.m_Event, key, PlayerSetterEventPlayTests.Key);
+            go.AddComponent<FeedbackPlayer>().m_Items.Add(call);
+            PrefabUtility.SaveAsPrefabAsset(go, prefabPath);
+            Object.DestroyImmediate(go);
+        }
+
+        static PositionItem Moving(string child)
+        {
+            var item = new PositionItem { m_Motion = new TweenMotion { m_Params = new TweenParams { m_To = new Vector4(2f, 0f, 0f, 0f), m_Loops = 1 } } };
+            item.m_Target = new TargetRef { m_Mode = TargetRefMode.Child, m_ChildLookup = ChildLookup.Path, m_Path = child, m_Anchor = "" };
+            item.m_Timing.m_Duration = 0.3f;
+            return item;
+        }
+
+        public void Cleanup() => AssetDatabase.DeleteAsset(Folder);
+    }
+
+    // a Resources prefab of two players with fixed managed reference ids — one with its own list, one linking a Resources
+    // preset — for the item seeds of a saved list where it plays. Its own folder, its own test class (not in the set below)
+    public sealed class FeedbackItemSeedAssets : IPrebuildSetup, IPostBuildCleanup
+    {
+        internal const string Folder = "Assets/FeedbackItemSeedAssets";
+
+        public void Setup()
+        {
+            string prefabPath = Folder + "/Resources/" + PlayerItemSeedPlayTests.PrefabName + ".prefab";
+            if (AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath) != null)
+                return;
+            if (!AssetDatabase.IsValidFolder(Folder))
+                AssetDatabase.CreateFolder("Assets", "FeedbackItemSeedAssets");
+            if (!AssetDatabase.IsValidFolder(Folder + "/Resources"))
+                AssetDatabase.CreateFolder(Folder, "Resources");
+            var preset = ScriptableObject.CreateInstance<FeedbackPreset>();
+            for (int i = 0; i < PlayerItemSeedPlayTests.PresetCount; i++)
+                preset.m_Items.Add(new PlayerTestAction { m_Label = "p" + i, m_Length = 0.5f });
+            Fix(preset, preset.m_Items, PlayerItemSeedPlayTests.PresetFirst);
+            AssetDatabase.CreateAsset(preset, Folder + "/Resources/" + PlayerItemSeedPlayTests.PresetName + ".asset");
+            var go = new GameObject("item seed probe");
+            var own = new GameObject("own");
+            own.transform.SetParent(go.transform, false);
+            FeedbackPlayer player = own.AddComponent<FeedbackPlayer>();
+            for (int i = 0; i < PlayerItemSeedPlayTests.OwnCount; i++)
+                player.m_Items.Add(new PlayerTestAction { m_Label = "o" + i, m_Length = 0.5f });
+            Fix(player, player.m_Items, PlayerItemSeedPlayTests.OwnFirst);
+            var linked = new GameObject("linked");
+            linked.transform.SetParent(go.transform, false);
+            linked.AddComponent<FeedbackPlayer>().m_Preset = preset;
+            PrefabUtility.SaveAsPrefabAsset(go, prefabPath);
+            Object.DestroyImmediate(go);
+        }
+
+        static void Fix(Object owner, List<FeedbackItem> items, long first)
+        {
+            for (int i = 0; i < items.Count; i++)
+            {
+                if (!UnityEngine.Serialization.ManagedReferenceUtility.SetManagedReferenceIdForObject(owner, items[i], first + i))
+                    throw new InvalidOperationException("the fixed id of item " + i);
+            }
+        }
+
+        public void Cleanup() => AssetDatabase.DeleteAsset(Folder);
+    }
+
     // the package's scene on the build list for the run — no scene is opened (making one in a setup stops the run)
     public sealed class FeedbackLinkerScene : IPrebuildSetup, IPostBuildCleanup
     {
@@ -190,6 +334,32 @@ namespace xpTURN.Feedback.Tests.Editor
         }
     }
 
+    // the package's test mixers under Resources — no code makes a mixer. FeedbackTestMixer: two exposed parameters
+    // (FeedbackTestVolume — Master's volume · FeedbackTestPitch — Master's pitch) and two snapshots (A, the start · B, the
+    // volume at −20 dB). FeedbackTestMixerOther: one snapshot, nothing exposed
+    public sealed class FeedbackTestMixer : IPrebuildSetup, IPostBuildCleanup
+    {
+        internal const string Folder = "Assets/FeedbackTestMixer";
+        internal const string Name = "FeedbackTestMixer";
+        internal const string Other = "FeedbackTestMixerOther";
+        internal const string Source = "Packages/com.xpturn.feedback/Tests/Editor/Audio/";
+
+        public void Setup()
+        {
+            if (!AssetDatabase.IsValidFolder(Folder))
+                AssetDatabase.CreateFolder("Assets", "FeedbackTestMixer");
+            if (!AssetDatabase.IsValidFolder(Folder + "/Resources"))
+                AssetDatabase.CreateFolder(Folder, "Resources");
+            foreach (string name in new[] { Name, Other })
+            {
+                if (AssetDatabase.LoadAssetAtPath<AudioMixer>(Folder + "/Resources/" + name + ".mixer") == null)
+                    AssetDatabase.CopyAsset(Source + name + ".mixer", Folder + "/Resources/" + name + ".mixer");
+            }
+        }
+
+        public void Cleanup() => AssetDatabase.DeleteAsset(Folder);
+    }
+
     // the one setup the runtime tests name — a class or a method takes one [PrebuildSetup] (not AllowMultiple — CS0579); the
     // test runner runs a setup type once however many classes name it
     public sealed class FeedbackTestAssets : IPrebuildSetup, IPostBuildCleanup
@@ -200,10 +370,12 @@ namespace xpTURN.Feedback.Tests.Editor
             new FeedbackLinkerAssets().Setup();
             new FeedbackLinkerScene().Setup();
             new FeedbackTestAnimator().Setup();
+            new FeedbackTestMixer().Setup();
         }
 
         public void Cleanup()
         {
+            new FeedbackTestMixer().Cleanup();
             new FeedbackTestAnimator().Cleanup();
             new FeedbackLinkerScene().Cleanup();
             new FeedbackLinkerAssets().Cleanup();
@@ -211,7 +383,7 @@ namespace xpTURN.Feedback.Tests.Editor
         }
     }
 
-    // the setups make the material (the pipeline's shader, a main color) and the linker prefabs
+    // the setups make the material (the pipeline's shader, a main color), the linker prefabs, the controller and the mixers
     // and put the scene on the build list once; the cleanups remove the folders (the .meta too) and the scene; twice is the
     // same; a cleanup with no setup is quiet
     public sealed class PlayerBuildAssetsTests
@@ -252,8 +424,17 @@ namespace xpTURN.Feedback.Tests.Editor
                 if (controller == null || controller.parameters.Length != 4 || controller.layers.Length != 2
                     || Array.FindAll(AssetDatabase.LoadAllAssetsAtPath(controllerPath), o => o is AnimationClip).Length != 3)
                     fail.Add("the controller — " + (controller != null ? controller.parameters.Length + " parameters · " + controller.layers.Length + " layers" : "none"));
+                // the mixers once — the exposed names (Edit mode reads them) and the snapshots
+                var mixer = AssetDatabase.LoadAssetAtPath<AudioMixer>(FeedbackTestMixer.Folder + "/Resources/" + FeedbackTestMixer.Name + ".mixer");
+                var other = AssetDatabase.LoadAssetAtPath<AudioMixer>(FeedbackTestMixer.Folder + "/Resources/" + FeedbackTestMixer.Other + ".mixer");
+                if (mixer == null || !mixer.GetFloat("FeedbackTestVolume", out _) || !mixer.GetFloat("FeedbackTestPitch", out _) || mixer.FindSnapshot("A") == null || mixer.FindSnapshot("B") == null)
+                    fail.Add("the mixer — " + (mixer != null ? mixer.name : "none"));
+                if (other == null || other.FindSnapshot("A") == null || other.GetFloat("FeedbackTestVolume", out _))
+                    fail.Add("the other mixer — " + (other != null ? other.name : "none"));
+                if (AssetDatabase.FindAssets("t:AudioMixer", new[] { FeedbackTestMixer.Folder }).Length != 2)
+                    fail.Add("the mixers twice");
                 assets.Cleanup();
-                foreach (string folder in new[] { FeedbackTestMaterial.Folder, FeedbackLinkerAssets.Folder, FeedbackTestAnimator.Folder })
+                foreach (string folder in new[] { FeedbackTestMaterial.Folder, FeedbackLinkerAssets.Folder, FeedbackTestAnimator.Folder, FeedbackTestMixer.Folder })
                 {
                     if (AssetDatabase.IsValidFolder(folder) || Directory.Exists(folder) || File.Exists(folder + ".meta"))
                         fail.Add("left behind — " + folder);
@@ -271,6 +452,7 @@ namespace xpTURN.Feedback.Tests.Editor
                 AssetDatabase.DeleteAsset(FeedbackTestMaterial.Folder);
                 AssetDatabase.DeleteAsset(FeedbackLinkerAssets.Folder);
                 AssetDatabase.DeleteAsset(FeedbackTestAnimator.Folder);
+                AssetDatabase.DeleteAsset(FeedbackTestMixer.Folder);
                 EditorBuildSettings.scenes = list;
             }
             Assert.That(fail, Is.Empty);

@@ -328,7 +328,7 @@ namespace xpTURN.Feedback.Tests.Editor.Docs
         {
             var empty = new List<string>();
             int rows = 0;
-            foreach ((string key, string body) in new[] { "Feedbacks.md", "Concepts.md", "GettingStarted.md" }.SelectMany(d => DocRegions.Find(Read(Doc(d)))).Where(r => r.key.StartsWith("reference:", StringComparison.Ordinal) || r.key.StartsWith("rules:", StringComparison.Ordinal) || r.key.StartsWith("motions:", StringComparison.Ordinal) || r.key.StartsWith("samples:", StringComparison.Ordinal)))
+            foreach ((string key, string body) in new[] { "Feedbacks.md", "Concepts.md", "GettingStarted.md", DocSources.MotionReference }.SelectMany(d => DocRegions.Find(Read(Doc(d)))).Where(r => r.key.StartsWith("reference:", StringComparison.Ordinal) || r.key.StartsWith("rules:", StringComparison.Ordinal) || r.key.StartsWith("motions:", StringComparison.Ordinal) || r.key.StartsWith("samples:", StringComparison.Ordinal) || r.key.StartsWith("params:", StringComparison.Ordinal) || r.key.StartsWith("eases:", StringComparison.Ordinal)))
             {
                 foreach (string line in body.Split('\n').Where(l => l.StartsWith("| ", StringComparison.Ordinal) && !l.StartsWith("|---", StringComparison.Ordinal)).Skip(1))
                 {
@@ -340,6 +340,117 @@ namespace xpTURN.Feedback.Tests.Editor.Docs
             }
             Assert.That(rows, Is.GreaterThanOrEqualTo(Floor.KeptRows), "the rows read");
             Assert.That(empty, Is.Empty, "rows without a description");
+        }
+
+        // each motion's parameter table in the motion reference lists the fields the inspector draws, in its order — read
+        // through a serialized copy of the motion, not the reflection the table is made from
+        [Test]
+        public void DX12_MotionParameterTables()
+        {
+            string text = Read(Doc(DocSources.MotionReference));
+            Dictionary<string, string> regions = DocRegions.Find(text).GroupBy(r => r.key).ToDictionary(g => g.Key, g => g.First().body);
+            List<MotionKind> kinds = Enum.GetValues(typeof(MotionKind)).Cast<MotionKind>().ToList();
+            var preset = ScriptableObject.CreateInstance<FeedbackPreset>();
+            var bad = new List<string>();
+            int rows = 0;
+            try
+            {
+                Dictionary<MotionKind, FeedbackMotion> data = DocSources.MotionData();
+                foreach (MotionKind k in kinds)
+                    preset.m_Items.Add(new CustomFloatItem { m_Motion = data[k] });
+                var so = new SerializedObject(preset);
+                for (int i = 0; i < kinds.Count; i++)
+                {
+                    string key = "params:" + kinds[i];
+                    if (!regions.TryGetValue(key, out string body))
+                    {
+                        bad.Add("no region " + key);
+                        continue;
+                    }
+                    var names = new List<string>();
+                    SerializedProperty parameters = so.FindProperty($"m_Items.Array.data[{i}].m_Motion.m_Params");
+                    SerializedProperty it = parameters.Copy();
+                    SerializedProperty end = parameters.GetEndProperty();
+                    bool enter = true;
+                    while (it.NextVisible(enter) && !SerializedProperty.EqualContents(it, end))
+                    {
+                        enter = false;
+                        names.Add(it.displayName);
+                    }
+                    List<string> cells = body.Split('\n').Where(l => l.StartsWith("| ", StringComparison.Ordinal) && !l.StartsWith("|---", StringComparison.Ordinal)).Skip(1).Select(l => DocSources.Cells(l)[0]).ToList();
+                    rows += cells.Count;
+                    if (!cells.SequenceEqual(names))
+                        bad.Add($"{key}: [{string.Join(", ", cells)}] — the inspector draws [{string.Join(", ", names)}]");
+                }
+                bad.AddRange(regions.Keys.Where(k => k.StartsWith("params:", StringComparison.Ordinal) && kinds.All(x => "params:" + x != k)).Select(k => "a region of no motion: " + k));
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(preset);
+            }
+            TestContext.WriteLine($"parameter rows {rows}");
+            Assert.That(rows, Is.GreaterThanOrEqualTo(40), "the parameter rows read");
+            Assert.That(bad, Is.Empty);
+        }
+
+        // the motion reference's ease table names every ease type once
+        [Test]
+        public void DX13_EaseTable()
+        {
+            string body = DocRegions.Find(Read(Doc(DocSources.MotionReference))).Where(r => r.key == "eases:all").Select(r => r.body).FirstOrDefault();
+            Assert.That(body, Is.Not.Null, "no eases:all region");
+            List<string> named = body.Split('\n').Where(l => l.StartsWith("| ", StringComparison.Ordinal) && !l.StartsWith("|---", StringComparison.Ordinal)).Skip(1)
+                .SelectMany(l => Regex.Matches(DocSources.Cells(l)[1], "`([A-Za-z]+)`").Cast<Match>().Select(m => m.Groups[1].Value)).ToList();
+            Assert.That(named, Is.EquivalentTo(Enum.GetNames(typeof(EaseType))), "each ease type once");
+        }
+
+        // the motion reference has a section per motion in the motions' order, each holding its parameter table, and its
+        // choosing table points at every motion
+        [Test]
+        public void DX14_MotionReferenceSections()
+        {
+            string text = Read(Doc(DocSources.MotionReference));
+            List<string> kinds = Enum.GetNames(typeof(MotionKind)).ToList();
+            List<string> sections = Prose(text).Where(l => l.text.StartsWith("## ", StringComparison.Ordinal)).Select(l => l.text.Substring(3).Trim()).Where(kinds.Contains).ToList();
+            Assert.That(sections, Is.EqualTo(kinds), "a section per motion, in the motions' order");
+            var bad = new List<string>();
+            foreach (string k in kinds)
+            {
+                Match section = Regex.Match(text, "^## " + k + "\n(?<s>.*?)(?=^## |\\z)", RegexOptions.Singleline | RegexOptions.Multiline);
+                if (!section.Groups["s"].Value.Contains("<!-- gen:params:" + k + " -->"))
+                    bad.Add(k + " — its section holds no params:" + k + " region");
+            }
+            Match choosing = Regex.Match(text, "^## Choosing a motion\n(?<s>.*?)(?=^## |\\z)", RegexOptions.Singleline | RegexOptions.Multiline);
+            Assert.That(choosing.Success, "no 'Choosing a motion' section");
+            var pointed = new HashSet<string>(Regex.Matches(choosing.Groups["s"].Value, @"\]\(#(?<a>[a-z0-9\-]+)\)").Cast<Match>().Select(m => m.Groups["a"].Value));
+            bad.AddRange(kinds.Where(k => !pointed.Contains(k.ToLowerInvariant())).Select(k => k + " — the choosing table does not point at it"));
+            Assert.That(bad, Is.Empty);
+        }
+
+        // a hand-written cell is kept by its row's first cell — by the link's text when that cell is a link, so a table whose
+        // names became links keeps its descriptions
+        [Test]
+        public void DX15_KeptCellsByLinkText()
+        {
+            Dictionary<string, string> kept = DocSources.Descriptions("| Motion | Description |\n|---|---|\n| [`Set`](Motions.md#set) | Writes it. |\n| `Tween` | Goes. |\n");
+            Assert.That(kept.TryGetValue("`Set`", out string set) ? set : null, Is.EqualTo("Writes it."));
+            Assert.That(kept.TryGetValue("`Tween`", out string tween) ? tween : null, Is.EqualTo("Goes."));
+        }
+
+        // the documents do not say the package is silent — the Audio feedbacks play Unity's sounds. A phrase broken over two
+        // lines counts too
+        [Test]
+        public void DX16_NoSilentPackageClaim()
+        {
+            var silent = new Regex(@"(?i)\b(?:plays|ships)\s+no\s+sound\b");
+            var bad = new List<string>();
+            foreach (string file in DocRegions.Documents())
+            {
+                string text = Read(file);
+                foreach (Match m in silent.Matches(text))
+                    bad.Add($"{Short(file)}:{text.Take(m.Index).Count(c => c == '\n') + 1} '{Regex.Replace(m.Value, @"\s+", " ")}'");
+            }
+            Assert.That(bad, Is.Empty);
         }
 
         // why a type this version did not export may stay in the documents — null when its source is in an assembly that did

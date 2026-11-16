@@ -86,14 +86,14 @@ namespace xpTURN.Feedback.Tests.Editor.Docs.Snippets
     // end
 
     // doc: api-custom-target
-    public class EngineHum : MonoBehaviour, IFeedbackTarget<float>
+    public class Engine : MonoBehaviour, IFeedbackTarget<float>
     {
-        [SerializeField] AudioSource hum;
+        [SerializeField] float throttle = 1f;
 
         public float FeedbackValue
         {
-            get => hum.volume;
-            set => hum.volume = value;
+            get => throttle;
+            set => throttle = value;
         }
     }
     // end

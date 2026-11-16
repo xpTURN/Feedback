@@ -14,6 +14,7 @@ namespace xpTURN.Feedback.Editor
     {
         internal override string Id => "FB-D01";
         internal override RuleSeverity Severity => RuleSeverity.Warning;
+        internal override bool OnVariants => false;
 
         internal override void Check(RuleContext c, List<RuleResult> into)
         {
@@ -47,6 +48,7 @@ namespace xpTURN.Feedback.Editor
     {
         internal override string Id => "FB-D03";
         internal override RuleSeverity Severity => RuleSeverity.Warning;
+        internal override bool OnVariants => false;
 
         internal static bool Persists(FeedbackMotion motion)
         {

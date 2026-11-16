@@ -132,15 +132,16 @@ namespace xpTURN.Feedback.Tests.Editor
                 On(new AnimatorLayerWeightItem { m_Layer = "Upper" }, normal, TweenTo(1.5f)),
                 On(new AnimatorLayerWeightItem { m_Layer = "Upper" }, normal, TweenTo(-0.5f, TweenMode.By)),
                 On(new AnimatorSpeedItem(), normal, TweenTo(-5f, TweenMode.By)),
-                On(new AnimatorLayerWeightItem { m_Layer = "Upper" }, normal, TweenTo(0.5f)));
-            Want(p, "FB-L05", new[] { 0, 1 }, RuleSeverity.Warning);
-            Want(p, "FB-L06", new[] { 0, 1, 2, 3, 4 }, RuleSeverity.Info);
+                On(new AnimatorLayerWeightItem { m_Layer = "Upper" }, normal, TweenTo(0.5f)),
+                On(new AnimatorSpeedItem(), a, new BounceMotion()));
+            Want(p, "FB-L05", new[] { 0, 1, 10 }, RuleSeverity.Warning);
+            Want(p, "FB-L06", new[] { 0, 1, 2, 3, 4, 10 }, RuleSeverity.Info);
             Want(p, "FB-L07", new[] { 3, 6 }, RuleSeverity.Info);
             Want(p, "FB-L08", new int[0], RuleSeverity.Info);
             RuleResult l05 = F.Of(p, "FB-L05").Single(r => r.Item == 0);
             FeedbackValidator.Apply(l05, l05.Fixes.Single(f => f.Name == "Write directly"));
             Assert.That(((AnimatorSpeedItem)p.m_Items[0]).m_DirectWrite, Is.True);
-            Want(p, "FB-L05", new[] { 1 }, RuleSeverity.Warning);
+            Want(p, "FB-L05", new[] { 1, 10 }, RuleSeverity.Warning);
         }
 
         // L08: the controller's behaviours (on a state, on a sub-machine) — the dev project's (the behaviour is the Animation tests')

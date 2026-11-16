@@ -62,6 +62,9 @@ namespace xpTURN.Feedback
 
         internal FeedbackContext Context { get; }
 
+        // the last Update stage's time — the frame the plays moved by
+        internal FrameTime LastTime { get; private set; }
+
         internal bool IsShutdown => m_IsShutdown;
 
         // a token's callback runs on the canceling thread
@@ -121,6 +124,7 @@ namespace xpTURN.Feedback
             if (!m_UpdatePending)
                 return;
             m_UpdatePending = false;
+            LastTime = time;
             using (s_UpdateMarker.Auto())
             {
                 m_InStage = true;
@@ -220,6 +224,8 @@ namespace xpTURN.Feedback
                     m_InStage = false;
                 }
             }
+            if (!Context.Layers.Dry)
+                FeedbackDiagnostics.RaiseApplied(this);
         }
 
         internal void Tick(float dt) => Tick(new FrameTime(dt, dt));

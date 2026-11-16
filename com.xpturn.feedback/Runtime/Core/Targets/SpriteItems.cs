@@ -84,7 +84,7 @@ namespace xpTURN.Feedback
     [Serializable]
     public sealed class LineWidthItem : TargetItem
     {
-        static readonly TargetTraits s_Traits = new TargetTraits(valueKind: ValueKind.Float, supportedMotions: MotionMask.Tween | MotionMask.Punch,
+        static readonly TargetTraits s_Traits = new TargetTraits(valueKind: ValueKind.Float, supportedMotions: MotionMask.Tween | MotionMask.Punch | MotionMask.Bounce,
             category: FeedbackCategory.None, flashSensitive: false, applyMode: ApplyMode.Offset);
 
         internal override TargetTraits Traits => s_Traits;
@@ -95,7 +95,7 @@ namespace xpTURN.Feedback
     [Serializable]
     public sealed class LineColorItem : TargetItem
     {
-        static readonly TargetTraits s_Traits = new TargetTraits(valueKind: ValueKind.Color, supportedMotions: MotionMask.Tween | MotionMask.Punch,
+        static readonly TargetTraits s_Traits = new TargetTraits(valueKind: ValueKind.Color, supportedMotions: MotionMask.Tween | MotionMask.Punch | MotionMask.Bounce,
             category: FeedbackCategory.None, flashSensitive: false, applyMode: ApplyMode.Offset);
 
         [SerializeField] internal LineEnd m_End;

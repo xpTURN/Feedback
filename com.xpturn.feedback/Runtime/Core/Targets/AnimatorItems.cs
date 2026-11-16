@@ -73,7 +73,7 @@ namespace xpTURN.Feedback
     [Serializable]
     public sealed class AnimatorSpeedItem : TargetItem
     {
-        static readonly TargetTraits s_Traits = new TargetTraits(valueKind: ValueKind.Float, supportedMotions: MotionMask.Tween | MotionMask.Punch | MotionMask.Spring,
+        static readonly TargetTraits s_Traits = new TargetTraits(valueKind: ValueKind.Float, supportedMotions: MotionMask.Tween | MotionMask.Punch | MotionMask.Bounce | MotionMask.Spring,
             category: FeedbackCategory.None, flashSensitive: false, applyMode: ApplyMode.Offset);
 
         internal override TargetTraits Traits => s_Traits;

@@ -9,7 +9,7 @@ namespace xpTURN.Feedback
     [Serializable]
     public sealed class RectSizeDeltaItem : TargetItem
     {
-        static readonly TargetTraits s_Traits = new TargetTraits(valueKind: ValueKind.Vector2, supportedMotions: MotionMask.Tween | MotionMask.Punch | MotionMask.Spring,
+        static readonly TargetTraits s_Traits = new TargetTraits(valueKind: ValueKind.Vector2, supportedMotions: MotionMask.Tween | MotionMask.Punch | MotionMask.Bounce | MotionMask.Spring,
             category: FeedbackCategory.Motion, flashSensitive: false, applyMode: ApplyMode.Offset);
 
         internal override TargetTraits Traits => s_Traits;

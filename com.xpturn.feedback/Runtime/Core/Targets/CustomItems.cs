@@ -11,7 +11,7 @@ namespace xpTURN.Feedback
     public sealed class CustomFloatItem : TargetItem
     {
         static readonly TargetTraits s_Traits = new TargetTraits(valueKind: ValueKind.Float,
-            supportedMotions: MotionMask.Set | MotionMask.Tween | MotionMask.Punch | MotionMask.Shake | MotionMask.Curve | MotionMask.Flash | MotionMask.Oscillate | MotionMask.Wiggle | MotionMask.Spring,
+            supportedMotions: MotionMask.Set | MotionMask.Tween | MotionMask.Punch | MotionMask.Bounce | MotionMask.Shake | MotionMask.Curve | MotionMask.Flash | MotionMask.Oscillate | MotionMask.Wiggle | MotionMask.Spring,
             category: FeedbackCategory.None, flashSensitive: false, applyMode: ApplyMode.Offset);
 
         internal override TargetTraits Traits => s_Traits;
@@ -22,7 +22,7 @@ namespace xpTURN.Feedback
     public sealed class CustomVector3Item : TargetItem
     {
         static readonly TargetTraits s_Traits = new TargetTraits(valueKind: ValueKind.Vector3,
-            supportedMotions: MotionMask.Tween | MotionMask.Punch | MotionMask.Shake | MotionMask.Curve | MotionMask.Oscillate | MotionMask.Wiggle | MotionMask.Spring,
+            supportedMotions: MotionMask.Tween | MotionMask.Punch | MotionMask.Bounce | MotionMask.Shake | MotionMask.Curve | MotionMask.Oscillate | MotionMask.Wiggle | MotionMask.Spring,
             category: FeedbackCategory.None, flashSensitive: false, applyMode: ApplyMode.Offset);
 
         internal override TargetTraits Traits => s_Traits;
@@ -47,7 +47,7 @@ namespace xpTURN.Feedback
     public sealed class CustomFloatEventItem : TargetItem
     {
         static readonly TargetTraits s_Traits = new TargetTraits(valueKind: ValueKind.Float,
-            supportedMotions: MotionMask.Tween | MotionMask.Punch | MotionMask.Shake | MotionMask.Curve | MotionMask.Oscillate,
+            supportedMotions: MotionMask.Tween | MotionMask.Punch | MotionMask.Bounce | MotionMask.Shake | MotionMask.Curve | MotionMask.Oscillate,
             category: FeedbackCategory.None, flashSensitive: false, applyMode: ApplyMode.Offset);
 
         [SerializeField] internal UnityEvent<float> m_Event = new UnityEvent<float>();

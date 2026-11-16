@@ -778,5 +778,83 @@ namespace xpTURN.Feedback.Tests
             Assert.That((step < 0.2f, least > 0.3f, Mathf.Abs(last[2]) < Eps), Is.EqualTo((true, true, true)),
                 $"the largest step {step:0.000} · every character moved {least:0.00} · the rest after the end {last[2]:0.000}");
         }
+
+        // ---- Per Axis on the offset — every character circles (a Sine, Axis Phase 0.25 on Y, Axis Frequency 1.5), and the
+        // stagger lags by the base Frequency: the last character is where the first was s / F = 0.25 s before (0.75 of a turn)
+
+        [UnityTest]
+        public IEnumerator CW28_PerAxisCirclesEveryCharacter()
+        {
+            Time.captureDeltaTime = 1f / 120f;
+            TextMeshProUGUI t = Text("ABCDE");
+            yield return null;
+            var circle = new OscillateMotion { m_Params = new OscillateParams { m_Amplitude = new Vector4(0.5f, 0.5f, 0f, 0f), m_Frequency = 2f, m_PerAxis = true, m_AxisPhase = new Vector4(0f, 0.25f, 0f, 0f), m_AxisFrequency = new Vector4(1.5f, 1.5f, 1f, 1f) } };
+            FeedbackPlayer p = Player(t.gameObject, new TMPCharacterOffsetItem { m_Stagger = 0.5f }, t, circle, 2f);
+            float size = Size(t.textInfo.characterInfo[0]);
+            var first = new List<Vector2>();
+            var lastOne = new List<Vector2>();
+            float off = 0f;
+            p.Play();
+            for (int f = 0; f < 170; f++)
+            {
+                yield return null;
+                for (int i = 0; i < 5; i++)
+                {
+                    Vector3 shift = Shift(t, i) / size;
+                    if (f >= 2)
+                        off = Mathf.Max(off, Mathf.Abs(new Vector2(shift.x, shift.y).magnitude - 0.5f));
+                }
+                first.Add(Shift(t, 0) / size);
+                lastOne.Add(Shift(t, 4) / size);
+            }
+            float lagged = 0f, apart = 0f;
+            for (int f = 32; f < 170; f++)
+            {
+                lagged = Mathf.Max(lagged, (lastOne[f] - first[f - 30]).magnitude);
+                apart = Mathf.Max(apart, (lastOne[f] - first[f]).magnitude);
+            }
+            Assert.That((off < 2e-3f, lagged < 2e-3f, apart > 0.3f), Is.EqualTo((true, true, true)),
+                $"off the circle {off:0.0000} · the last vs the first 0.25 s before {lagged:0.0000} · vs the first now {apart:0.00}");
+        }
+
+        // ---- a Fade In on the offset — one factor for every character, the lagged ones too (their T is the same), and none on an
+        // endless item, which moves from its first frame: a Sine from phase 0.25 is 1 at 0 s, and at 0.1 Hz with a lag of 0.1
+        // no character comes near 0, so the faded text over its twin without the fade is the factor, character by character. An
+        // endless text lags its characters otherwise than a finite one, so it is not the twin
+
+        [UnityTest]
+        public IEnumerator CW29_TheFadeIsOneFactorForEveryCharacter()
+        {
+            Time.captureDeltaTime = 1f / 120f;
+            TextMeshProUGUI a = Text("ABCDE"), b = Text("ABCDE"), c = Text("ABCDE");
+            yield return null;
+            OscillateMotion Peak(float fadeIn) => new OscillateMotion { m_Params = new OscillateParams { m_Amplitude = new Vector4(0.5f, 0f, 0f, 0f), m_Frequency = 0.1f, m_Phase = 0.25f, m_FadeIn = fadeIn } };
+            var endless = new TMPCharacterOffsetItem { m_Stagger = 0.1f };
+            FeedbackPlayer pa = Player(a.gameObject, endless, a, Peak(0.5f), 2f);
+            endless.m_Timing.m_Infinite = true;
+            FeedbackPlayer pb = Player(b.gameObject, new TMPCharacterOffsetItem { m_Stagger = 0.1f }, b, Peak(0.5f), 2f);
+            FeedbackPlayer pc = Player(c.gameObject, new TMPCharacterOffsetItem { m_Stagger = 0.1f }, c, Peak(0f), 2f);
+            float size = Size(a.textInfo.characterInfo[0]);
+            pa.Play();
+            pb.Play();
+            pc.Play();
+            float firstA = float.NaN, firstFactor = float.NaN, lastFactor = float.NaN, spread = 0f;
+            var factor = new float[5];
+            for (int f = 0; f < 140; f++)
+            {
+                yield return null;
+                for (int i = 0; i < 5; i++)
+                    factor[i] = Shift(b, i).x / Shift(c, i).x;
+                if (f == 0)
+                {
+                    firstA = Mathf.Abs(Shift(a, 0).x) / size;
+                    firstFactor = factor[0];
+                }
+                spread = Mathf.Max(spread, Mathf.Max(factor[0], factor[1], factor[2], factor[3], factor[4]) - Mathf.Min(factor[0], factor[1], factor[2], factor[3], factor[4]));
+                lastFactor = factor[4];
+            }
+            Assert.That((Mathf.Abs(firstA - 0.5f) < 1e-3f, firstFactor < 0.05f, spread < 1e-3f, Mathf.Abs(lastFactor - 1f) < 1e-4f), Is.EqualTo((true, true, true, true)),
+                $"endless at its first frame {firstA:0.0000} · the factor at the first frame {firstFactor:0.0000} · its spread over the characters {spread:0.000000} · past the fade {lastFactor:0.000000}");
+        }
     }
 }

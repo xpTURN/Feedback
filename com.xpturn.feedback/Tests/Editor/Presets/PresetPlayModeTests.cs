@@ -95,5 +95,77 @@ namespace xpTURN.Feedback.Tests.Editor
                 fx.Clean();
             }
         }
+
+        // in play, a Variant's edit waits for the players that use it as a variant · the banner counts them · Rebuild Them
+        // rebuilds them · a Variants change of the player waits too
+        [UnityTest]
+        public IEnumerator VS24_InPlayAVariantEditWaitsForThePlayersUsingIt()
+        {
+            var fx = new F();
+            bool enabled = EditorSettings.enterPlayModeOptionsEnabled;
+            EnterPlayModeOptions options = EditorSettings.enterPlayModeOptions;
+            EditorSettings.enterPlayModeOptionsEnabled = true;
+            EditorSettings.enterPlayModeOptions = EnterPlayModeOptions.DisableDomainReload;
+            FeedbackPreset variant = fx.Preset("VS24", F.Tween(0.2f));
+            FeedbackPlayer user = null, other = null;
+            bool pendingUser = false, pendingOther = true, cleared = false, variantsPath = false;
+            string banner = null;
+            int rebuilt = -1;
+            yield return new EnterPlayMode();
+            try
+            {
+                user = new GameObject("VS24User").AddComponent<FeedbackPlayer>();
+                other = new GameObject("VS24Other").AddComponent<FeedbackPlayer>();
+                user.m_Items.Add(F.Tween(0.2f));
+                user.m_Variants = new System.Collections.Generic.List<FeedbackPreset> { variant };
+                other.m_Items.Add(F.Tween(0.2f));
+            }
+            catch
+            {
+                EditorSettings.enterPlayModeOptionsEnabled = enabled;
+                EditorSettings.enterPlayModeOptions = options;
+                throw;
+            }
+            yield return null;
+            user.Rebuild();
+            other.Rebuild();
+            var so = new SerializedObject(variant);
+            so.FindProperty("m_Items.Array.data[0].m_Timing.m_Duration").floatValue = 0.5f;
+            so.ApplyModifiedProperties();
+            yield return null;
+            pendingUser = PlayModeEdits.Pending(user);
+            pendingOther = PlayModeEdits.Pending(other);
+            var editor = (FeedbackPresetEditor)UnityEditor.Editor.CreateEditor(variant);
+            fx.Draw(editor);
+            yield return InspectorTesting.Wait(0.4);
+            banner = editor.Banner.style.display.value == DisplayStyle.Flex ? editor.Banner.text : null;
+            rebuilt = PresetOps.RebuildLinked(variant);
+            cleared = !PlayModeEdits.Pending(user);
+            var uso = new SerializedObject(user);
+            uso.FindProperty("m_Variants").DeleteArrayElementAtIndex(0);
+            uso.ApplyModifiedProperties();
+            yield return null;
+            variantsPath = PlayModeEdits.Pending(user);
+            PlayModeEdits.Clear();
+            fx.Made.Remove(editor);
+            Object.DestroyImmediate(editor);
+            yield return new ExitPlayMode();
+            EditorSettings.enterPlayModeOptionsEnabled = enabled;
+            EditorSettings.enterPlayModeOptions = options;
+            try
+            {
+                Assert.That(pendingUser, Is.True, "a player using it as a variant waits");
+                Assert.That(pendingOther, Is.False);
+                Assert.That(banner, Is.EqualTo(FeedbackPresetEditor.PlayText + " (1)"), "the banner counts it");
+                Assert.That(rebuilt, Is.EqualTo(1));
+                Assert.That(cleared, Is.True);
+                Assert.That(variantsPath, Is.True, "a Variants change in play waits for a Rebuild");
+                Assert.That(FeedbackPresetEditor.PlayText, Does.Contain("players using it"));
+            }
+            finally
+            {
+                fx.Clean();
+            }
+        }
     }
 }

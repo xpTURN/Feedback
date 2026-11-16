@@ -134,6 +134,7 @@ namespace xpTURN.Feedback.Tests.Editor
                 case WiggleMotion w: return w.m_Params.m_Amplitude;
                 case SpringMotion s: return s.m_Params.m_Value;
                 case BlinkMotion b: return b.m_Params.m_Value;
+                case BounceMotion u: return u.m_Params.m_Amplitude;
                 default: return Vector4.zero;
             }
         }
@@ -170,7 +171,7 @@ namespace xpTURN.Feedback.Tests.Editor
             List<CatalogLeaf> leaves = Leaves();
             foreach (CatalogLeaf leaf in leaves)
                 ItemListEdits.Insert(so, ItemListEdits.ItemsPath, -1, new[] { ItemFactory.Create(leaf) }, "Add Feedback");
-            Assert.That(leaves.Count(l => !l.Custom), Is.EqualTo(377), "7 × 3 + 10 transform · 17 light · 10 light 2d · 30 ui · 54 tmp · 4 screen · 45 postfx · 18 cinemachine · 3 haptics · 6 rect transform · 1 video · 73 renderer · 17 camera · 7 game object · 7 particles · 7 animation · 5 physics · 14 action and flow · 25 custom · 3 time scale");
+            Assert.That(leaves.Count(l => !l.Custom), Is.EqualTo(483), "8 × 3 + 12 transform · 19 light · 10 light 2d · 34 ui · 59 tmp · 4 screen · 50 postfx · 23 cinemachine · 3 haptics · 7 rect transform · 1 video · 66 audio · 77 renderer · 22 camera · 7 game object · 7 particles · 8 animation · 5 physics · 14 action and flow · 28 custom · 3 time scale");
             Assert.That(p.m_Items.Count, Is.EqualTo(leaves.Count));
             Assert.That(p.m_Items, Has.None.Null);
             for (int i = 0; i < leaves.Count; i++)
@@ -193,7 +194,7 @@ namespace xpTURN.Feedback.Tests.Editor
 
         static readonly Type[] s_CameraTypes =
         {
-            typeof(CameraShakeItem), typeof(CameraFieldOfViewItem), typeof(CameraOrthographicSizeItem), typeof(CameraZoomItem),
+            typeof(CameraShakeItem), typeof(CameraTraumaItem), typeof(CameraFieldOfViewItem), typeof(CameraOrthographicSizeItem), typeof(CameraZoomItem),
             typeof(CameraClippingPlanesItem), typeof(CameraBackgroundColorItem),
         };
 
@@ -227,7 +228,7 @@ namespace xpTURN.Feedback.Tests.Editor
         public void IX02t_TheDefaultsFitTheTarget()
         {
             float timing = new PositionItem().m_Timing.m_Duration;
-            foreach (MotionKind k in new[] { MotionKind.Tween, MotionKind.Punch, MotionKind.Shake, MotionKind.Curve, MotionKind.Oscillate, MotionKind.Wiggle })
+            foreach (MotionKind k in new[] { MotionKind.Tween, MotionKind.Punch, MotionKind.Shake, MotionKind.Curve, MotionKind.Oscillate, MotionKind.Wiggle, MotionKind.Bounce })
                 Assert.That(Size(New(typeof(RotationItem), k).m_Motion), Is.EqualTo(Vector4.one * 30f), "rotation " + k);
             Assert.That(Size(New(typeof(RotationItem), MotionKind.Spring).m_Motion), Is.EqualTo(Vector4.one * 1900f), "rotation bump");
             Assert.That(Size(New(typeof(LightIntensityItem), MotionKind.Spring).m_Motion), Is.EqualTo(Vector4.one * 60f), "light bump");
@@ -245,6 +246,27 @@ namespace xpTURN.Feedback.Tests.Editor
             Assert.That(New(typeof(LightIntensityItem), MotionKind.Shake).m_Timing.m_Duration, Is.EqualTo(0.5f), "a shake");
             Assert.That(Size(New(typeof(PositionItem), MotionKind.Punch).m_Motion), Is.EqualTo(Vector4.one), "the motion's amplitude 1");
             Assert.That(New(typeof(PositionItem), MotionKind.Punch).m_Timing.m_Duration, Is.EqualTo(timing), "the timing's own");
+            Assert.That(Size(New(typeof(PositionItem), MotionKind.Bounce).m_Motion), Is.EqualTo(new Vector4(0f, 1f, 0f, 0f)), "a hop goes up");
+            Assert.That(Size(New(typeof(CameraShakeItem), MotionKind.Bounce).m_Motion), Is.EqualTo(new Vector4(0f, 0.2f, 0f, 0f)), "a camera's hop goes up");
+            Assert.That(New(typeof(PositionItem), MotionKind.Bounce).m_Timing.m_Duration, Is.EqualTo(0.6f), "a bounce");
+        }
+
+        // every target with a Punch has a Bounce — the Punch's amplitude (a position's and a camera shake's on Y only) for 0.6 s
+        [Test]
+        public void IX02x_EveryPunchLeafHasABounce()
+        {
+            List<CatalogLeaf> leaves = Leaves().Where(l => !l.Custom).ToList();
+            List<CatalogLeaf> bounces = leaves.Where(l => l.Motion == (int)MotionKind.Bounce).ToList();
+            Assert.That(bounces.Select(l => l.Type), Is.EquivalentTo(leaves.Where(l => l.Motion == (int)MotionKind.Punch).Select(l => l.Type)));
+            Assert.That(bounces.Count, Is.EqualTo(48));
+            foreach (CatalogLeaf leaf in bounces)
+            {
+                var item = (TargetItem)ItemFactory.Create(leaf);
+                Vector4 punch = Size(New(leaf.Type, MotionKind.Punch).m_Motion);
+                bool up = leaf.Type == typeof(PositionItem) || leaf.Type == typeof(CameraShakeItem);
+                Assert.That(Size(item.m_Motion), Is.EqualTo(up ? new Vector4(0f, punch.y, 0f, 0f) : punch), leaf.Path);
+                Assert.That(item.m_Timing.m_Duration, Is.EqualTo(0.6f), leaf.Path + " duration");
+            }
         }
 
         // the light's and the camera's value targets — every leaf of the nine, written by hand. A Tween's end moves a new
@@ -255,6 +277,7 @@ namespace xpTURN.Feedback.Tests.Editor
             (typeof(LightRangeItem), MotionKind.Punch, Vector4.one * 5f),
             (typeof(LightRangeItem), MotionKind.Oscillate, Vector4.one * 5f),
             (typeof(LightRangeItem), MotionKind.Spring, Vector4.one * 300f),
+            (typeof(LightRangeItem), MotionKind.Bounce, Vector4.one * 5f),
             (typeof(LightColorItem), MotionKind.Tween, new Vector4(1f, 0f, 0f, 1f)),
             (typeof(LightColorItem), MotionKind.Spring, Vector4.one * 30f),
             (typeof(LightSpotAngleItem), MotionKind.Tween, Vector4.one * 60f),
@@ -263,12 +286,15 @@ namespace xpTURN.Feedback.Tests.Editor
             (typeof(CameraFieldOfViewItem), MotionKind.Punch, Vector4.one * 10f),
             (typeof(CameraFieldOfViewItem), MotionKind.Shake, Vector4.one * 5f),
             (typeof(CameraFieldOfViewItem), MotionKind.Spring, Vector4.one * 600f),
+            (typeof(CameraFieldOfViewItem), MotionKind.Bounce, Vector4.one * 10f),
             (typeof(CameraOrthographicSizeItem), MotionKind.Tween, Vector4.one * 10f),
             (typeof(CameraOrthographicSizeItem), MotionKind.Punch, Vector4.one),
             (typeof(CameraOrthographicSizeItem), MotionKind.Shake, Vector4.one * 0.5f),
             (typeof(CameraOrthographicSizeItem), MotionKind.Spring, Vector4.one * 60f),
+            (typeof(CameraOrthographicSizeItem), MotionKind.Bounce, Vector4.one),
             (typeof(CameraZoomItem), MotionKind.Tween, Vector4.one),
             (typeof(CameraZoomItem), MotionKind.Punch, Vector4.one * 0.5f),
+            (typeof(CameraZoomItem), MotionKind.Bounce, Vector4.one * 0.5f),
             (typeof(CameraClippingPlanesItem), MotionKind.Tween, new Vector4(6.25f, 5000f, 0f, 0f)),
             (typeof(CameraBackgroundColorItem), MotionKind.Tween, Vector4.one),
         };
@@ -299,6 +325,7 @@ namespace xpTURN.Feedback.Tests.Editor
             (typeof(SquashAndStretchItem), MotionKind.Punch, Vector4.one * 0.5f),
             (typeof(SquashAndStretchItem), MotionKind.Curve, Vector4.one * 0.5f),
             (typeof(SquashAndStretchItem), MotionKind.Spring, Vector4.one * 30f),
+            (typeof(SquashAndStretchItem), MotionKind.Bounce, Vector4.one * 0.5f),
             (typeof(LookAtItem), MotionKind.Set, Vector4.zero),
             (typeof(LookAtItem), MotionKind.Tween, Vector4.one),
             (typeof(RotateAroundItem), MotionKind.Tween, Vector4.one * 90f),
@@ -331,6 +358,7 @@ namespace xpTURN.Feedback.Tests.Editor
             (typeof(MaterialFloatItem), MotionKind.Curve, Vector4.one),
             (typeof(MaterialFloatItem), MotionKind.Oscillate, Vector4.one),
             (typeof(MaterialFloatItem), MotionKind.Spring, Vector4.one * 30f),
+            (typeof(MaterialFloatItem), MotionKind.Bounce, Vector4.one),
             (typeof(MaterialVectorItem), MotionKind.Tween, Vector4.one),
             (typeof(MaterialVectorItem), MotionKind.Curve, Vector4.one),
             (typeof(MaterialVectorItem), MotionKind.Oscillate, Vector4.one),
@@ -409,8 +437,9 @@ namespace xpTURN.Feedback.Tests.Editor
                 + (OptionalAssemblyTests.Implemented(typeof(Light2DIntensityItem)) ? 0 : 4) + (OptionalAssemblyTests.Implemented(typeof(GraphicColorItem)) ? 0 : 16)
                 + (OptionalAssemblyTests.Implemented(typeof(VideoPlayerControlItem)) ? 0 : 1) + (OptionalAssemblyTests.Implemented(typeof(TMPFontSizeItem)) ? 0 : 17)
                 + (OptionalAssemblyTests.Implemented(typeof(ScreenFlashItem)) ? 0 : 3) + (OptionalAssemblyTests.Implemented(typeof(PostFXBloomItem)) ? 0 : 16)
-                + (OptionalAssemblyTests.Implemented(typeof(CinemachineImpulseItem)) ? 0 : 8) + (OptionalAssemblyTests.Implemented(typeof(GamepadRumbleItem)) ? 0 : 1)),
-                "the particles' five, the animators' five, the bodies' three and two, the 2D lights' four, uGUI's sixteen, the video's one, TMP's seventeen where their modules · packages are off");
+                + (OptionalAssemblyTests.Implemented(typeof(CinemachineImpulseItem)) ? 0 : 8) + (OptionalAssemblyTests.Implemented(typeof(GamepadRumbleItem)) ? 0 : 1)
+                + (OptionalAssemblyTests.Implemented(typeof(AudioVolumeItem)) ? 0 : 14)),
+                "the particles' five, the animators' five, the bodies' three and two, the 2D lights' four, uGUI's sixteen, the video's one, TMP's seventeen, the audio's fourteen where their modules · packages are off");
         }
 
         // the favorites in the order marked
@@ -463,7 +492,7 @@ namespace xpTURN.Feedback.Tests.Editor
             yield return InspectorTesting.Wait(0.2);
             AddMenuPopup popup = AddMenuPopup.Last;
             Assert.That(popup?.Tree, Is.Not.Null, "opened");
-            Assert.That(popup.Shown.Count(l => !l.Custom), Is.EqualTo(377), "no words — the categories");
+            Assert.That(popup.Shown.Count(l => !l.Custom), Is.EqualTo(483), "no words — the categories");
             Assert.That(list.List.selectedIndex, Is.EqualTo(0), "selected with the popup open");
             popup.Filter("punch");
             Assert.That(popup.Shown[0].Path, Is.EqualTo("Animation/Speed/Punch"));
@@ -506,6 +535,9 @@ namespace xpTURN.Feedback.Tests.Editor
             Assert.That(((PositionItem)p.m_Items[0]).m_Motion, Is.InstanceOf<ShakeMotion>());
             Undo.PerformUndo();
             Assert.That(((PositionItem)p.m_Items[0]).m_Motion, Is.InstanceOf<TweenMotion>(), "one undo");
+            Assert.That(MotionField.Set(so, Item0, MotionKind.Bounce), Is.True);
+            now = (PositionItem)p.m_Items[0];
+            Assert.That((now.m_Motion is BounceMotion, Size(now.m_Motion), now.m_Timing.m_Duration), Is.EqualTo((true, new Vector4(0f, 1f, 0f, 0f), 0.7f)), "a Bounce — the table's, the duration not carried");
         }
 
         // a new ease type takes its own parameters
@@ -522,6 +554,8 @@ namespace xpTURN.Feedback.Tests.Editor
             Assert.That(Saved().m_P1, Is.EqualTo(Ease.Of(EaseType.BackOut).m_P1).And.Not.Zero);
             EaseField.Set(ease, EaseType.ElasticOut);
             Assert.That((Saved().m_P1, Saved().m_P2), Is.EqualTo((Ease.Of(EaseType.ElasticOut).m_P1, Ease.Of(EaseType.ElasticOut).m_P2)));
+            EaseField.Set(ease, EaseType.Steps);
+            Assert.That((Saved().m_P1, Saved().m_P2), Is.EqualTo((4f, 0f)), "four steps");
             EaseField.Set(ease, EaseType.CubicIn);
             Assert.That((Saved().m_P1, Saved().m_P2), Is.EqualTo((0f, 0f)));
         }
@@ -673,7 +707,7 @@ namespace xpTURN.Feedback.Tests.Editor
         static readonly Type[] s_TransformTypes =
         {
             typeof(PositionItem), typeof(RotationItem), typeof(ScaleItem),
-            typeof(SquashAndStretchItem), typeof(LookAtItem), typeof(RotateAroundItem), typeof(MatchTransformItem), typeof(SetParentItem),
+            typeof(SquashAndStretchItem), typeof(LookAtItem), typeof(RotateAroundItem), typeof(MatchTransformItem), typeof(SetParentItem), typeof(TransformTraumaItem),
         };
 
         static readonly Type[] s_RendererTypes =
@@ -690,19 +724,19 @@ namespace xpTURN.Feedback.Tests.Editor
             Light light = new GameObject("Light").AddComponent<Light>();
             List<CatalogLeaf> s = ComponentDrop.Suggest(leaves, light);
             // a Behaviour · a Renderer suggests Component Enabled's two too · a Transform the spawn
-            Assert.That(s.Count(l => !l.Custom), Is.EqualTo(19));
+            Assert.That(s.Count(l => !l.Custom), Is.EqualTo(21));
             Assert.That(s.Where(l => !l.Custom).Where(l => !l.Custom).Select(l => l.Type).Distinct(), Is.EquivalentTo(s_LightTypes.Append(typeof(ComponentEnabledItem))));
             var item = (TargetItem)ComponentDrop.Create(s[0], light);
             Assert.That(item.m_Target.m_Mode, Is.EqualTo(TargetRefMode.Direct));
             Assert.That(item.m_Target.m_Object, Is.SameAs(light));
             Assert.That(item.m_Motion, Is.Not.Null);
-            Assert.That(ComponentDrop.Suggest(leaves, light.transform).Where(l => !l.Custom).Select(l => l.Type).Distinct(), Is.EquivalentTo(s_TransformTypes.Append(typeof(SpawnItem)).Append(typeof(ParticleSpawnItem)).Append(typeof(RigidbodyExplosionItem)).Append(typeof(FloatingTextItem))));
+            Assert.That(ComponentDrop.Suggest(leaves, light.transform).Where(l => !l.Custom).Select(l => l.Type).Distinct(), Is.EquivalentTo(s_TransformTypes.Append(typeof(SpawnItem)).Append(typeof(ParticleSpawnItem)).Append(typeof(RigidbodyExplosionItem)).Append(typeof(FloatingTextItem)).Append(typeof(AudioPlayAtPointItem))));
             Camera cam = new GameObject("Cam").AddComponent<Camera>();
             Assert.That(ComponentDrop.Suggest(leaves, cam).Where(l => !l.Custom).Select(l => l.Type).Distinct(), Is.EquivalentTo(s_CameraTypes.Append(typeof(ComponentEnabledItem))));
             MeshRenderer renderer = new GameObject("Mesh").AddComponent<MeshRenderer>();
             Assert.That(ComponentDrop.Suggest(leaves, renderer).Where(l => !l.Custom).Select(l => l.Type).Distinct(), Is.EquivalentTo(s_RendererTypes.Append(typeof(ComponentEnabledItem))));
             Assert.That(ComponentDrop.Suggest(leaves, light.gameObject).Where(l => !l.Custom).Select(l => l.Type).Distinct(),
-                Is.EquivalentTo(new[] { typeof(SetActiveItem), typeof(SpawnItem), typeof(DespawnItem), typeof(SetLayerItem), typeof(ComponentEnabledItem), typeof(ParticleSpawnItem), typeof(RigidbodyExplosionItem), typeof(FloatingTextItem) }.Concat(s_TransformTypes).Concat(s_LightTypes)));
+                Is.EquivalentTo(new[] { typeof(SetActiveItem), typeof(SpawnItem), typeof(DespawnItem), typeof(SetLayerItem), typeof(ComponentEnabledItem), typeof(ParticleSpawnItem), typeof(RigidbodyExplosionItem), typeof(FloatingTextItem), typeof(AudioPlayAtPointItem) }.Concat(s_TransformTypes).Concat(s_LightTypes)));
             var fromObject = (TargetItem)ComponentDrop.Create(s[0], light.gameObject);
             Assert.That(fromObject.m_Target.m_Object, Is.SameAs(light), "a GameObject dropped for a light's item holds the light");
             var setActive = (TargetItem)ComponentDrop.Create(leaves.First(l => l.Type == typeof(SetActiveItem)), light.gameObject);
@@ -787,13 +821,13 @@ namespace xpTURN.Feedback.Tests.Editor
             Assert.That(p.m_Items.Count, Is.EqualTo(1), "one undo");
         }
 
-        // a thumbnail's points are the ease's; only Back · Elastic are parametric
+        // a thumbnail's points are the ease's; only Back · Elastic · Steps are parametric
         [Test]
         public void IX17a_TheThumbnailIsTheEase()
         {
             List<EaseType> thumbed = EaseField.Thumbed().ToList();
-            Assert.That(thumbed.Count, Is.EqualTo(31));
-            Assert.That(thumbed, Has.No.Member(EaseType.Custom));
+            Assert.That(thumbed.Count, Is.EqualTo(32));
+            Assert.That(thumbed, Has.No.Member(EaseType.Custom).And.Member(EaseType.Steps));
             foreach (EaseType t in thumbed)
             {
                 Vector2[] points = EaseField.Points(t, EaseField.ThumbPoints);
@@ -806,7 +840,8 @@ namespace xpTURN.Feedback.Tests.Editor
             }
             Assert.That(EaseField.Points(EaseType.BackOut, EaseField.ThumbPoints).Max(v => v.y), Is.GreaterThan(1f), "the overshoot drawn");
             Assert.That(thumbed.Where(EaseField.Parametric),
-                Is.EqualTo(new[] { EaseType.BackIn, EaseType.BackOut, EaseType.BackInOut, EaseType.ElasticIn, EaseType.ElasticOut, EaseType.ElasticInOut }));
+                Is.EqualTo(new[] { EaseType.BackIn, EaseType.BackOut, EaseType.BackInOut, EaseType.ElasticIn, EaseType.ElasticOut, EaseType.ElasticInOut, EaseType.Steps }));
+            Assert.That(EaseField.Points(EaseType.Steps, EaseField.ThumbPoints).Select(v => v.y).Distinct().OrderBy(y => y), Is.EqualTo(new[] { 0f, 0.25f, 0.5f, 0.75f, 1f }), "Steps' thumbnail is a staircase");
         }
 
         // the ease field's popup sets the type; the parameters and the curve show for their types
@@ -842,6 +877,33 @@ namespace xpTURN.Feedback.Tests.Editor
             yield return InspectorTesting.Wait(0.2);
             Assert.That(field.Curve.style.display.value, Is.EqualTo(DisplayStyle.Flex));
             Assert.That(field.P1.style.display.value, Is.EqualTo(DisplayStyle.None));
+            Assert.That(m_Errors, Is.Empty);
+        }
+
+        // Steps from the popup: its count shows in P1, named Steps, without P2 or the curve
+        [UnityTest]
+        public IEnumerator IX17c_StepsShowsItsCount()
+        {
+            FeedbackPlayer p = Player("EaseSteps", New(typeof(ScaleItem), MotionKind.Tween));
+            InspectorElement inspector = InspectorTesting.Inspector(m_Window, p);
+            yield return InspectorTesting.Wait(0.2);
+            ItemElement row = InspectorTesting.Rows(inspector).Single();
+            row.Header.Fold.value = true;
+            yield return InspectorTesting.Wait(0.2);
+            EaseField field = row.Body.Q<EaseField>();
+            EasePopup.Last = null;
+            PreviewBarTesting.Submit(field.Choice);
+            yield return InspectorTesting.Wait(0.2);
+            Assert.That(EasePopup.Last, Is.Not.Null);
+            EasePopup.Last.Choose(EaseType.Steps);
+            yield return InspectorTesting.Wait(0.2);
+            Ease saved = ((TweenMotion)((TargetItem)p.m_Items[0]).m_Motion).m_Params.m_Ease;
+            Assert.That((saved.m_Type, saved.m_P1, saved.m_P2), Is.EqualTo((EaseType.Steps, 4f, 0f)));
+            Assert.That(field.Choice.text, Is.EqualTo(nameof(EaseType.Steps)));
+            Assert.That(field.P1.style.display.value, Is.EqualTo(DisplayStyle.Flex), "the count shows");
+            Assert.That(field.P1.label, Is.EqualTo("Steps"));
+            Assert.That(field.P2.style.display.value, Is.EqualTo(DisplayStyle.None));
+            Assert.That(field.Curve.style.display.value, Is.EqualTo(DisplayStyle.None));
             Assert.That(m_Errors, Is.Empty);
         }
     }

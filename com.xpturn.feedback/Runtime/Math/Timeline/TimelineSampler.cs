@@ -58,57 +58,69 @@ namespace xpTURN.Feedback
             into.Reverse = reverse;
             long total = _r.Total;
             for (int node = 0; node < _p.NodeCount; node++)
+                SampleOne(node, position, reverse, total, into);
+        }
+
+        // one node's state at a nominal position — the same as Sample's for that node; the other nodes' are left as they were
+        public void SampleNode(int node, long position, bool reverse, TimelineSample into)
+        {
+            into.Position = position;
+            into.Reverse = reverse;
+            SampleOne(node, position, reverse, _r.Total, into);
+        }
+
+        // the nodes are independent: a node's state reads the program and the resolved times only
+        void SampleOne(int node, long position, bool reverse, long total, TimelineSample into)
+        {
+            int scope = _p.NodeScope(node);
+            long localStart = _r.NodeLocalStart(node);
+            long q;
+            if (!reverse)
             {
-                int scope = _p.NodeScope(node);
-                long localStart = _r.NodeLocalStart(node);
-                long q;
-                if (!reverse)
-                {
-                    q = StartCount(node, Clamp(node, position)) - 1;
-                }
-                else
-                {
-                    long valid = StartCount(node, Clamp(node, total));
-                    long ended = position > total ? valid : TimelineTime.Min(EndedBefore(scope, _r.NodeLocalEnd(node), position), valid);
-                    q = ended < valid ? ended : -1;
-                }
+                q = StartCount(node, Clamp(node, position)) - 1;
+            }
+            else
+            {
+                long valid = StartCount(node, Clamp(node, total));
+                long ended = position > total ? valid : TimelineTime.Min(EndedBefore(scope, _r.NodeLocalEnd(node), position), valid);
+                q = ended < valid ? ended : -1;
+            }
 
-                into._occurrence[node] = q;
-                if (q < 0)
-                {
-                    into._stage[node] = TimelineStage.Pending;
-                    into._start[node] = 0;
-                    into._naturalEnd[node] = 0;
-                    into._effectiveEnd[node] = 0;
-                }
-                else
-                {
-                    long scopeStart = ScopeIterationStart(scope, q);
-                    long start = TimelineTime.Add(scopeStart, localStart);
-                    int item = _p.NodeItem(node);
-                    long natural = item >= 0 ? TimelineTime.Add(start, _r.ItemDuration(item)) : TimelineTime.Add(scopeStart, _r.NodeLocalEnd(node));
-                    long effective = _p.NodeInBackground(node) ? TimelineTime.Min(natural, total) : natural;
-                    into._start[node] = start;
-                    into._naturalEnd[node] = natural;
-                    into._effectiveEnd[node] = effective;
-                    bool running = reverse ? position > start : position < effective;
-                    into._stage[node] = running ? TimelineStage.Running : TimelineStage.Done;
-                }
+            into._occurrence[node] = q;
+            if (q < 0)
+            {
+                into._stage[node] = TimelineStage.Pending;
+                into._start[node] = 0;
+                into._naturalEnd[node] = 0;
+                into._effectiveEnd[node] = 0;
+            }
+            else
+            {
+                long scopeStart = ScopeIterationStart(scope, q);
+                long start = TimelineTime.Add(scopeStart, localStart);
+                int item = _p.NodeItem(node);
+                long natural = item >= 0 ? TimelineTime.Add(start, _r.ItemDuration(item)) : TimelineTime.Add(scopeStart, _r.NodeLocalEnd(node));
+                long effective = _p.NodeInBackground(node) ? TimelineTime.Min(natural, total) : natural;
+                into._start[node] = start;
+                into._naturalEnd[node] = natural;
+                into._effectiveEnd[node] = effective;
+                bool running = reverse ? position > start : position < effective;
+                into._stage[node] = running ? TimelineStage.Running : TimelineStage.Done;
+            }
 
-                int block = _p.NodeBlock(node);
-                if (block < 0)
-                    continue;
-                int inner = TimelineProgram.BlockScope(block);
-                if (!reverse)
-                {
-                    into._scopeOccurrence[block] = IterationCount(inner, Clamp(node, position)) - 1;
-                }
-                else
-                {
-                    long valid = IterationCount(inner, Clamp(node, total));
-                    long ended = position > total ? valid : TimelineTime.Min(EndedBefore(inner, _r.BlockLength(block), position), valid);
-                    into._scopeOccurrence[block] = ended < valid ? ended : -1;
-                }
+            int block = _p.NodeBlock(node);
+            if (block < 0)
+                return;
+            int inner = TimelineProgram.BlockScope(block);
+            if (!reverse)
+            {
+                into._scopeOccurrence[block] = IterationCount(inner, Clamp(node, position)) - 1;
+            }
+            else
+            {
+                long valid = IterationCount(inner, Clamp(node, total));
+                long ended = position > total ? valid : TimelineTime.Min(EndedBefore(inner, _r.BlockLength(block), position), valid);
+                into._scopeOccurrence[block] = ended < valid ? ended : -1;
             }
         }
 

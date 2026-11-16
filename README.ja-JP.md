@@ -4,7 +4,7 @@
 
 > この文書は英語の [README](README.md) の翻訳です。内容が異なる場合は英語版を正とします。
 
-<!-- english: ba1e8cb6028f -->
+<!-- english: 95f21f0706de -->
 
 ![ブロック崩しのボスに再生したフィードバック — クリティカルヒット・爆発・画面フラッシュ — を Game ビューでプレビューした様子](com.xpturn.feedback/Documentation~/images/hero.gif)
 
@@ -30,10 +30,11 @@ public class Enemy : MonoBehaviour
 
 ## 含まれるもの
 
-- **ターゲット × モーション** — <!-- gen:count:targets -->141<!-- /gen:count:targets --> のターゲットが <!-- gen:count:motions -->11<!-- /gen:count:motions --> のモーションを <!-- gen:count:combinations -->361<!-- /gen:count:combinations --> 通りの組み合わせで受け取ります。
-- **追加メニュー** — 検索・お気に入り・最近使った項目を備えた <!-- gen:count:leaves -->377<!-- /gen:count:leaves --> 項目。
+- **ターゲット × モーション** — <!-- gen:count:targets -->157<!-- /gen:count:targets --> のターゲットが <!-- gen:count:motions -->12<!-- /gen:count:motions --> のモーションを <!-- gen:count:combinations -->467<!-- /gen:count:combinations --> 通りの組み合わせで受け取ります。
+- **追加メニュー** — 検索・お気に入り・最近使った項目を備えた <!-- gen:count:leaves -->483<!-- /gen:count:leaves --> 項目。
 - **エディットモードのプレビュー** — プレイヤーの ▶ を押すと Scene ビューと Game ビューで確認でき、止めると値が戻ります。
-- **プリセット** — オブジェクトに置くか、プレイヤーからリンクするプリセットが <!-- gen:count:presets -->21<!-- /gen:count:presets --> 個。
+  インスペクターのグラフは、各アイテムとリストが書き込む値を描きます。
+- **プリセット** — オブジェクトに置く、プレイヤーからリンクする、またはプレイヤーのバリアントとして再生するプリセットが <!-- gen:count:presets -->21<!-- /gen:count:presets --> 個。
 - **バリデーターとデバッガー** — ワンクリックで修正できる `Window > xpTURN > Feedback Validator` と、いま再生中のものを見る
   `Window > xpTURN > Feedback Debugger`。
 - **サンプル** — 最初のフィードバックから短いゲームまで、<!-- gen:count:bundles -->5<!-- /gen:count:bundles --> つのバンドル。
@@ -60,6 +61,7 @@ Unity 6000.0.85f2 以降。Unity 6000.3.28f1 と 6000.6.8f1 でテストして�
 | Physics module | 1.0.0 | Rigidbody の力・速度・爆発・Collider の切り替え |
 | Physics 2D module | 1.0.0 | Rigidbody 2D の力と速度 |
 | Video module | 1.0.0 | Video Player の制御 |
+| Audio module | 1.0.0 | 音の再生・音の音量・ピッチ・パン・フィルター・リスナーの音量・ミキサーのパラメーターとスナップショット・プールから出して一点で鳴らす音 |
 
 表のバージョンは各アセンブリがコンパイルされ始めるバージョンです。このパッケージは Universal RP 17.3.0、uGUI 2.0.0、
 Cinemachine 3.1.7、Input System 1.20.1、UniTask 2.5.11、Timeline 1.8.13（Unity 6000.6 では組み込みの Timeline 6.6.0）で
@@ -72,7 +74,7 @@ Cinemachine 3.1.7、Input System 1.20.1、UniTask 2.5.11、Timeline 1.8.13（Uni
 ## インストール
 
 - Package Manager で **+ > Add package from git URL…** を選び、
-  `https://github.com/xpTURN/Feedback.git?path=/com.xpturn.feedback#v0.1.0` を入力します。
+  `https://github.com/xpTURN/Feedback.git?path=/com.xpturn.feedback#v0.2.0` を入力します。
 - または **+ > Add package from disk…** を選び、`com.xpturn.feedback` フォルダーの `package.json` を選びます。
 - または **+ > Add package from tarball…** を選び、パッケージの `.tgz` を選びます。
 - または `Packages/manifest.json` に追加します（相対パスは `Packages` フォルダーから始まります）：
@@ -102,10 +104,12 @@ Labs、UI、Advanced、Showcase）を読み込みます。サンプルには Inp
   エディターのツール・サンプル
 - [コンセプト](com.xpturn.feedback/Documentation~/Concepts.md) — ターゲットとモーション、値の書き込み方、時間と再生、
   Unity Timeline
-- [スクリプト API](com.xpturn.feedback/Documentation~/ScriptingAPI.md) — コードから呼ぶ型と、独自のフィードバック（サウンド・
-  ミドルウェアのイベント・スマートフォンの振動）の土台
+- [スクリプト API](com.xpturn.feedback/Documentation~/ScriptingAPI.md) — コードから呼ぶ型と、独自のフィードバック（ミドルウェアのイベント・
+  スマートフォンの振動）の土台
 - [フィードバック・リファレンス](com.xpturn.feedback/Documentation~/Feedbacks.md) — すべてのフィードバックと、それぞれが
   受け取るモーション
+- [モーション・リファレンス](com.xpturn.feedback/Documentation~/Motions.md) — 各モーションの形とパラメーター、そして
+  イージング
 - [パフォーマンス](com.xpturn.feedback/Documentation~/Performance.md) — 再生ごとのアロケーションなし・再生ごとのコルーチンとの
   比較・ターゲット別のコスト
 

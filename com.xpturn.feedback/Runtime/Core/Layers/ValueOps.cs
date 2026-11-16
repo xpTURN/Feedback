@@ -68,6 +68,16 @@ namespace xpTURN.Feedback
 
         public bool BitEquals(in Vector3 a, in Vector3 b) => B(a.x) == B(b.x) && B(a.y) == B(b.y) && B(a.z) == B(b.z);
 
+        // the length softly capped (MotionKernels.SoftLimit), the direction kept — up to half the limit the same vector
+        internal static Vector3 SoftLimit(in Vector3 v, float limit)
+        {
+            float length = v.magnitude;
+            if (!(length > 0f))
+                return v;
+            float capped = MotionKernels.SoftLimit(length, limit);
+            return capped == length ? v : v * (capped / length);
+        }
+
         static int B(float x) => BitConverter.SingleToInt32Bits(x);
     }
 
@@ -124,6 +134,23 @@ namespace xpTURN.Feedback
         public Quaternion Lerp(in Quaternion a, in Quaternion b, float t) => Quaternion.SlerpUnclamped(a, b, t);
 
         public bool BitEquals(in Quaternion a, in Quaternion b) => B(a.x) == B(b.x) && B(a.y) == B(b.y) && B(a.z) == B(b.z) && B(a.w) == B(b.w);
+
+        // the angle in degrees softly capped (MotionKernels.SoftLimit), the axis kept — the angle from atan2 (a float acos
+        // reads a few hundredths of a degree as 0); up to half the limit the same rotation
+        internal static Quaternion SoftLimit(in Quaternion q, float limit)
+        {
+            float s = Mathf.Sqrt(q.x * q.x + q.y * q.y + q.z * q.z);
+            if (!(s > 0f))
+                return q;
+            float sign = q.w < 0f ? -1f : 1f;
+            float angle = 2f * Mathf.Atan2(s, q.w * sign) * Mathf.Rad2Deg;
+            float capped = MotionKernels.SoftLimit(angle, limit);
+            if (capped == angle)
+                return q;
+            float half = capped * 0.5f * Mathf.Deg2Rad;
+            float k = sign * Mathf.Sin(half) / s;
+            return new Quaternion(q.x * k, q.y * k, q.z * k, Mathf.Cos(half));
+        }
 
         static int B(float x) => BitConverter.SingleToInt32Bits(x);
     }

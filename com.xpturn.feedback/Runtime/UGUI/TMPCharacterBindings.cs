@@ -124,8 +124,8 @@ namespace xpTURN.Feedback
                 start = now;
             }
             m_Reverse[record] = context.Reverse;
-            uint seed = Hash32.Tagged(context.ItemSeed, Hash32.Occurrence, Hash32.Fold(context.Occurrence));
-            m_Evaluator.Begin(ref m_States[record], start, new MotionBegin { Seed = seed, Intensity = context.Intensity });
+            uint seed = PlayMath.OccurrenceSeed(context.ItemSeed, context.Occurrence);
+            m_Evaluator.Begin(ref m_States[record], start, new MotionBegin { Seed = seed, Intensity = context.Intensity, Endless = context.Endless });
             m_Handles[record] = m_Slot.Open(m_Channel, m_Write, m_Evaluator, m_Stagger, m_Backward, m_Frequency, m_OwnSeeds);
         }
 

@@ -911,7 +911,7 @@ namespace xpTURN.Feedback.Tests.Editor
                 MethodInfo set = typeof(FeedbackPlayer).GetMethod("SetListener", BindingFlags.Public | BindingFlags.Instance);
                 Check(set != null && set.ReturnType == typeof(bool), "SetListener");
                 Check(typeof(PlayArgs).GetMethod("WithListener", BindingFlags.Public | BindingFlags.Instance) != null && typeof(PlayArgs).GetProperty("Listener") != null, "WithListener · Listener");
-                Check(UnsafeUtility.SizeOf<PlayArgs>() == 32, "PlayArgs 32 B: " + UnsafeUtility.SizeOf<PlayArgs>());
+                Check(UnsafeUtility.SizeOf<PlayArgs>() == 48, "PlayArgs 48 B (the listener, the preset and the Variant key cells): " + UnsafeUtility.SizeOf<PlayArgs>());
                 Check(!typeof(PlaybackTokens).IsPublic, "the store is internal");
             }
             // every With carries the listener

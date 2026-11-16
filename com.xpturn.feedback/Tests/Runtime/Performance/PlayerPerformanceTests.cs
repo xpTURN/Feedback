@@ -497,6 +497,53 @@ namespace xpTURN.Feedback.Tests
             End();
         }
 
+        // ---- (v) a player with ten Variants — the prepare (its list and the ten), a variant's Play and its Stop by handle (a
+        // stopwatch), written down
+        [UnityTest]
+        public IEnumerator GP22_Variants()
+        {
+            yield return null;
+            const int n = 100;
+            const int count = 10;
+            var presets = new List<FeedbackPreset>(count);
+            for (int k = 0; k < count; k++)
+            {
+                var preset = ScriptableObject.CreateInstance<FeedbackPreset>();
+                preset.m_Items.Add(Item<PositionItem>(Punch));
+                m_Made.Add(preset);
+                presets.Add(preset);
+            }
+            var players = new List<FeedbackPlayer>(n);
+            for (int i = 0; i < n; i++)
+            {
+                var p = Go("vp").AddComponent<FeedbackPlayer>();
+                p.m_Initialization = PlayerInitialization.Lazy;
+                p.m_Items.Add(Item<PositionItem>(Punch));
+                p.m_Variants = new List<FeedbackPreset>(presets);
+                players.Add(p);
+            }
+            yield return null;
+            var sw = System.Diagnostics.Stopwatch.StartNew();
+            foreach (FeedbackPlayer p in players)
+                p.EnsureRuntime();
+            double prepareUs = sw.Elapsed.TotalMilliseconds * 1000.0 / n;
+            yield return null;
+            var handles = new PlaybackHandle[n];
+            PlayArgs last = PlayArgs.Default.WithPreset(presets[count - 1]);
+            sw.Restart();
+            for (int i = 0; i < n; i++)
+                handles[i] = players[i].Play(in last);
+            double playNs = sw.Elapsed.TotalMilliseconds * 1e6 / n;
+            sw.Restart();
+            for (int i = 0; i < n; i++)
+                players[i].Stop(handles[i], StopMode.Hold);
+            double stopNs = sw.Elapsed.TotalMilliseconds * 1e6 / n;
+            Debug.Log("PERF " + Where + "(v) variants=" + count + " n=" + n + " prepareUs=" + F(prepareUs) + " playNs=" + F(playNs) + " stopNs=" + F(stopNs));
+            Check(prepareUs > 0 && playNs > 0 && stopNs > 0, "the stopwatch");
+            Check(handles[0] != default && handles[n - 1] != default, "the variant plays accepted");
+            End();
+        }
+
         // ---- the frame allocation — the rows of this run (GP01 ~ GP06, first in the class's order) against the no-play window
         // measured the same way; the baseline holds to the run's end; the positive controls (a runner that allocates each frame ·
         // 100 kB once) are seen. A play-independent allocation each frame lifts the baseline too — the cycle delegates of

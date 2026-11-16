@@ -50,6 +50,47 @@ namespace xpTURN.Feedback.Tests.Editor
             }
         }
 
+        // the envelope's path — the faded motions, a Custom Fade Ease, on both slopes and between them, finite and endless
+        [Test]
+        public void E07_TheFadedEvaluationAllocatesNothing()
+        {
+            Ease custom = Ease.Of(EaseType.Custom);
+            custom.m_Curve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
+            var faded = new MotionEvaluator[]
+            {
+                new OscillateEvaluator(new OscillateParams { m_Amplitude = A, m_Frequency = 2f, m_FadeIn = 0.3f, m_FadeOut = 0.4f, m_FadeEase = Ease.Of(EaseType.QuadIn) }, 4),
+                new OscillateEvaluator(new OscillateParams { m_Amplitude = A, m_Frequency = 2f, m_PerAxis = true, m_AxisFrequency = Vector4.one, m_FadeIn = 0.3f, m_FadeOut = 0.4f, m_FadeEase = custom }, 4),
+                new WiggleEvaluator(new WiggleParams { m_Amplitude = A, m_Frequency = 3f, m_Octaves = 2, m_FadeIn = 0.3f, m_FadeOut = 0.4f, m_FadeEase = custom }, 4),
+                new ShakeEvaluator(new ShakeParams { m_Amplitude = A, m_Frequency = 7f, m_FadeIn = 0.3f, m_FadeEase = custom }, 4),
+            };
+            foreach (var e in faded)
+            {
+                foreach (bool endless in new[] { false, true })
+                {
+                    var s = new MotionState();
+                    var args = new MotionBegin { Seed = 9u, Intensity = 1f, Endless = endless };
+                    var current = new Vector4(1f, 2f, 3f, 4f);
+
+                    void Run()
+                    {
+                        e.Begin(ref s, current, args);
+                        foreach (float t in s_Slopes)
+                        {
+                            var time = new MotionTime(t, t * Item);
+                            e.Evaluate(s, time, out MotionSample sample);
+                            e.EvaluateShape(s, time);
+                        }
+                    }
+
+                    TestDelegate run = Run;
+                    run();
+                    Assert.That(Allocates(run), Is.False, e.GetType().Name + (endless ? " endless" : ""));
+                }
+            }
+        }
+
+        static readonly float[] s_Slopes = { 0.1f, 0.5f, 0.9f };
+
         // the positive control — a curve's keys getter allocates
         [Test]
         public void E07_TheKeysGetterIsSeenAllocating()

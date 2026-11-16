@@ -139,8 +139,8 @@ namespace xpTURN.Feedback.Editor
         }
     }
 
-    // FB-L05: an offset speed (Punch · a Spring's bump) on a Fixed (Animate Physics) animator — it evaluates after the next
-    // revert, so only the direct write shows it (a Tween or a Spring's move is Persist — it shows)
+    // FB-L05: an offset speed (Punch · Bounce · a Spring's bump) on a Fixed (Animate Physics) animator — it evaluates after
+    // the next revert, so only the direct write shows it (a Tween or a Spring's move is Persist — it shows)
     internal sealed class AnimatorFixedRule : FeedbackRule
     {
         internal override string Id => "FB-L05";
@@ -153,7 +153,7 @@ namespace xpTURN.Feedback.Editor
             {
                 if (!(c.Items[i] is AnimatorSpeedItem s) || !s.m_Active || s.m_DirectWrite || !(c.Target(i) is Animator a) || a.updateMode != AnimatorUpdateMode.Fixed)
                     continue;
-                bool offset = s.m_Motion is PunchMotion || (s.m_Motion is SpringMotion spring && spring.m_Params.m_Mode != SpringMode.MoveTo);
+                bool offset = s.m_Motion is PunchMotion || s.m_Motion is BounceMotion || (s.m_Motion is SpringMotion spring && spring.m_Params.m_Mode != SpringMode.MoveTo);
                 if (!offset)
                     continue;
                 RuleResult r = Result(c, i, "A Fixed (Animate Physics) animator evaluates after the revert — the speed's offsets don't show");

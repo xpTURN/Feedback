@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.LowLevel;
@@ -641,6 +642,8 @@ namespace xpTURN.Feedback.Tests
             { typeof(LightIntensityItem), Leaf.LightCamera }, { typeof(SetActiveItem), Leaf.LightCamera }, { typeof(MaterialColorItem), Leaf.Cube },
             // the camera shake on the grandchild's transform (the hit stop is no target item)
             { typeof(CameraShakeItem), Leaf.LightCamera },
+            // a trauma add on the leaf's camera and transform
+            { typeof(CameraTraumaItem), Leaf.LightCamera }, { typeof(TransformTraumaItem), Leaf.LightCamera },
             // the leaf carries a light and a camera
             { typeof(LightRangeItem), Leaf.LightCamera }, { typeof(LightColorItem), Leaf.LightCamera }, { typeof(LightSpotAngleItem), Leaf.LightCamera }, { typeof(LightShadowStrengthItem), Leaf.LightCamera },
             { typeof(CameraFieldOfViewItem), Leaf.LightCamera }, { typeof(CameraOrthographicSizeItem), Leaf.LightCamera }, { typeof(CameraZoomItem), Leaf.LightCamera },
@@ -769,19 +772,21 @@ namespace xpTURN.Feedback.Tests
                 if (bad != null)
                     m_Fails.Add(bad);
             }
-            // the particles' seven where their module compiles · the animators' eight (a speed's spring twice) · the 3D bodies'
-            // three, the 2D bodies' two · Core's thirty-one (Time Scale 3 · Float Value 10 · Vector3 8 · Color 5 · Float Event 5)
-            Check(combos == 181 + (FeedbackImplementations.RegisteredTypes.Contains(typeof(ParticleControlItem)) ? 7 : 0)
-                + (FeedbackImplementations.RegisteredTypes.Contains(typeof(AnimatorSpeedItem)) ? 8 : 0)
+            // the particles' seven where their module compiles · the animators' nine (a speed's spring twice) · the 3D bodies'
+            // three, the 2D bodies' two · Core's thirty-four (Time Scale 3 · Float Value 11 · Vector3 9 · Color 5 · Float Event 6) · the
+            // audio's seventy-six (sixty-six, a spring twice)
+            Check(combos == 202 + (FeedbackImplementations.RegisteredTypes.Contains(typeof(ParticleControlItem)) ? 7 : 0)
+                + (FeedbackImplementations.RegisteredTypes.Contains(typeof(AnimatorSpeedItem)) ? 9 : 0)
                 + (FeedbackImplementations.RegisteredTypes.Contains(typeof(RigidbodyForceItem)) ? 3 : 0)
                 + (FeedbackImplementations.RegisteredTypes.Contains(typeof(Rigidbody2DForceItem)) ? 2 : 0)
-                + (FeedbackImplementations.RegisteredTypes.Contains(typeof(Light2DIntensityItem)) ? 10 : 0) + 15
-                + (FeedbackImplementations.RegisteredTypes.Contains(typeof(GraphicColorItem)) ? 33 : 0) + (FeedbackImplementations.RegisteredTypes.Contains(typeof(VideoPlayerControlItem)) ? 1 : 0)
-                + (FeedbackImplementations.RegisteredTypes.Contains(typeof(TMPFontSizeItem)) ? (ModuleFixtures.SkipInEditor(typeof(TMPCountToItem)) ? 64 : 65) : 0)
+                + (FeedbackImplementations.RegisteredTypes.Contains(typeof(Light2DIntensityItem)) ? 10 : 0) + 16
+                + (FeedbackImplementations.RegisteredTypes.Contains(typeof(GraphicColorItem)) ? 37 : 0) + (FeedbackImplementations.RegisteredTypes.Contains(typeof(VideoPlayerControlItem)) ? 1 : 0)
+                + (FeedbackImplementations.RegisteredTypes.Contains(typeof(TMPFontSizeItem)) ? (ModuleFixtures.SkipInEditor(typeof(TMPCountToItem)) ? 69 : 70) : 0)
                 + (FeedbackImplementations.RegisteredTypes.Contains(typeof(ScreenFlashItem)) ? 4 : 0)
-                + (FeedbackImplementations.RegisteredTypes.Contains(typeof(PostFXBloomItem)) ? 45 : 0)
-                + (FeedbackImplementations.RegisteredTypes.Contains(typeof(CinemachineLensFieldOfViewItem)) ? 19 : 0)
-                + (FeedbackImplementations.RegisteredTypes.Contains(typeof(GamepadRumbleItem)) ? 3 : 0), "combos " + combos);
+                + (FeedbackImplementations.RegisteredTypes.Contains(typeof(PostFXBloomItem)) ? 50 : 0)
+                + (FeedbackImplementations.RegisteredTypes.Contains(typeof(CinemachineLensFieldOfViewItem)) ? 24 : 0)
+                + (FeedbackImplementations.RegisteredTypes.Contains(typeof(GamepadRumbleItem)) ? 3 : 0)
+                + (FeedbackImplementations.RegisteredTypes.Contains(typeof(AudioVolumeItem)) ? 76 : 0), "combos " + combos);
             // UnityEvent: an empty event · a listener's second invoke
             string ue = Judge("UnityEvent empty", o => new UnityEventItem(), Leaf.LightCamera);
             if (ue != null)
@@ -840,6 +845,79 @@ namespace xpTURN.Feedback.Tests
             Done();
         }
 
+        // the target items whose values the editor's graph does not draw — a new target item describes its values or is
+        // named here
+        static readonly HashSet<string> s_NoGraph = new HashSet<string>
+        {
+            "AnimatorParameterItem", "AnimatorStateItem", "AudioMixerSnapshotItem", "AudioPlayAtPointItem", "AudioPlayClipItem", "AudioSourceControlItem",
+            "CameraTraumaItem", "CinemachineActivateCameraItem", "CustomFloatEventItem", "DespawnItem", "FloatingTextItem", "GraphicMaterialItem",
+            "ImageSpriteItem", "MatchTransformItem", "MaterialSwapItem", "ParticleControlItem", "ParticleEmitItem", "ParticleSpawnItem", "RectOffsetsItem",
+            "Rigidbody2DForceItem", "Rigidbody2DVelocityItem", "RigidbodyExplosionItem", "RigidbodyForceItem", "RigidbodyVelocityItem", "SetLayerItem",
+            "SetParentItem", "SpawnItem", "SpriteSwapItem", "TMPCharacterAlphaItem", "TMPCharacterOffsetItem", "TMPCharacterScaleItem", "TMPTextItem",
+            "TextContentItem", "TrailClearItem", "TransformTraumaItem", "VideoPlayerControlItem",
+        };
+
+        static PropertyInfo Prepared(Type type, string name) => type.GetProperty(name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+
+        // a fresh unprepared binding's description against the prepared one: the same evaluator kind and dimension, the
+        // same space; a camera shake's two values; none only for the named items
+        string Describes(string name, Func<GameObject, FeedbackItem> make, Leaf cube, Type itemType)
+        {
+            Fixture f = Fresh(make, cube, itemType);
+            ItemBinding prepared = f.Player.Runtime?.Binding(0);
+            if (prepared == null)
+                return name + " not prepared";
+            var item = (EffectItem)f.Player.m_Items[0];
+            var channels = new List<GraphChannel>();
+            FeedbackImplementations.Create(item).Describe(channels);
+            bool none = s_NoGraph.Contains(itemType.Name);
+            if (channels.Count == 0)
+                return none ? null : name + " describes nothing and is not named as drawing none";
+            if (none)
+                return name + " describes values but is named as drawing none";
+            if (prepared is CameraShakeBinding camera)
+            {
+                bool two = camera.PreparedRotation != null;
+                if (channels.Count != (two ? 2 : 1) || channels[0].Dimension != camera.PreparedPosition.Dimension || channels[0].Space != LayerSpace.Self
+                    || (two && (channels[1].Dimension != camera.PreparedRotation.Dimension || channels[1].Space != LayerSpace.Local || !channels[1].CopySeed)))
+                    return name + " the camera shake's channels";
+                return null;
+            }
+            PropertyInfo evaluator = Prepared(prepared.GetType(), "PreparedEvaluator");
+            if (evaluator == null || channels.Count != 1)
+                return name + " " + channels.Count + " channels on " + prepared.GetType().Name;
+            var e = (MotionEvaluator)evaluator.GetValue(prepared);
+            if (e.GetType() != channels[0].Evaluator.GetType() || e.Dimension != channels[0].Dimension)
+                return name + " the evaluator " + channels[0].Evaluator.GetType().Name + "×" + channels[0].Dimension + " / " + e.GetType().Name + "×" + e.Dimension;
+            PropertyInfo space = Prepared(prepared.GetType(), "PreparedSpace");
+            if (space != null && (LayerSpace)space.GetValue(prepared) != channels[0].Space)
+                return name + " the space " + channels[0].Space + " / " + space.GetValue(prepared);
+            if (space == null && !channels[0].Toggle)
+                return name + " an on/off binding's channel is not a toggle";
+            return null;
+        }
+
+        IEnumerator DescriptionRows(bool materials, int expected)
+        {
+            yield return null;
+            int combos = 0;
+            foreach ((string name, Func<GameObject, FeedbackItem> make, Leaf cube, Type itemType) in Combos(materials).ToList())
+            {
+                combos++;
+                string bad = Describes(name, make, cube, itemType);
+                if (bad != null)
+                    m_Fails.Add(bad);
+            }
+            Check(expected < 0 || combos == expected, "combos " + combos);
+            Done();
+        }
+
+        [UnityTest]
+        public IEnumerator NP05_GraphDescriptions() => DescriptionRows(false, -1);
+
+        [UnityTest, Category("DevProject")]
+        public IEnumerator NP05_GraphDescriptionsMaterials() => DescriptionRows(true, 65);
+
         [UnityTest, Category("DevProject")]
         public IEnumerator NP04_FirstRowsMaterials()
         {
@@ -852,7 +930,7 @@ namespace xpTURN.Feedback.Tests
                 if (bad != null)
                     m_Fails.Add(bad);
             }
-            Check(combos == 61, "material combos " + combos);
+            Check(combos == 65, "material combos " + combos);
             Done();
         }
 
@@ -895,7 +973,7 @@ namespace xpTURN.Feedback.Tests
                 if (bad != null)
                     m_Fails.Add(bad);
             }
-            Check(combos >= 181, "combos " + combos);
+            Check(combos >= 200, "combos " + combos);
             foreach ((string name, FeedbackMotion motion) in new (string, FeedbackMotion)[] { ("Punch", Punch(Vector4.one)), ("Shake", Shake(Vector4.one)), ("Oscillate", Oscillate(Vector4.one)), ("Flash", Flash(Vector4.one)) })
             {
                 FeedbackMotion m = motion;
@@ -918,7 +996,7 @@ namespace xpTURN.Feedback.Tests
                 if (bad != null)
                     m_Fails.Add(bad);
             }
-            Check(combos == 61, "material combos " + combos);
+            Check(combos == 65, "material combos " + combos);
             Done();
         }
     }

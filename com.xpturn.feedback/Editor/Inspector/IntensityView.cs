@@ -68,13 +68,20 @@ namespace xpTURN.Feedback.Editor
             return sb.ToString();
         }
 
-        // the last play — the record of the highest Serial, ended or not
+        // the last play — of the runtime that accepted the player's last play (its stamp), the record of the highest Serial,
+        // ended or not
         internal static bool LastIntensity(FeedbackPlayer player, out float intensity)
         {
             intensity = 0f;
             PlayerRuntime runtime = player != null ? player.Runtime : null;
             if (runtime == null || runtime.IsReleased)
                 return false;
+            for (int k = 0; k < player.VariantRuntimeCount; k++)
+            {
+                PlayerRuntime variant = player.VariantRuntime(k);
+                if (variant != null && !variant.IsReleased && variant.LastStamp > runtime.LastStamp)
+                    runtime = variant;
+            }
             long serial = 0;
             for (int r = 0; r < runtime.RecordCount; r++)
             {

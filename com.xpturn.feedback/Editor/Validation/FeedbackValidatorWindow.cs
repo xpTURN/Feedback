@@ -132,13 +132,21 @@ namespace xpTURN.Feedback.Editor
                 Last.AddRange(FeedbackValidator.Run(host));
         }
 
-        // a row picked: its item's fold opened (the inspector draws it open), its host selected
+        // a row picked: its item's fold opened (the inspector draws it open), its host selected. A player's item shows its list
+        // first — a Variant's item on the player (its anchors), the fold the preset's; an open inspector follows
         internal static void Select(RuleResult r)
         {
-            if (r.Host is FeedbackPlayer p && r.Item >= 0 && r.Item < p.Items.Count && p.Items[r.Item] != null)
+            if (r.Host is FeedbackPlayer v && r.List != null && r.Item >= 0 && r.Item < r.List.m_Items.Count && r.List.m_Items[r.Item] != null)
+            {
+                long rid = UnityEngine.Serialization.ManagedReferenceUtility.GetManagedReferenceIdForObject(r.List, r.List.m_Items[r.Item]);
+                SessionState.SetBool(ItemListView.FoldKey(r.List, rid), true);
+                VariantShow.Set(v, r.List);
+            }
+            else if (r.Host is FeedbackPlayer p && r.Item >= 0 && r.Item < p.Items.Count && p.Items[r.Item] != null)
             {
                 long rid = UnityEngine.Serialization.ManagedReferenceUtility.GetManagedReferenceIdForObject(PresetLinks.Owner(p), p.Items[r.Item]);
                 SessionState.SetBool(ItemListView.FoldKey(p, rid), true);
+                VariantShow.Set(p, null);
             }
             else if (r.Host is FeedbackPreset preset && r.Item >= 0 && r.Item < preset.m_Items.Count && preset.m_Items[r.Item] != null)
             {

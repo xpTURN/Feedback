@@ -73,9 +73,9 @@ namespace xpTURN.Feedback.Tests.Editor.Samples
             LoadHub();
             yield return Frames(30);
             Assert.That(SampleHub.Instance, Is.Not.Null, "the hub");
-            var enabled0 = new bool[9];
-            var scale0 = new float[9];
-            for (int i = 1; i < 9; i++)
+            var enabled0 = new bool[10];
+            var scale0 = new float[10];
+            for (int i = 1; i < 10; i++)
             {
                 enabled0[i] = FeedbackCategories.IsEnabled((FeedbackCategory)i);
                 scale0[i] = FeedbackCategories.GetScale((FeedbackCategory)i);
@@ -103,7 +103,7 @@ namespace xpTURN.Feedback.Tests.Editor.Samples
                 if (EventSystems() != 1)
                     s_Problems.Add($"{card.Title}: event systems {EventSystems()}");
                 SampleState.SetAfter(false);
-                for (int i = 1; i < 9; i++)
+                for (int i = 1; i < 10; i++)
                     if (FeedbackCategories.IsEnabled((FeedbackCategory)i))
                         s_Problems.Add($"{card.Title}: Before left {(FeedbackCategory)i} on");
                 SampleState.SetAfter(true);
@@ -118,7 +118,7 @@ namespace xpTURN.Feedback.Tests.Editor.Samples
                 SampleHub.BackToHub();
                 yield return Frames(40);
                 bool restored = Mathf.Approximately(FeedbackTimeScale.BaseScale, base0) && FeedbackCategories.FlashLimit == flash0;
-                for (int i = 1; i < 9; i++)
+                for (int i = 1; i < 10; i++)
                     restored &= FeedbackCategories.IsEnabled((FeedbackCategory)i) == enabled0[i] && Mathf.Approximately(FeedbackCategories.GetScale((FeedbackCategory)i), scale0[i]);
                 if (!restored)
                     s_Problems.Add($"{card.Title}: not put back");
@@ -147,9 +147,9 @@ namespace xpTURN.Feedback.Tests.Editor.Samples
             Assert.That(FeedbackTimeScale.BaseScale, Is.EqualTo(editBase), "a call outside play wrote");
             yield return new EnterPlayMode();
             Begin();
-            m_SettingsOn = new bool[9];
-            m_SettingsScale = new float[9];
-            for (int i = 1; i < 9; i++)
+            m_SettingsOn = new bool[10];
+            m_SettingsScale = new float[10];
+            for (int i = 1; i < 10; i++)
             {
                 m_SettingsOn[i] = FeedbackCategories.IsEnabled((FeedbackCategory)i);
                 m_SettingsScale[i] = FeedbackCategories.GetScale((FeedbackCategory)i);
@@ -158,9 +158,9 @@ namespace xpTURN.Feedback.Tests.Editor.Samples
             // the user's own switches before the samples write: Camera off · Motion at 0.5
             FeedbackCategories.SetEnabled(FeedbackCategory.Camera, false);
             FeedbackCategories.SetScale(FeedbackCategory.Motion, 0.5f);
-            var on0 = new bool[9];
-            var scale0 = new float[9];
-            for (int i = 1; i < 9; i++)
+            var on0 = new bool[10];
+            var scale0 = new float[10];
+            for (int i = 1; i < 10; i++)
             {
                 on0[i] = FeedbackCategories.IsEnabled((FeedbackCategory)i);
                 scale0[i] = FeedbackCategories.GetScale((FeedbackCategory)i);
@@ -168,11 +168,11 @@ namespace xpTURN.Feedback.Tests.Editor.Samples
             int flash0 = FeedbackCategories.FlashLimit;
             float base0 = FeedbackTimeScale.BaseScale;
             SampleState.SetAfter(false);
-            for (int i = 1; i < 9; i++)
+            for (int i = 1; i < 10; i++)
                 if (FeedbackCategories.IsEnabled((FeedbackCategory)i))
                     s_Problems.Add($"Before: {(FeedbackCategory)i} on");
             SampleState.SetAfter(true);
-            for (int i = 1; i < 9; i++)
+            for (int i = 1; i < 10; i++)
                 if (FeedbackCategories.IsEnabled((FeedbackCategory)i) != on0[i])
                     s_Problems.Add($"After: {(FeedbackCategory)i} {FeedbackCategories.IsEnabled((FeedbackCategory)i)} (before {on0[i]})");
             SampleState.SetIntensity(0.5f);
@@ -211,7 +211,7 @@ namespace xpTURN.Feedback.Tests.Editor.Samples
             // the sample's scale left at 100 and the HUD's at 0.5 — Restore puts both back
             SampleState.Restore();
             bool back = Mathf.Approximately(FeedbackTimeScale.BaseScale, base0) && FeedbackCategories.FlashLimit == flash0;
-            for (int i = 1; i < 9; i++)
+            for (int i = 1; i < 10; i++)
                 back &= FeedbackCategories.IsEnabled((FeedbackCategory)i) == on0[i] && Mathf.Approximately(FeedbackCategories.GetScale((FeedbackCategory)i), scale0[i]);
             if (!back)
                 s_Problems.Add("Restore did not put the values back");
@@ -222,7 +222,7 @@ namespace xpTURN.Feedback.Tests.Editor.Samples
             yield return new ExitPlayMode();
             yield return new EnterPlayMode();
             var next = new List<string>();
-            for (int i = 1; i < 9; i++)
+            for (int i = 1; i < 10; i++)
                 if (FeedbackCategories.IsEnabled((FeedbackCategory)i) != m_SettingsOn[i] || !Mathf.Approximately(FeedbackCategories.GetScale((FeedbackCategory)i), m_SettingsScale[i]))
                     next.Add(((FeedbackCategory)i).ToString());
             if (!Mathf.Approximately(FeedbackTimeScale.BaseScale, m_SettingsBase))

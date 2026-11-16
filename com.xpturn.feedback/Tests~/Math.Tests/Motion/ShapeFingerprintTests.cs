@@ -15,6 +15,7 @@ namespace xpTURN.Feedback.Tests.Motion
     {
         static readonly (float Vibrato, float Decay)[] Punches = { (5f, 1f), (3f, 0.5f), (2.25f, 2f) };
         static readonly float[] Zetas = { 0.05f, 0.4f, 1f, 1.5f, 10f };
+        static readonly (int Count, float Restitution)[] Bounces = { (3, 0.5f), (5, 0.7f), (1, 0.5f), (4, 1f) };
 
         static double[] Range(int count, Func<int, double> sample) => Enumerable.Range(0, count).Select(sample).ToArray();
 
@@ -22,6 +23,7 @@ namespace xpTURN.Feedback.Tests.Motion
         {
             foreach (var e in EasingTests.Curves)
                 yield return ($"Ease.{e}", false, Range(9, i => Easing.Evaluate(e, EasingTests.P1(e), EasingTests.P2(e), i / 8f)));
+            yield return ("Ease.Steps", true, Range(9, i => Easing.Evaluate(EaseType.Steps, 4f, 0f, i / 8f)));
             foreach (var (vibrato, decay) in Punches)
                 yield return (FormattableString.Invariant($"Punch.{vibrato}_{decay}"), false, Range(9, i => MotionKernels.Punch(i / 8f, vibrato, decay)));
             foreach (Waveform w in Enum.GetValues(typeof(Waveform)))
@@ -34,6 +36,14 @@ namespace xpTURN.Feedback.Tests.Motion
                 MotionKernels.Trapezoid(i % 11 / 10f, i < 11 ? 0.2f : 0.6f, i < 11 ? 0.3f : 0.6f, i < 11 ? 0.2f : 0.6f, out bool ramp);
                 return ramp ? 1 : 0;
             }));
+            yield return ("Fade", false, Range(22, i => MotionKernels.Fade(i % 11 / 10f, i < 11 ? 0.2f : 0.6f, i < 11 ? 0.3f : 0.9f, out _)));
+            yield return ("FadeRamp", true, Range(22, i =>
+            {
+                MotionKernels.Fade(i % 11 / 10f, i < 11 ? 0.2f : 0.6f, i < 11 ? 0.3f : 0.9f, out bool ramp);
+                return ramp ? 1 : 0;
+            }));
+            foreach (var (count, restitution) in Bounces)
+                yield return (FormattableString.Invariant($"Bounce.{count}_{restitution}"), false, Range(17, i => MotionKernels.Bounce(i / 16f, count, restitution)));
             yield return ("Blink.StartOn", true, Range(64, i => MotionKernels.Blink(3u, i * 0.013, 0.1f, 0.3f, 0.5f, true) ? 1 : 0));
             yield return ("Blink.StartOff", true, Range(64, i => MotionKernels.Blink(3u, i * 0.013, 0.1f, 0.3f, 0.5f, false) ? 1 : 0));
             yield return ("Smooth", false, Range(16, i => Noise.Smooth(7u, i * 0.37)));
@@ -122,6 +132,7 @@ namespace xpTURN.Feedback.Tests.Motion
             ["Ease.BounceIn"] = new double[] { 0, 0.0380859375, 0.02734375, 0.2021484375, 0.234375, 0.030273377895355225, 0.52734375, 0.8818359375, 1 },
             ["Ease.BounceOut"] = new double[] { 0, 0.1181640625, 0.47265625, 0.9697266221046448, 0.765625, 0.7978515625, 0.97265625, 0.9619140625, 1 },
             ["Ease.BounceInOut"] = new double[] { 0, 0.013671875, 0.1171875, 0.263671875, 0.5, 0.736328125, 0.8828125, 0.986328125, 1 },
+            ["Ease.Steps"] = new double[] { 0, 0, 0.25, 0.25, 0.5, 0.5, 0.75, 0.75, 1 },
             ["Punch.5_1"] = new double[] { 0, -0.6187185049057007, 0.75, -0.4419412910938263, -3.3776623808989825E-07, 0.26516515016555786, -0.25, 0.08838819712400436, 0 },
             ["Punch.3_0.5"] = new double[] { 0, 0.6614378094673157, -0.8660253882408142, 0.55901700258255, -1.6864326823906595E-08, -0.4330127239227295, 0.5, -0.2500002384185791, 0 },
             ["Punch.2.25_2"] = new double[] { 0, 0.750913679599762, -0.21525944769382477, -0.32479286193847656, 0.1767766922712326, 0.07812703400850296, -0.05774246156215668, -0.003048289567232132, 0 },
@@ -134,6 +145,12 @@ namespace xpTURN.Feedback.Tests.Motion
             ["Warp.2"] = new double[] { 0, 0.25, 0.5, 0.75, 0, 0.25, 0.5, 0.75, 1 },
             ["Trapezoid"] = new double[] { 0, 0.5, 1, 1, 1, 1, 0.49999988079071045, 0, 0, 0, 0, 0, 0.29999998211860657, 0.5999999642372131, 0.9000000357627869, 1, 1, 1, 0.9000000953674316, 0.6000000238418579, 0.30000025033950806, 0 },
             ["TrapezoidRamp"] = new double[] { 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0 },
+            ["Fade"] = new double[] { 0, 0.5, 1, 1, 1, 1, 1, 1, 0.6666666269302368, 0.33333340287208557, 0, 0, 0.25, 0.5, 0.75, 1, 0.8333333730697632, 0.6666666865348816, 0.5000000596046448, 0.3333333432674408, 0.16666671633720398, 0 },
+            ["FadeRamp"] = new double[] { 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 0 },
+            ["Bounce.3_0.5"] = new double[] { 0, 0.3896484375, 0.68359375, 0.8818359375, 0.984375, 0.9912109375, 0.90234375, 0.7177734375, 0.4375, 0.0615234375, 0.15234375, 0.2412109375, 0.234375, 0.1318359375, 0.02734375, 0.0615234375, 0 },
+            ["Bounce.5_0.7"] = new double[] { 0, 0.5731174349784851, 0.9059197902679443, 0.9984070062637329, 0.8505791425704956, 0.46243613958358765, 0.10538291186094284, 0.41517719626426697, 0.4846563935279846, 0.3138204514980316, 0.060641810297966, 0.23417289555072784, 0.1673888862133026, 0.07068467140197754, 0.10076849162578583, 0.04629776254296303, 0 },
+            ["Bounce.1_0.5"] = new double[] { 0, 0.234375, 0.4375, 0.609375, 0.75, 0.859375, 0.9375, 0.984375, 1, 0.984375, 0.9375, 0.859375, 0.75, 0.609375, 0.4375, 0.234375, 0 },
+            ["Bounce.4_1"] = new double[] { 0, 0.75, 1, 0.75, 0, 0.75, 1, 0.75, 0, 0.75, 1, 0.75, 0, 0.75, 1, 0.75, 0 },
             ["Blink.StartOn"] = new double[] { 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1 },
             ["Blink.StartOff"] = new double[] { 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0 },
             ["Smooth"] = new double[] { -0, -0.8788463473320007, -0.6297687292098999, 0.1975790411233902, 0.03492003679275513, -0.2467762529850006, 0.52336585521698, 0.9405494332313538, 0.08110807090997696, -0.2500738203525543, 0.2738400101661682, -0.13384012877941132, -0.1028493344783783, 0.2789449691772461, -0.4159454107284546, -0.9813746213912964 },

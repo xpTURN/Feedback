@@ -1,36 +1,49 @@
 using System;
 using UnityEngine;
-using UnityEngine.Audio;
 
 namespace xpTURN.Feedback.Tests.Extension
 {
     // the scripting API's examples of a user's feedbacks — compiled here, against the public surface alone
 
-    // doc: api-custom-action
-    [CustomFeedback("Audio/One Shot", Aliases = "sound sfx", Requires = typeof(AudioSource))]
-    [Serializable]
-    public sealed class OneShotSound : CustomActionItem
+    // stands for a sound middleware's runtime
+    public static class MyAudio
     {
-        [SerializeField] AudioClip clip;
+        public static void Post(string sound, Vector3 position, float volume)
+        {
+        }
+
+        public static void SetParameter(string name, float value)
+        {
+        }
+    }
+
+    // doc: api-custom-action
+    [CustomFeedback("Audio/Middleware One Shot", Aliases = "sound sfx fmod wwise", Requires = typeof(Transform))]
+    [Serializable]
+    public sealed class MiddlewareOneShot : CustomActionItem
+    {
+        [SerializeField] string sound = "event:/Hit";
         [SerializeField] float volume = 1f;
+
+        public override FeedbackCategory Category => FeedbackCategory.Audio;
 
         protected override CustomAction CreateAction() => new Action(this);
 
         sealed class Action : CustomAction
         {
-            readonly OneShotSound item;
-            AudioSource source;
+            readonly MiddlewareOneShot item;
+            Transform emitter;
 
-            public Action(OneShotSound item) => this.item = item;
+            public Action(MiddlewareOneShot item) => this.item = item;
 
-            protected override bool Prepare(in CustomPrepare context) => context.TryFindTarget(out source);
+            protected override bool Prepare(in CustomPrepare context) => context.TryFindTarget(out emitter);
 
             protected override void Fire(in CustomPlay play)
             {
                 // a Seek or a Skip that sweeps over the moment does not play it
                 if (play.Swept)
                     return;
-                source.PlayOneShot(item.clip, item.volume * play.Intensity * play.CategoryScale);
+                MyAudio.Post(item.sound, emitter.position, item.volume * play.Intensity * play.CategoryScale);
             }
         }
     }
@@ -101,23 +114,22 @@ namespace xpTURN.Feedback.Tests.Extension
     // end
 
     // doc: api-custom-effect
-    [CustomFeedback("Audio/Mixer Parameter", Global = true)]
+    [CustomFeedback("Audio/Middleware Parameter", Global = true)]
     [Serializable]
-    public sealed class MixerParameter : CustomEffectItem
+    public sealed class MiddlewareParameter : CustomEffectItem
     {
-        [SerializeField] AudioMixer mixer;
         [SerializeField] string parameter = "Volume";
 
         protected override CustomEffect CreateEffect() => new Effect(this);
 
         sealed class Effect : CustomEffect
         {
-            readonly MixerParameter item;
+            readonly MiddlewareParameter item;
 
-            public Effect(MixerParameter item) => this.item = item;
+            public Effect(MiddlewareParameter item) => this.item = item;
 
             // every frame the play runs; slot −1 puts the item's base back after a Revert or a Restore
-            protected override void Apply(int slot, float value) => item.mixer.SetFloat(item.parameter, value);
+            protected override void Apply(int slot, float value) => MyAudio.SetParameter(item.parameter, value);
         }
     }
     // end

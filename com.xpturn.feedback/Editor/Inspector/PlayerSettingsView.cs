@@ -18,7 +18,7 @@ namespace xpTURN.Feedback.Editor
         {
             "m_MaxOverlap", "m_DurationMultiplier", "m_StartDelay", "m_Speed", "m_RandomizeDuration", "m_DurationRange", "m_Cooldown",
             "m_Chance", "m_RemapIntensity", "m_IntensityRemap", "m_UseDistanceGate", "m_GateReference", "m_GateAnchor", "m_GateDistance",
-            "m_UseGateFalloff", "m_GateFalloff", "m_ApplyInitialState", "m_DisableBehavior", "m_UnityEvents", "m_Anchors",
+            "m_UseGateFalloff", "m_GateFalloff", "m_ApplyInitialState", "m_DisableBehavior", "m_AudioOutput", "m_UnityEvents", "m_Anchors",
         };
 
         internal readonly Foldout Advanced;
@@ -46,7 +46,15 @@ namespace xpTURN.Feedback.Editor
             SerializedProperty p = so.FindProperty(name);
             if (p == null)
                 return;
+            // the Play At Point sounds' output group — where the Audio module is on
+            if (name == "m_AudioOutput" && !FeedbackImplementations.IsImplemented(typeof(AudioPlayAtPointItem)))
+                return;
             Bound.Add(name);
+            if (name == "m_AudioOutput")
+            {
+                parent.Add(AudioOutputField(p, p.displayName));
+                return;
+            }
             if (name == "m_UnityEvents" && !so.isEditingMultipleObjects)
             {
                 parent.Add(new UnityEventListField(p));
@@ -62,5 +70,8 @@ namespace xpTURN.Feedback.Editor
                 parent.Add(RemapHint);
             }
         }
+
+        // an output group field — an Object property that takes an AudioMixerGroup only (the player's and the project's)
+        internal static ObjectField AudioOutputField(SerializedProperty p, string label) => AudioFields.Object(p, label, typeof(UnityEngine.Audio.AudioMixerGroup));
     }
 }

@@ -607,9 +607,9 @@ namespace xpTURN.Feedback.Tests
 
             public bool Owns(FeedbackPlayer player) => false;
 
-            public SeekRefusal Scrub(FeedbackPlayer player, PlaybackHandle handle) => SeekRefusal.NotLive;
+            public SeekRefusal Scrub(FeedbackPlayer player, PlaybackHandle handle, FeedbackPreset preset) => SeekRefusal.NotLive;
 
-            public bool Drives(FeedbackPlayer player) => false;
+            public bool Drives(FeedbackPlayer player, FeedbackPreset preset) => false;
 
             public void Seeked() { }
 
@@ -810,6 +810,402 @@ namespace xpTURN.Feedback.Tests
             public bool Equals((bool, float) a, (bool, float) b) => a.Item1 == b.Item1 && Mathf.Abs(a.Item2 - b.Item2) < 1e-4f;
 
             public int GetHashCode((bool, float) v) => 0;
+        }
+
+        // ---- a clip's Preset
+
+        // y from 0 to 2 over the seconds, linear — the variant's
+        static PositionItem Rise(float seconds)
+        {
+            TweenParams tween = TweenParams.Default;
+            tween.m_To = new Vector4(0f, 2f, 0f, 0f);
+            tween.m_Ease = Ease.Of(EaseType.Linear);
+            var item = new PositionItem { m_Target = new TargetRef { m_Mode = TargetRefMode.Self, m_Path = "", m_Anchor = "" }, m_Motion = new TweenMotion { m_Params = tween } };
+            item.m_Timing.m_Duration = seconds;
+            return item;
+        }
+
+        FeedbackPreset Preset(params FeedbackItem[] items)
+        {
+            var preset = ScriptableObject.CreateInstance<FeedbackPreset>();
+            preset.m_Items.AddRange(items);
+            m_Made.Add(preset);
+            return preset;
+        }
+
+        [UnityTest]
+        public IEnumerator VS14_ADrivenClipPlaysItsPreset()
+        {
+            FeedbackPreset rise = Preset(Rise(1f));
+            FeedbackPlayer p = Player("clip", Line(1f));
+            p.m_Variants.Add(rise);
+            PlayableDirector d = Director(DirectorUpdateMode.Manual, p, out FeedbackTrack track);
+            Clip(track, 0.0, 1.0, FeedbackClipTiming.Driven, out _);
+            FeedbackClip variant = Clip(track, 2.0, 1.0, FeedbackClipTiming.Driven, out _);
+            variant.m_Preset = rise;
+            d.RebuildGraph();
+            var seen = new List<string>();
+            foreach (double t in new[] { 0.5, 2.5, 2.75, 0.25 })
+            {
+                yield return EvaluateAt(d, t);
+                seen.Add($"{Seen(p):F2}");
+            }
+            Assert.That(seen, Is.EqualTo(new[] { "(0.50, 0.00, 0.00)", "(0.00, 1.00, 0.00)", "(0.00, 1.50, 0.00)", "(0.25, 0.00, 0.00)" }));
+        }
+
+        // a triggered clip plays its preset on the player's clock; a driven clip whose preset cannot be scrubbed plays as
+        // Triggered — the player's Chance refuses it there (0 %), where a driven play would pass it
+        [UnityTest]
+        public IEnumerator VS15_ATriggeredOrUnscrubbedPresetRunsOnThePlayersClock()
+        {
+            FeedbackPreset rise = Preset(Rise(1f));
+            FeedbackPlayer p = Player("clip", Line(1f));
+            p.m_Variants.Add(rise);
+            PlayableDirector d = Director(DirectorUpdateMode.GameTime, p, out FeedbackTrack track);
+            Clip(track, 0.1, 1.0, FeedbackClipTiming.Triggered, out _).m_Preset = rise;
+            d.Play();
+            yield return Frames(30);
+            Vector3 mid = Seen(p);
+            bool triggered = p.IsPlaying && mid.y > 0.1f && mid.x == 0f;
+            d.Stop();
+            p.Stop(StopMode.Revert);
+            yield return null;
+            FeedbackPreset open = Preset(Rise(0.5f), new WaitForSignalItem());
+            FeedbackPreset seekable = Preset(Rise(0.5f));
+            FeedbackPlayer q = Player("chance", Line(1f));
+            q.m_Chance = 0f;
+            q.m_Variants.Add(open);
+            q.m_Variants.Add(seekable);
+            PlayableDirector e = Director(DirectorUpdateMode.Manual, q, out FeedbackTrack qTrack);
+            Clip(qTrack, 0.0, 1.0, FeedbackClipTiming.Driven, out _).m_Preset = open;
+            Clip(qTrack, 2.0, 1.0, FeedbackClipTiming.Driven, out _).m_Preset = seekable;
+            e.RebuildGraph();
+            LogAssert.Expect(LogType.Warning, FeedbackClipBehaviour.NotScrubbedWarning);
+            yield return EvaluateAt(e, 0.5);
+            bool fallbackRefused = !q.IsPlaying;
+            yield return EvaluateAt(e, 2.5);
+            bool drivenPasses = q.IsPlaying;
+            Assert.That((triggered, fallbackRefused, drivenPasses), Is.EqualTo((true, true, true)), $"{mid:F2}");
+        }
+
+        // ---- the Intensity setter, the Variant keys and the director's FeedbackTimelineOptions
+
+        // the player moved by `by` over the seconds, linear — a By tween's change follows the play's intensity
+        static PositionItem By(Vector3 by, float seconds)
+        {
+            TweenParams tween = TweenParams.Default;
+            tween.m_Mode = TweenMode.By;
+            tween.m_To = by;
+            tween.m_Ease = Ease.Of(EaseType.Linear);
+            var item = new PositionItem { m_Target = new TargetRef { m_Mode = TargetRefMode.Self, m_Path = "", m_Anchor = "" }, m_Motion = new TweenMotion { m_Params = tween } };
+            item.m_Timing.m_Duration = seconds;
+            return item;
+        }
+
+        FeedbackPreset Aliased(string alias, params FeedbackItem[] items)
+        {
+            FeedbackPreset preset = Preset(items);
+            preset.m_Alias = alias;
+            return preset;
+        }
+
+        // the list (alias normal) moves x, light y, heavy z — each 1 over its seconds
+        FeedbackPlayer Lists(string name, out FeedbackPreset light, out FeedbackPreset heavy, float seconds = 1f)
+        {
+            FeedbackPlayer p = Player(name, By(Vector3.right, seconds));
+            p.m_ListAlias = "normal";
+            light = Aliased("light", By(Vector3.up, seconds));
+            heavy = Aliased("heavy", By(Vector3.forward, seconds));
+            p.m_Variants.Add(light);
+            p.m_Variants.Add(heavy);
+            return p;
+        }
+
+        static string S(FeedbackPlayer p) => $"{Seen(p):F2}";
+
+        // T3 — a driven clip's strength is the clip's intensity × the player's at its entry
+        [UnityTest]
+        public IEnumerator PV12_TheIntensityAtEachEntry()
+        {
+            FeedbackPlayer p = Player("int", By(Vector3.right, 1f));
+            PlayableDirector d = Director(DirectorUpdateMode.Manual, p, out FeedbackTrack track);
+            Clip(track, 0.0, 1.0, FeedbackClipTiming.Driven, out _).m_Intensity = 2f;
+            d.RebuildGraph();
+            var seen = new List<string>();
+            yield return EvaluateAt(d, 0.5);
+            seen.Add(S(p));
+            p.Intensity = 3f;
+            yield return EvaluateAt(d, 0.75);
+            seen.Add(S(p));
+            yield return EvaluateAt(d, 1.5);
+            yield return EvaluateAt(d, 0.5);
+            seen.Add(S(p));
+            Assert.That(seen, Is.EqualTo(new[] { "(1.00, 0.00, 0.00)", "(1.50, 0.00, 0.00)", "(3.00, 0.00, 0.00)" }));
+        }
+
+        // T11 — the director's key picks every clip's list on each player that has it, ahead of the clip's Preset
+        [UnityTest]
+        public IEnumerator PV13_TheDirectorsKeyPicksEveryClipsList()
+        {
+            FeedbackPlayer p = Lists("p", out FeedbackPreset light, out FeedbackPreset heavy);
+            FeedbackPlayer q = Player("q", By(Vector3.right, 1f));
+            PlayableDirector d = Director(DirectorUpdateMode.Manual, p, out FeedbackTrack track);
+            FeedbackTrack qTrack = ((TimelineAsset)d.playableAsset).CreateTrack<FeedbackTrack>(null, "Q");
+            d.SetGenericBinding(qTrack, q);
+            Clip(track, 0.0, 1.0, FeedbackClipTiming.Driven, out _);
+            Clip(track, 2.0, 1.0, FeedbackClipTiming.Driven, out _).m_Preset = light;
+            Clip(track, 4.0, 1.0, FeedbackClipTiming.Driven, out _).m_Preset = heavy;
+            Clip(qTrack, 0.0, 1.0, FeedbackClipTiming.Driven, out _);
+            d.RebuildGraph();
+            var seen = new List<string>();
+            IEnumerator Row(double t)
+            {
+                yield return EvaluateAt(d, t);
+                seen.Add(t.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture) + " " + S(p) + " " + S(q));
+            }
+            foreach (double t in new[] { 0.5, 1.5, 2.5, 3.5, 4.5, 5.5 })
+                yield return Row(t);
+            // added after the graph was built — the next entries read it
+            FeedbackTimelineOptions options = d.gameObject.AddComponent<FeedbackTimelineOptions>();
+            options.VariantKey = "heavy";
+            foreach (double t in new[] { 0.5, 1.5, 2.5, 3.5, 4.5, 5.5 })
+                yield return Row(t);
+            // the own list's alias over the player's key · the player's key under the clip's Preset
+            options.VariantKey = "normal";
+            p.VariantKey = "heavy";
+            foreach (double t in new[] { 0.5, 1.5, 2.5, 3.5 })
+                yield return Row(t);
+            options.VariantKey = "";
+            foreach (double t in new[] { 0.5, 1.5, 2.5, 3.5 })
+                yield return Row(t);
+            p.VariantKey = "";
+            // a change inside a clip waits for its next entry
+            options.VariantKey = "light";
+            yield return Row(2.2);
+            options.VariantKey = "heavy";
+            foreach (double t in new[] { 2.5, 3.5, 2.5, 3.5 })
+                yield return Row(t);
+            // the options' intensity
+            options.VariantKey = "";
+            options.Intensity = 2f;
+            foreach (double t in new[] { 0.5, 1.5 })
+                yield return Row(t);
+            options.Intensity = 1f;
+            // a second director on the same player — its own key
+            PlayableDirector e = Director(DirectorUpdateMode.Manual, p, out FeedbackTrack eTrack);
+            Clip(eTrack, 0.0, 1.0, FeedbackClipTiming.Driven, out _);
+            e.gameObject.AddComponent<FeedbackTimelineOptions>().VariantKey = "light";
+            e.RebuildGraph();
+            yield return EvaluateAt(e, 0.5);
+            seen.Add("e " + S(p));
+            Assert.That(seen, Is.EqualTo(new[]
+            {
+                "0.5 (0.50, 0.00, 0.00) (0.50, 0.00, 0.00)", "1.5 (0.00, 0.00, 0.00) (0.00, 0.00, 0.00)", "2.5 (0.00, 0.50, 0.00) (0.00, 0.00, 0.00)",
+                "3.5 (0.00, 0.00, 0.00) (0.00, 0.00, 0.00)", "4.5 (0.00, 0.00, 0.50) (0.00, 0.00, 0.00)", "5.5 (0.00, 0.00, 0.00) (0.00, 0.00, 0.00)",
+                "0.5 (0.00, 0.00, 0.50) (0.50, 0.00, 0.00)", "1.5 (0.00, 0.00, 0.00) (0.00, 0.00, 0.00)", "2.5 (0.00, 0.00, 0.50) (0.00, 0.00, 0.00)",
+                "3.5 (0.00, 0.00, 0.00) (0.00, 0.00, 0.00)", "4.5 (0.00, 0.00, 0.50) (0.00, 0.00, 0.00)", "5.5 (0.00, 0.00, 0.00) (0.00, 0.00, 0.00)",
+                "0.5 (0.50, 0.00, 0.00) (0.50, 0.00, 0.00)", "1.5 (0.00, 0.00, 0.00) (0.00, 0.00, 0.00)", "2.5 (0.50, 0.00, 0.00) (0.00, 0.00, 0.00)",
+                "3.5 (0.00, 0.00, 0.00) (0.00, 0.00, 0.00)",
+                "0.5 (0.00, 0.00, 0.50) (0.50, 0.00, 0.00)", "1.5 (0.00, 0.00, 0.00) (0.00, 0.00, 0.00)", "2.5 (0.00, 0.50, 0.00) (0.00, 0.00, 0.00)",
+                "3.5 (0.00, 0.00, 0.00) (0.00, 0.00, 0.00)",
+                "2.2 (0.00, 0.20, 0.00) (0.00, 0.00, 0.00)", "2.5 (0.00, 0.50, 0.00) (0.00, 0.00, 0.00)", "3.5 (0.00, 0.00, 0.00) (0.00, 0.00, 0.00)",
+                "2.5 (0.00, 0.00, 0.50) (0.00, 0.00, 0.00)", "3.5 (0.00, 0.00, 0.00) (0.00, 0.00, 0.00)",
+                "0.5 (1.00, 0.00, 0.00) (1.00, 0.00, 0.00)", "1.5 (0.00, 0.00, 0.00) (0.00, 0.00, 0.00)",
+                "e (0.00, 0.50, 0.00)",
+            }));
+        }
+
+        // T12 — the drive decision is the play's list: a key that picks an endless list plays as Triggered (Chance 0 refuses
+        // it), the list it would pass as Driven; a triggered loop plays its entry's list again
+        [UnityTest]
+        public IEnumerator PV14_TheDriveDecisionIsThePlaysList()
+        {
+            FeedbackPreset open = Aliased("open", Rise(0.5f), new WaitForSignalItem());
+            FeedbackPlayer q = Player("chance", Line(1f));
+            q.m_Chance = 0f;
+            q.m_Variants.Add(open);
+            PlayableDirector e = Director(DirectorUpdateMode.Manual, q, out FeedbackTrack qTrack);
+            Clip(qTrack, 0.0, 1.0, FeedbackClipTiming.Driven, out _);
+            FeedbackTimelineOptions options = e.gameObject.AddComponent<FeedbackTimelineOptions>();
+            options.VariantKey = "open";
+            e.RebuildGraph();
+            LogAssert.Expect(LogType.Warning, FeedbackClipBehaviour.NotScrubbedWarning);
+            yield return EvaluateAt(e, 0.5);
+            bool keyedRefused = !q.IsPlaying;
+            options.VariantKey = "";
+            yield return EvaluateAt(e, 1.5);
+            yield return EvaluateAt(e, 0.5);
+            bool drivenPasses = q.IsPlaying;
+            yield return EvaluateAt(e, 1.5);
+            q.VariantKey = "open";
+            yield return EvaluateAt(e, 0.5);
+            bool playersKeyRefused = !q.IsPlaying;
+            q.VariantKey = "";
+            yield return EvaluateAt(e, 1.5);
+
+            FeedbackPlayer r = Lists("loop", out _, out _, 0.2f);
+            PlayableDirector g = Director(DirectorUpdateMode.GameTime, r, out FeedbackTrack gTrack);
+            Clip(gTrack, 0.0, 1.5, FeedbackClipTiming.Triggered, out _).m_Loop = true;
+            FeedbackTimelineOptions loop = g.gameObject.AddComponent<FeedbackTimelineOptions>();
+            loop.VariantKey = "heavy";
+            g.Play();
+            yield return Frames(3);
+            loop.VariantKey = "light";
+            bool anyY = false, laterZ = false;
+            for (int i = 0; i < 60; i++)
+            {
+                yield return null;
+                anyY |= Seen(r).y > 0.01f;
+                if (i > 20)
+                    laterZ |= Seen(r).z > 0.01f;
+            }
+            g.Stop();
+            Assert.That((keyedRefused, drivenPasses, playersKeyRefused, anyY, laterZ), Is.EqualTo((true, true, true, false, true)));
+        }
+
+        // T21 — a row of the Hits table: its clips play with its intensity and its Variant Key (on a player that has the
+        // alias, else the director's key), the other clips as the director says
+        [UnityTest]
+        public IEnumerator PV15_AHitRowReachesItsClips()
+        {
+            FeedbackPlayer p = Lists("hits", out _, out _);
+            FeedbackPlayer r = Player("other", By(Vector3.right, 1f));
+            r.m_Variants.Add(Aliased("light", By(Vector3.up, 1f)));
+            PlayableDirector d = Director(DirectorUpdateMode.Manual, p, out FeedbackTrack track);
+            FeedbackTrack rTrack = ((TimelineAsset)d.playableAsset).CreateTrack<FeedbackTrack>(null, "R");
+            d.SetGenericBinding(rTrack, r);
+            Clip(track, 0.0, 1.0, FeedbackClipTiming.Driven, out _).m_HitKey = "hit1";
+            Clip(track, 2.0, 1.0, FeedbackClipTiming.Driven, out _).m_HitKey = "hit2";
+            Clip(track, 4.0, 1.0, FeedbackClipTiming.Driven, out _).m_HitKey = "finisher";
+            Clip(track, 6.0, 1.0, FeedbackClipTiming.Driven, out _).m_HitKey = "finisher";
+            Clip(rTrack, 4.0, 1.0, FeedbackClipTiming.Driven, out _).m_HitKey = "finisher";
+            FeedbackTimelineOptions options = d.gameObject.AddComponent<FeedbackTimelineOptions>();
+            // doc: timeline-hits
+            options.SetHit("finisher", 1.5f, "heavy");
+            options.SetHit("hit2", 0.6f);
+            // end
+            d.RebuildGraph();
+            var seen = new List<string>();
+            IEnumerator Row(double t)
+            {
+                yield return EvaluateAt(d, t);
+                seen.Add(t.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture) + " " + S(p) + " " + S(r));
+            }
+            foreach (double t in new[] { 0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5 })
+                yield return Row(t);
+            options.VariantKey = "light";
+            foreach (double t in new[] { 0.5, 1.5, 2.5, 3.5, 4.5, 5.5 })
+                yield return Row(t);
+            options.RemoveHit("finisher");
+            foreach (double t in new[] { 4.5, 5.5 })
+                yield return Row(t);
+            options.VariantKey = "";
+            options.m_Hits.Add(new FeedbackTimelineHit { m_HitKey = "finisher", m_Intensity = 2f, m_VariantKey = "" });
+            foreach (double t in new[] { 4.5, 5.5 })
+                yield return Row(t);
+            options.ClearHits();
+            foreach (double t in new[] { 4.5, 5.5 })
+                yield return Row(t);
+            // a row's intensity and the director's multiply
+            options.SetHit("hit2", 0.6f);
+            options.Intensity = 2f;
+            foreach (double t in new[] { 2.5, 3.5 })
+                yield return Row(t);
+            options.Intensity = 1f;
+            options.ClearHits();
+            options.SetHit("hit1", 2f);
+            yield return Row(0.2);
+            options.SetHit("hit1", 3f);
+            foreach (double t in new[] { 0.5, 1.5, 0.5, 1.5 })
+                yield return Row(t);
+            Assert.That(seen, Is.EqualTo(new[]
+            {
+                "0.5 (0.50, 0.00, 0.00) (0.00, 0.00, 0.00)", "1.5 (0.00, 0.00, 0.00) (0.00, 0.00, 0.00)", "2.5 (0.30, 0.00, 0.00) (0.00, 0.00, 0.00)",
+                "3.5 (0.00, 0.00, 0.00) (0.00, 0.00, 0.00)", "4.5 (0.00, 0.00, 0.75) (0.75, 0.00, 0.00)", "5.5 (0.00, 0.00, 0.00) (0.00, 0.00, 0.00)",
+                "6.5 (0.00, 0.00, 0.75) (0.00, 0.00, 0.00)", "7.5 (0.00, 0.00, 0.00) (0.00, 0.00, 0.00)",
+                "0.5 (0.00, 0.50, 0.00) (0.00, 0.00, 0.00)", "1.5 (0.00, 0.00, 0.00) (0.00, 0.00, 0.00)", "2.5 (0.00, 0.30, 0.00) (0.00, 0.00, 0.00)",
+                "3.5 (0.00, 0.00, 0.00) (0.00, 0.00, 0.00)", "4.5 (0.00, 0.00, 0.75) (0.00, 0.75, 0.00)", "5.5 (0.00, 0.00, 0.00) (0.00, 0.00, 0.00)",
+                "4.5 (0.00, 0.50, 0.00) (0.00, 0.50, 0.00)", "5.5 (0.00, 0.00, 0.00) (0.00, 0.00, 0.00)",
+                "4.5 (1.00, 0.00, 0.00) (1.00, 0.00, 0.00)", "5.5 (0.00, 0.00, 0.00) (0.00, 0.00, 0.00)",
+                "4.5 (0.50, 0.00, 0.00) (0.50, 0.00, 0.00)", "5.5 (0.00, 0.00, 0.00) (0.00, 0.00, 0.00)",
+                "2.5 (0.60, 0.00, 0.00) (0.00, 0.00, 0.00)", "3.5 (0.00, 0.00, 0.00) (0.00, 0.00, 0.00)",
+                "0.2 (0.40, 0.00, 0.00) (0.00, 0.00, 0.00)", "0.5 (1.00, 0.00, 0.00) (0.00, 0.00, 0.00)", "1.5 (0.00, 0.00, 0.00) (0.00, 0.00, 0.00)",
+                "0.5 (1.50, 0.00, 0.00) (0.00, 0.00, 0.00)", "1.5 (0.00, 0.00, 0.00) (0.00, 0.00, 0.00)",
+            }));
+        }
+
+        // T17 — an entry that reads the director's options (its key, a Hits row) allocates no more than one without them
+        [UnityTest]
+        public IEnumerator PV17_AnEntryWithOptionsAllocatesNothing()
+        {
+            int Entries(PlayableDirector d)
+            {
+                int allocating = 0;
+                for (int k = 0; k < 5; k++)
+                {
+                    d.time = 1.5;
+                    d.Evaluate();
+                    if (UIs.AllocatingGCMemory().ApplyTo((TestDelegate)(() => { d.time = 0.5; d.Evaluate(); })).IsSuccess)
+                        allocating++;
+                }
+                return allocating;
+            }
+            FeedbackPlayer p = Lists("plain", out _, out _);
+            PlayableDirector plain = Director(DirectorUpdateMode.Manual, p, out FeedbackTrack plainTrack);
+            Clip(plainTrack, 0.0, 1.0, FeedbackClipTiming.Driven, out _).m_HitKey = "hit";
+            plain.RebuildGraph();
+            FeedbackPlayer q = Lists("options", out _, out _);
+            PlayableDirector keyed = Director(DirectorUpdateMode.Manual, q, out FeedbackTrack keyedTrack);
+            Clip(keyedTrack, 0.0, 1.0, FeedbackClipTiming.Driven, out _).m_HitKey = "hit";
+            FeedbackTimelineOptions options = keyed.gameObject.AddComponent<FeedbackTimelineOptions>();
+            options.VariantKey = "light";
+            options.SetHit("hit", 0.5f, "heavy");
+            keyed.RebuildGraph();
+            for (int k = 0; k < 3; k++)
+            {
+                yield return EvaluateAt(plain, 0.5);
+                yield return EvaluateAt(plain, 1.5);
+                yield return EvaluateAt(keyed, 0.5);
+                yield return EvaluateAt(keyed, 1.5);
+            }
+            int without = Entries(plain);
+            int with = Entries(keyed);
+            yield return null;
+            Assert.That((with, S(q)), Is.EqualTo((without, "(0.00, 0.00, 0.25)")), "allocating entries of 5 — without the options " + without);
+        }
+
+        // T26 — a Control track's inner timeline reads its own director's options, not the outer one's
+        [UnityTest]
+        public IEnumerator PV16_AnInnerTimelineReadsItsOwnOptions()
+        {
+            FeedbackPlayer p = Lists("inner", out _, out _);
+            PlayableDirector inner = Director(DirectorUpdateMode.Manual, p, out FeedbackTrack innerTrack);
+            Clip(innerTrack, 0.0, 1.0, FeedbackClipTiming.Driven, out _);
+            // a later clip: the inner timeline outlasts the outer clip's time, so 1.5 leaves the first clip
+            Clip(innerTrack, 5.0, 0.5, FeedbackClipTiming.Driven, out _);
+            var go = new GameObject("Outer");
+            m_Made.Add(go);
+            var outer = go.AddComponent<PlayableDirector>();
+            outer.playOnAwake = false;
+            outer.timeUpdateMode = DirectorUpdateMode.Manual;
+            var asset = ScriptableObject.CreateInstance<TimelineAsset>();
+            m_Made.Add(asset);
+            TimelineClip control = asset.CreateTrack<ControlTrack>(null, "Control").CreateClip<ControlPlayableAsset>();
+            control.start = 0.0;
+            control.duration = 2.0;
+            var source = (ControlPlayableAsset)control.asset;
+            source.sourceGameObject.exposedName = Guid.NewGuid().ToString();
+            outer.SetReferenceValue(source.sourceGameObject.exposedName, inner.gameObject);
+            outer.playableAsset = asset;
+            go.AddComponent<FeedbackTimelineOptions>().VariantKey = "heavy";
+            outer.RebuildGraph();
+            yield return EvaluateAt(outer, 0.5);
+            string outerKey = S(p);
+            yield return EvaluateAt(outer, 1.5);
+            inner.gameObject.AddComponent<FeedbackTimelineOptions>().VariantKey = "light";
+            yield return EvaluateAt(outer, 0.5);
+            string innerKey = S(p);
+            Assert.That((outerKey, innerKey), Is.EqualTo(("(0.50, 0.00, 0.00)", "(0.00, 0.50, 0.00)")));
         }
     }
 }

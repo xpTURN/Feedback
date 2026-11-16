@@ -14,14 +14,16 @@
 #   - its OnEnable after the reload sees an open Default, and our three systems are in the loop
 #   - in the 60 frames after the reload the new Default's frame number rises once a frame and the three fronts are ours
 #   - at the exit OnApplicationQuit sees it open and OnDestroy closed (quitting before the cleanup)
-# The players: eight, made at the first frame of play — all Awake-initialized but lz (Lazy).
+# The players: nine, made at the first frame of play — all Awake-initialized but lz (Lazy); vr holds two Variants (its list
+# and both prepared before the reload and again after it, a variant's play after the reload moves its target).
 # Then also:
-#   - right after the reload no player has a runtime; after OnEnable the six Awake ones are prepared again on the new
-#     Default (reserved 6 — det's object is gone) and the Lazy one waits for its next Play
+#   - right after the reload no player has a runtime; after OnEnable the seven Awake ones are prepared again on the new
+#     Default (reserved 9 — det's object is gone, vr reserves for its list and its two Variants) and the Lazy one waits for
+#     its next Play
 #   - the OnEnable and OnStart auto plays play again · Restore() has nothing to put back · the Toggle cell is lost (Forward)
 #   - the play that ran at the reload is cut with no event and stays there · the detached play (det's object destroyed at
 #     frame 30) ended at the shutdown before the reload · the first frame is not written again over ini's play
-# The receivers: rx (a FeedbackReceiver on its own Awake player — the reservation is 7 with it) and shk (a
+# The receivers: rx (a FeedbackReceiver on its own Awake player — the reservation is 10 with it) and shk (a
 # CameraShakeReceiver). Before the reload a send reaches rx; right after it neither is registered; after OnEnable each is on
 # the new Default once and a send reaches rx again
 # The listeners: four Lazy players (they add nothing to the reservation). Before the reload ls (a listener) and tk (a
@@ -33,13 +35,13 @@
 # The drivers: dl (a Loop MotionDriver — Oscillate on its own position) and df (a Follow one — SetTarget (5, 0, 0)), made at
 # the first frame. Before the reload both run; right after it neither is prepared — dl's value is home and df's stays where
 # it stood (written through the door), its SetTarget value lost; after OnEnable both run on the new Default (the reservation
-# 9 with them, 10 with sp's below) from 0 s, df's target the value it stands at
-# The pools: sp (an Awake player — the reservation 10 with it) with one pooled Spawn of a scene template (pool 3, lifetime
+# 12 with them, 13 with sp's below) from 0 s, df's target the value it stands at
+# The pools: sp (an Awake player — the reservation 13 with it) with one pooled Spawn of a scene template (pool 3, lifetime
 # 0), played twice at the first frame. Before the reload one container, 3 made, 2 live; the shutdown before the reload
 # destroys them at a frame's end, so right after the reload they are still there and the first frame after it has the new
 # Default's pool beside them (2 containers, 6 made); a spawn plays on the new Default; the next frame and 60 frames later one
 # container, 3 made, 1 live; nothing is left after the exit
-# The services: three Awake players (the reservation 13 with them) — a screen flash (the overlay canvas), a bloom (the
+# The services: three Awake players (the reservation 16 with them) — a screen flash (the overlay canvas), a bloom (the
 # overlay volume) and a rumble on a recording gamepad (this assembly's layout — the reload drops it). Their objects are made
 # at the first play; the Default's close before the reload destroys them at once (none left right after the reload) and the
 # rumble's close sends (0, 0), the Default closed then; a play after the reload makes them again; nothing is left after the
@@ -205,8 +207,8 @@ if reload is not None:
     gone = last("observer-disable", reload)
     if back is not None:
         a = events[back][1]
-        check(a.get("reserved") == "13", "the players' reservation after the reload: " + str(a.get("reserved")) + " (13 — the Awake ones, rx's, sp's, the two drivers and the three services)")
-        for name in ("cont", "en", "st", "res", "ini", "tog"):
+        check(a.get("reserved") == "16", "the players' reservation after the reload: " + str(a.get("reserved")) + " (16 — the Awake ones, vr's list and its two Variants, rx's, sp's, the two drivers and the three services)")
+        for name in ("cont", "en", "st", "res", "ini", "tog", "vr"):
             check(a.get(name, "").startswith("r"), name + " is not prepared again after the reload: " + a.get(name, "none"))
         check(a.get("lz", "").startswith("_"), "lz (Lazy) is prepared before its Play: " + a.get("lz", "none"))
         check(a.get("en", "")[1:2] == "p" and a.get("st", "")[1:2] == "p", "an auto play does not play again: en " + a.get("en", "none") + " · st " + a.get("st", "none"))
@@ -221,6 +223,20 @@ if reload is not None:
         ini = a.get("ini", "").split("@")[-1]
         check(gone is not None and ini == events[gone][1].get("ini") and ini != "0,5",
               "ini's first frame written again: " + ini + " · before the reload " + (events[gone][1].get("ini", "none") if gone is not None else "none"))
+
+# the variants — vr (Awake) with two Variants and its key vr-b: its list and both prepared before the reload and again after it
+# (OnEnable), the key kept through the reload, and a Play() after the reload moves the key's variant's target, not the player's own
+vm = index("variants-made")
+check(vm is not None and events[vm][1].get("count") == "2" and events[vm][1].get("ready") == "2" and events[vm][1].get("key") == "vr-b",
+      "vr's Variants before the reload: " + (events[vm][2] if vm is not None else "none"))
+if reload is not None:
+    va = index("variants-after", reload)
+    check(va is not None and events[va][1].get("count") == "2" and events[va][1].get("ready") == "2" and events[va][1].get("accepted") == "1"
+          and events[va][1].get("key") == "vr-b",
+          "vr's Variants after the reload: " + (events[va][2] if va is not None else "none"))
+    vf = index("variants-frames", reload)
+    check(vf is not None and float(events[vf][1].get("b", "0,0").split(",")[0]) > 0.1 and float(events[vf][1].get("self", "0,0").split(",")[0]) == 0.0,
+          "vr's key played its variant after the reload, not its own list: " + (events[vf][2] if vf is not None else "none"))
 
 # the receivers
 made = index("receivers-made")

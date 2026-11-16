@@ -10,8 +10,8 @@ using UnityEngine.Timeline;
 namespace xpTURN.Feedback.Editor
 {
     // what the Timeline window shows of a track's player — its list's model, what the list holds, its validation's errors and
-    // warnings — built once a player and again when the player, its linked preset or its settings change (their dirty
-    // counts: an edit, an Undo, a link; a script's direct write is not seen). The window asks at each draw: an ask that
+    // warnings — built once a player and a clip's preset (none: the player's list) and again when the player, the list's
+    // preset or its settings change (their dirty counts: an edit, an Undo, a link; a script's direct write is not seen). The window asks at each draw: an ask that
     // finds the info built allocates nothing. A clip asset is looked up in the window's timeline (the inspected one — a
     // sub-timeline's when the window entered it) through a map checked at each ask; a clip the window does not show has no
     // length. The overlaps of a player's clips are found once a timeline and again when a Feedback track, its binding, its
@@ -30,6 +30,7 @@ namespace xpTURN.Feedback.Editor
         internal const string TriggeredText = "Triggered — the play starts with the clip and runs on the player's clock.";
         internal const string SimulatedText = "Plays as Triggered in the Timeline window's preview (a simulated target).";
         internal const string HitStopText = "A Hit Stop stops the game — the director with it — for its length.";
+        internal const string NotVariantText = "The clip's Preset is neither the player's linked preset nor one of its Variants — the clip plays nothing.";
         internal const float MinRow = 2f;
         internal const int MaxRepeats = 64;
         internal const float DimAlpha = 0.45f;
@@ -66,6 +67,9 @@ namespace xpTURN.Feedback.Editor
         {
             internal int Version = int.MinValue;
             internal FeedbackClipTiming Timing;
+            internal FeedbackPreset Preset;
+            internal string HitKey;
+            internal bool Listed;
             internal uint Seed;
             internal PlayPolicy Overlap;
             internal string Error = "";
@@ -85,6 +89,8 @@ namespace xpTURN.Feedback.Editor
         }
 
         static readonly Dictionary<FeedbackPlayer, TimelinePlayerInfo> s_Players = new Dictionary<FeedbackPlayer, TimelinePlayerInfo>();
+        // a player's info for the list of a clip's preset that is not the player's
+        static readonly Dictionary<(FeedbackPlayer, FeedbackPreset), TimelinePlayerInfo> s_Variants = new Dictionary<(FeedbackPlayer, FeedbackPreset), TimelinePlayerInfo>();
         static readonly Dictionary<FeedbackClip, TimelineClip> s_Clips = new Dictionary<FeedbackClip, TimelineClip>();
         static readonly Dictionary<FeedbackClip, ClipText> s_Texts = new Dictionary<FeedbackClip, ClipText>();
         static readonly Dictionary<FeedbackClip, PlayPolicy> s_Overlaps = new Dictionary<FeedbackClip, PlayPolicy>();
@@ -106,6 +112,7 @@ namespace xpTURN.Feedback.Editor
         internal static void Clear()
         {
             s_Players.Clear();
+            s_Variants.Clear();
             s_Clips.Clear();
             s_Texts.Clear();
             s_Overlaps.Clear();
@@ -114,23 +121,42 @@ namespace xpTURN.Feedback.Editor
             s_OverlapDirector = null;
         }
 
-        internal static TimelinePlayerInfo Of(FeedbackPlayer player)
+        internal static TimelinePlayerInfo Of(FeedbackPlayer player) => Of(player, null);
+
+        // the info of the list a clip's preset picks — the player's for none or the linked preset
+        internal static TimelinePlayerInfo Of(FeedbackPlayer player, FeedbackPreset preset)
         {
-            if (!s_Players.TryGetValue(player, out TimelinePlayerInfo info))
+            bool own = preset == null || ReferenceEquals(preset, player.m_Preset);
+            TimelinePlayerInfo info;
+            if (own)
+            {
+                if (!s_Players.TryGetValue(player, out info))
+                {
+                    info = new TimelinePlayerInfo();
+                    s_Players.Add(player, info);
+                }
+            }
+            else if (!s_Variants.TryGetValue((player, preset), out info))
             {
                 info = new TimelinePlayerInfo();
-                s_Players.Add(player, info);
+                s_Variants.Add((player, preset), info);
             }
-            info.Refresh(player);
+            info.Refresh(player, own ? null : preset);
             return info;
         }
 
-        void Refresh(FeedbackPlayer player)
+        // the preset is one of the player's lists — none, the linked preset or a Variants entry
+        internal static bool Lists(FeedbackPlayer player, FeedbackPreset preset)
+            => preset == null || ReferenceEquals(preset, player.m_Preset) || (player.m_Variants != null && player.m_Variants.Contains(preset));
+
+        // variant: the clip's preset when it is not the player's list — the player gives the settings, the preset the items;
+        // the validation is the player's list's
+        void Refresh(FeedbackPlayer player, FeedbackPreset variant)
         {
-            FeedbackPreset preset = player.m_Preset;
+            FeedbackPreset preset = variant != null ? variant : player.m_Preset;
             int playerDirty = EditorUtility.GetDirtyCount(player);
             int presetDirty = preset != null ? EditorUtility.GetDirtyCount(preset) : 0;
-            List<FeedbackItem> items = player.Items;
+            List<FeedbackItem> items = variant != null ? variant.m_Items : player.Items;
             if (Model != null && playerDirty == m_PlayerDirty && presetDirty == m_PresetDirty && ReferenceEquals(preset, m_Preset)
                 && items.Count == Count && player.m_DurationMultiplier == m_Multiplier && player.m_StartDelay == m_StartDelay)
                 return;
@@ -152,7 +178,12 @@ namespace xpTURN.Feedback.Editor
                 TimeScale |= effect is TimeScaleItem;
                 HitStop |= effect is HitStopItem;
             }
-            Simulated = PreviewSession.Simulates(player);
+            Simulated = PreviewSession.Simulates(items);
+            if (variant != null)
+            {
+                TrackText = "";
+                return;
+            }
             s_Problems.Clear();
             foreach (RuleResult r in FeedbackValidator.Run(player))
             {
@@ -171,7 +202,7 @@ namespace xpTURN.Feedback.Editor
             FeedbackPlayer player = clip != null ? Bound(clip.GetParentTrack()) : null;
             if (player == null)
                 return double.PositiveInfinity;
-            double total = Of(player).Model.Total;
+            double total = Of(player, asset.m_Preset).Model.Total;
             return total > 0 && !double.IsInfinity(total) ? total : double.PositiveInfinity;
         }
 
@@ -254,7 +285,8 @@ namespace xpTURN.Feedback.Editor
             TimelineAsset timeline = TimelineEditor.inspectedAsset;
             bool known = director != null && track != null && timeline != null && track.timelineAsset == timeline;
             FeedbackPlayer player = known ? director.GetGenericBinding(track) as FeedbackPlayer : null;
-            TimelinePlayerInfo info = player != null ? Of(player) : null;
+            TimelinePlayerInfo info = player != null ? Of(player, asset.m_Preset) : null;
+            bool listed = player == null || Lists(player, asset.m_Preset);
             int version = !known ? -1 : info != null ? info.Version : 0;
             PlayPolicy overlap = info != null ? OverlapOf(timeline, director, asset) : PlayPolicy.Overlap;
             if (!s_Texts.TryGetValue(asset, out ClipText text))
@@ -262,23 +294,29 @@ namespace xpTURN.Feedback.Editor
                 text = new ClipText();
                 s_Texts.Add(asset, text);
             }
-            if (text.Version != version || text.Timing != asset.m_Timing || text.Seed != asset.m_Seed || text.Overlap != overlap)
+            if (text.Version != version || text.Timing != asset.m_Timing || text.Seed != asset.m_Seed || text.Overlap != overlap
+                || !ReferenceEquals(text.Preset, asset.m_Preset) || text.Listed != listed || text.HitKey != asset.m_HitKey)
             {
                 text.Version = version;
                 text.Timing = asset.m_Timing;
+                text.Preset = asset.m_Preset;
+                text.HitKey = asset.m_HitKey;
+                text.Listed = listed;
                 text.Seed = asset.m_Seed;
                 text.Overlap = overlap;
-                text.Error = known ? ErrorOf(asset, info, overlap) : "";
+                text.Error = known ? ErrorOf(asset, info, overlap, listed) : "";
                 text.Tooltip = TooltipOf(asset, info);
             }
             error = text.Error;
             tooltip = text.Tooltip;
         }
 
-        static string ErrorOf(FeedbackClip asset, TimelinePlayerInfo info, PlayPolicy overlap)
+        static string ErrorOf(FeedbackClip asset, TimelinePlayerInfo info, PlayPolicy overlap, bool listed)
         {
             if (info == null)
                 return NoPlayerText;
+            if (!listed)
+                return NotVariantText;
             var lines = new List<string>(3);
             bool seekable = info.Model.Seekable;
             if (asset.m_Timing == FeedbackClipTiming.Driven && !seekable)
@@ -313,6 +351,10 @@ namespace xpTURN.Feedback.Editor
                 double total = info.Model.Total;
                 lines.Add("List " + (double.IsInfinity(total) ? "∞" : total.ToString("0.###") + " s") + " · " + info.Count + (info.Count == 1 ? " item" : " items"));
             }
+            if (asset.m_Preset != null)
+                lines.Add("Preset " + asset.m_Preset.name);
+            if (!string.IsNullOrEmpty(asset.m_HitKey))
+                lines.Add("Hit Key " + asset.m_HitKey);
             lines.Add("Seed " + asset.m_Seed);
             if (info != null && info.Simulated && asset.m_Timing != FeedbackClipTiming.Triggered && seekable)
                 lines.Add(SimulatedText);
@@ -415,7 +457,7 @@ namespace xpTURN.Feedback.Editor
             FeedbackPlayer player = Bound(track);
             if (player == null)
                 return false;
-            TimelinePlayerInfo info = Of(player);
+            TimelinePlayerInfo info = Of(player, asset.m_Preset);
             bool triggered = asset.m_Timing == FeedbackClipTiming.Triggered || !info.Model.Seekable || (info.Simulated && !Application.isPlaying);
             Place(info.Model, area, start, end, asset.m_Loop, triggered, into);
             return into.Count > 0;

@@ -19,6 +19,7 @@ namespace xpTURN.Feedback
                 case BlinkMotion m: return new BlinkEvaluator(in m.m_Params, dimension);
                 case WiggleMotion m: return new WiggleEvaluator(in m.m_Params, dimension);
                 case SpringMotion m: return new SpringEvaluator(in m.m_Params, dimension);
+                case BounceMotion m: return new BounceEvaluator(in m.m_Params, dimension);
                 default: return null;
             }
         }

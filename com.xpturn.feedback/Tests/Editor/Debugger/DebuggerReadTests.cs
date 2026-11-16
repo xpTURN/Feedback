@@ -264,6 +264,23 @@ namespace xpTURN.Feedback.Tests.Editor
             Assert.That(w.ServiceLines, Does.Contain("  ×0.5 open (under the timed)"));
         }
 
+        // the trauma's rows — none before the service is made (no 'not made' line) · then one line of each transform holding one
+        [Test]
+        public void DT04d_TheTraumaRows()
+        {
+            FeedbackScheduler s = T.NewScheduler();
+            DebuggerSource.Override = s;
+            FeedbackDebuggerWindow w = T.Window();
+            w.Refresh();
+            Assert.That(w.ServiceLines.Any(x => x.StartsWith("Trauma", System.StringComparison.Ordinal)), Is.False, "no row before the service is made");
+            GameObject go = T.Go("shaken");
+            s.Context.Trauma.Add(go.transform, 0.5f, TraumaKind.Object);
+            s.Tick(0.05f);
+            w.Refresh();
+            Assert.That(w.ServiceLines, Does.Contain("Trauma — 1 of 16"));
+            Assert.That(w.ServiceLines, Does.Contain("  shaken 0.45 · Motion"));
+        }
+
         [Test]
         public void DT04a_ServicesAreReadNotMade()
         {
@@ -570,6 +587,60 @@ namespace xpTURN.Feedback.Tests.Editor
             long heard = events.EndTotal;
             FeedbackDiagnostics.RaiseEnded(p, hp, PlaybackEnd.Stopped, true);
             Assert.That(events.EndTotal, Is.EqualTo(heard), "a closed window");
+        }
+
+        // a Variant's play: its row says the preset, its items are the variant's list (longer than the player's), its tokens
+        // the variant runtime's — the player's play reads the player's
+        [Test]
+        public void VS22_AVariantPlaysRowItemsAndTokens()
+        {
+            FeedbackScheduler s = T.NewScheduler();
+            var preset = ScriptableObject.CreateInstance<FeedbackPreset>();
+            preset.name = "Heavy";
+            T.Keep(preset);
+            for (int i = 0; i < 3; i++)
+            {
+                PositionItem v = T.Tween(1f, T.Self);
+                v.m_Label = "v" + i;
+                preset.m_Items.Add(v);
+            }
+            PositionItem own = T.Tween(1f, T.Self);
+            own.m_Label = "b0";
+            FeedbackPlayer p = T.Player("P", null, own);
+            p.m_Policy = PlayPolicy.Overlap;
+            p.m_MaxOverlap = 2;
+            p.m_Variants = new List<FeedbackPreset> { preset };
+            p.Bind(s);
+            var cts = new CancellationTokenSource();
+            try
+            {
+                PlaybackHandle variant = p.Play(PlayArgs.Default.WithPreset(preset), cts.Token);
+                PlaybackHandle mine = p.Play();
+                s.Tick(0.1f);
+                var reader = new DebuggerReader();
+                reader.Read(s);
+                int vRow = reader.Plays.FindIndex(r => r.Handle == variant);
+                int bRow = reader.Plays.FindIndex(r => r.Handle == mine);
+                Assert.That(vRow, Is.GreaterThanOrEqualTo(0));
+                Assert.That(bRow, Is.GreaterThanOrEqualTo(0));
+                Assert.That(DebuggerTable.OwnerText(reader.Plays[vRow]), Is.EqualTo("P · Heavy"));
+                Assert.That(DebuggerTable.OwnerText(reader.Plays[bRow]), Is.EqualTo("P"));
+                Assert.That(reader.Plays[vRow].Group, Is.EqualTo(reader.Plays[bRow].Group), "one player's group");
+
+                reader.Select(vRow);
+                reader.Read(s);
+                Assert.That(reader.Items.Select(x => x.Item != null ? x.Item.m_Label : "null"), Is.EqualTo(new[] { "v0", "v1", "v2" }), "the variant's items");
+                Assert.That(reader.Tokens.Count, Is.EqualTo(1), "the variant runtime's token");
+
+                reader.Select(reader.Plays.FindIndex(r => r.Handle == mine));
+                reader.Read(s);
+                Assert.That(reader.Items.Select(x => x.Item != null ? x.Item.m_Label : "null"), Is.EqualTo(new[] { "b0" }));
+                Assert.That(reader.Tokens.Count, Is.EqualTo(0), "the player's runtime has none");
+            }
+            finally
+            {
+                cts.Dispose();
+            }
         }
     }
 }

@@ -176,7 +176,7 @@ namespace xpTURN.Feedback.Tests.Editor
             FeedbackPlayer p = m_Fx.Player("PH12b");
             var editor = (FeedbackPlayerEditor)UnityEditor.Editor.CreateEditor(p);
             m_Fx.Made.Add(editor);
-            var field = editor.CreateInspectorGUI().Q<UnityEditor.UIElements.ObjectField>();
+            var field = editor.CreateInspectorGUI().Query<UnityEditor.UIElements.ObjectField>().ToList().Single(f => f.objectType == typeof(FeedbackPreset));
             Assert.That(field.label, Is.EqualTo("Preset"));
             Assert.That(field.tooltip, Does.Contain("A Unity Preset holds the whole component"));
         }

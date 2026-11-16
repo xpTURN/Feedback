@@ -15,8 +15,8 @@ namespace xpTURN.Feedback
     }
 
     // every value has its own mark, so default(PlayArgs) and new PlayArgs() are not a play of intensity 0. The listener
-    // needs no mark — null is none
-    /// <summary>What one Play carries — intensity, seed, position, direction and listener; default is a play of intensity 1 with the player's own settings.</summary>
+    // and the Variant key need no mark — null is none
+    /// <summary>What one Play carries — intensity, seed, position, direction, listener, preset and Variant key; default is a play at intensity 1 of the list the player picks — its VariantKey's, else its own — with the player's own settings.</summary>
     public readonly struct PlayArgs
     {
         const byte IntensityMark = 1;
@@ -27,6 +27,9 @@ namespace xpTURN.Feedback
         const byte UnconditionalMark = 16;
         // a track's driven play — the clock does not move it, its track seeks it
         const byte DrivenMark = 32;
+        const byte PresetMark = 64;
+        // the player's list, past its VariantKey
+        const byte PlayerListMark = 128;
 
         readonly float m_Intensity;
         readonly uint m_Seed;
@@ -34,8 +37,10 @@ namespace xpTURN.Feedback
         readonly byte m_Direction;
         readonly byte m_Marks;
         readonly IPlaybackListener m_Listener;
+        readonly FeedbackPreset m_Preset;
+        readonly string m_VariantKey;
 
-        PlayArgs(float intensity, uint seed, Vector3 position, byte direction, byte marks, IPlaybackListener listener)
+        PlayArgs(float intensity, uint seed, Vector3 position, byte direction, byte marks, IPlaybackListener listener, FeedbackPreset preset, string variantKey)
         {
             m_Intensity = intensity;
             m_Seed = seed;
@@ -43,9 +48,11 @@ namespace xpTURN.Feedback
             m_Direction = direction;
             m_Marks = marks;
             m_Listener = listener;
+            m_Preset = preset;
+            m_VariantKey = variantKey;
         }
 
-        /// <summary>The default play: intensity 1, no seed, no position, the player's direction, no listener.</summary>
+        /// <summary>The default play: intensity 1, no seed, no position, the player's direction, no listener, no preset and no Variant key — the list the player's VariantKey picks, else the player's list.</summary>
         public static PlayArgs Default => default;
 
         /// <summary>The play's intensity; 1 unless set.</summary>
@@ -73,28 +80,53 @@ namespace xpTURN.Feedback
         public IPlaybackListener Listener => m_Listener;
 
         /// <summary>A copy with the intensity set.</summary>
-        public PlayArgs WithIntensity(float intensity) => new PlayArgs(intensity, m_Seed, m_Position, m_Direction, (byte)(m_Marks | IntensityMark), m_Listener);
+        public PlayArgs WithIntensity(float intensity) => new PlayArgs(intensity, m_Seed, m_Position, m_Direction, (byte)(m_Marks | IntensityMark), m_Listener, m_Preset, m_VariantKey);
 
         /// <summary>A copy with the seed set.</summary>
-        public PlayArgs WithSeed(uint seed) => new PlayArgs(m_Intensity, seed, m_Position, m_Direction, (byte)(m_Marks | SeedMark), m_Listener);
+        public PlayArgs WithSeed(uint seed) => new PlayArgs(m_Intensity, seed, m_Position, m_Direction, (byte)(m_Marks | SeedMark), m_Listener, m_Preset, m_VariantKey);
 
         /// <summary>A copy with the position set.</summary>
-        public PlayArgs WithPosition(Vector3 position) => new PlayArgs(m_Intensity, m_Seed, position, m_Direction, (byte)(m_Marks | PositionMark), m_Listener);
+        public PlayArgs WithPosition(Vector3 position) => new PlayArgs(m_Intensity, m_Seed, position, m_Direction, (byte)(m_Marks | PositionMark), m_Listener, m_Preset, m_VariantKey);
 
         // a value past a byte stays undefined rather than wrapping onto a defined one
         /// <summary>A copy with the direction set; a value that is not a defined direction makes Play refuse it.</summary>
         public PlayArgs WithDirection(PlayerDirection direction)
-            => new PlayArgs(m_Intensity, m_Seed, m_Position, (uint)direction <= byte.MaxValue ? (byte)direction : byte.MaxValue, (byte)(m_Marks | DirectionMark), m_Listener);
+            => new PlayArgs(m_Intensity, m_Seed, m_Position, (uint)direction <= byte.MaxValue ? (byte)direction : byte.MaxValue, (byte)(m_Marks | DirectionMark), m_Listener, m_Preset, m_VariantKey);
 
         /// <summary>A copy with the listener set; null for none.</summary>
-        public PlayArgs WithListener(IPlaybackListener listener) => new PlayArgs(m_Intensity, m_Seed, m_Position, m_Direction, m_Marks, listener);
+        public PlayArgs WithListener(IPlaybackListener listener) => new PlayArgs(m_Intensity, m_Seed, m_Position, m_Direction, m_Marks, listener, m_Preset, m_VariantKey);
+
+        /// <summary>True when a preset is set.</summary>
+        public bool HasPreset => (m_Marks & PresetMark) != 0;
+
+        /// <summary>The preset the play plays, when <see cref="PlayArgs.HasPreset"/> is true.</summary>
+        public FeedbackPreset Preset => m_Preset;
+
+        // the mark follows the reference, not the engine's null: a deleted asset is still the slot it was. A preset or none
+        // takes the player's list mark away
+        /// <summary>A copy that plays <paramref name="preset"/> — the player's linked preset or one of its Variants — instead of the player's list; null names no preset — the list the player's VariantKey picks, else the player's list.</summary>
+        public PlayArgs WithPreset(FeedbackPreset preset)
+            => new PlayArgs(m_Intensity, m_Seed, m_Position, m_Direction, (byte)(ReferenceEquals(preset, null) ? m_Marks & ~(PresetMark | PlayerListMark) : (m_Marks | PresetMark) & ~PlayerListMark), m_Listener, preset, m_VariantKey);
+
+        /// <summary>True when the play plays the player's list whatever its VariantKey.</summary>
+        public bool HasPlayerList => (m_Marks & PlayerListMark) != 0;
+
+        /// <summary>A copy that plays the player's list (or its linked preset's) whatever the player's VariantKey; it takes a preset set before away.</summary>
+        public PlayArgs WithPlayerList() => new PlayArgs(m_Intensity, m_Seed, m_Position, m_Direction, (byte)((m_Marks & ~PresetMark) | PlayerListMark), m_Listener, null, m_VariantKey);
+
+        /// <summary>The alias the play picks among the player's lists; empty when none is set.</summary>
+        public string VariantKey => m_VariantKey ?? "";
+
+        /// <summary>A copy that plays the player's list whose alias is <paramref name="alias"/> — ahead of a preset set, which plays when no list has the alias; null or empty sets none.</summary>
+        public PlayArgs WithVariant(string alias)
+            => new PlayArgs(m_Intensity, m_Seed, m_Position, m_Direction, m_Marks, m_Listener, m_Preset, string.IsNullOrEmpty(alias) ? null : alias);
 
         internal bool Unconditional => (m_Marks & UnconditionalMark) != 0;
 
-        internal PlayArgs WithUnconditional() => new PlayArgs(m_Intensity, m_Seed, m_Position, m_Direction, (byte)(m_Marks | UnconditionalMark), m_Listener);
+        internal PlayArgs WithUnconditional() => new PlayArgs(m_Intensity, m_Seed, m_Position, m_Direction, (byte)(m_Marks | UnconditionalMark), m_Listener, m_Preset, m_VariantKey);
 
         internal bool Driven => (m_Marks & DrivenMark) != 0;
 
-        internal PlayArgs WithDriven() => new PlayArgs(m_Intensity, m_Seed, m_Position, m_Direction, (byte)(m_Marks | DrivenMark), m_Listener);
+        internal PlayArgs WithDriven() => new PlayArgs(m_Intensity, m_Seed, m_Position, m_Direction, (byte)(m_Marks | DrivenMark), m_Listener, m_Preset, m_VariantKey);
     }
 }

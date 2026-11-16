@@ -240,7 +240,7 @@ namespace xpTURN.Feedback.Tests.Editor
             Assert.That(fails, Is.Empty);
         }
 
-        // ---- FB-G08 takes the four · FB-G14 says an Anchored plain Transform moves as Local
+        // ---- FB-G08 takes the four and Transform/Trauma · FB-G14 says an Anchored plain Transform moves as Local
 
         [Test]
         public void RT12_TheRules()
@@ -264,9 +264,10 @@ namespace xpTURN.Feedback.Tests.Editor
                     On(new RectOffsetsItem(), driven, TweenTo(Vector4.one), 1f),                                 // 3 G08
                     On(new PositionItem { m_Space = PositionSpace.Anchored }, plain.transform, TweenTo(Vector4.one), 1f),   // 4 G14
                     On(new PositionItem { m_Space = PositionSpace.Anchored }, parent, TweenTo(Vector4.one), 1f),            // 5
+                    On(new TransformTraumaItem(), driven, new SetMotion(), 0f),                                  // 6 G08
                 });
                 List<RuleResult> got = FeedbackValidator.Run(host).Where(r => r.Id == "FB-G08" || r.Id == "FB-G14").ToList();
-                Assert.That(got.Select(r => r.Id + "@" + r.Item).OrderBy(x => x), Is.EqualTo(new[] { "FB-G08@0", "FB-G08@1", "FB-G08@2", "FB-G08@3", "FB-G14@4" }));
+                Assert.That(got.Select(r => r.Id + "@" + r.Item).OrderBy(x => x), Is.EqualTo(new[] { "FB-G08@0", "FB-G08@1", "FB-G08@2", "FB-G08@3", "FB-G08@6", "FB-G14@4" }));
             }
             finally
             {

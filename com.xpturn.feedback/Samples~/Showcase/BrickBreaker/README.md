@@ -6,7 +6,7 @@ Break all 32 bricks (the top rows crack first), then beat the boss. Keep breakin
 
 ## See
 
-The board moves the ball itself on the game clock (no physics) and never waits for a feedback. One Impact a frame carries the combo tier as its intensity: the camera shake grows, the hit stops and the rumble come in by intensity range. The score counts up on the unscaled clock; a floating +score needs TMP Essential Resources. The boss comes down with a tween from above its place, a hit stops the game for 0.15 s (a 0.5 s guard keeps the flashes under the limit), its bar trails, a red pulse runs while it rages, and its defeat slows time and drains the colour. Before plays the same game with no feedback and no floating scores.
+The board moves the ball itself on the game clock (no physics) and never waits for a feedback. One Impact a frame carries the combo tier as its intensity: the camera shake grows, the hit stops and the rumble come in by intensity range. The score counts up on the unscaled clock; a floating +score needs TMP Essential Resources. The boss comes down with a tween from above its place, a hit stops the game for 0.15 s (a 0.5 s guard keeps the flashes under the limit), its bar trails, a red pulse runs while it rages, and its defeat slows time and drains the colour. The paddle and each brick's crack (quieter) and break sound from the pool on their own players; a lost ball, a boss hit and the defeat play a sound player beside theirs. Before plays the same game with no feedback, no sound and no floating scores.
 
 ## Controls
 
@@ -22,4 +22,4 @@ H · L3 — fold the HUD
 
 ## Requires
 
-the Particle System module
+the Particle System and Audio modules

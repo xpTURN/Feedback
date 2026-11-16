@@ -108,8 +108,8 @@ namespace xpTURN.Feedback
 
         internal override void Begin(int record, in BeginContext context)
         {
-            uint seed = Hash32.Tagged(context.ItemSeed, Hash32.Occurrence, Hash32.Fold(context.Occurrence));
-            m_Evaluator.Begin(ref m_States[record], new Vector4(m_Item.m_Base, 0f, 0f, 0f), new MotionBegin { Seed = seed, Intensity = context.Intensity });
+            uint seed = PlayMath.OccurrenceSeed(context.ItemSeed, context.Occurrence);
+            m_Evaluator.Begin(ref m_States[record], new Vector4(m_Item.m_Base, 0f, 0f, 0f), new MotionBegin { Seed = seed, Intensity = context.Intensity, Endless = context.Endless });
             m_Started[record] = true;
             m_Logged[record] = false;
             if (Skips)
@@ -132,9 +132,9 @@ namespace xpTURN.Feedback
                 m_Context.SkipUnityEvent(m_Item.m_Event, "Float Event");
                 return;
             }
-            uint seed = Hash32.Tagged(context.ItemSeed, Hash32.Occurrence, Hash32.Fold(context.Occurrence));
+            uint seed = PlayMath.OccurrenceSeed(context.ItemSeed, context.Occurrence);
             m_Logged[record] = false;
-            m_Evaluator.Begin(ref m_States[record], new Vector4(m_Item.m_Base, 0f, 0f, 0f), new MotionBegin { Seed = seed, Intensity = context.Intensity });
+            m_Evaluator.Begin(ref m_States[record], new Vector4(m_Item.m_Base, 0f, 0f, 0f), new MotionBegin { Seed = seed, Intensity = context.Intensity, Endless = context.Endless });
             m_Evaluator.Evaluate(in m_States[record], new MotionTime(context.Reverse ? 0f : 1f, 0.0), out MotionSample sample);
             Invoke(m_Write == MotionWrite.Offset ? m_Item.m_Base + sample.Value.x * m_Gate.Scale(m_Category) : sample.Value.x, record);
         }

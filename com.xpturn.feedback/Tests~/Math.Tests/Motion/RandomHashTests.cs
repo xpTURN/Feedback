@@ -46,6 +46,7 @@ namespace xpTURN.Feedback.Tests.Motion
         [TestCase(Hash32.Duration, 0x600u, 3612188204u)]
         [TestCase(Hash32.Output, 0x700u, 3143671592u)]
         [TestCase(Hash32.Pick, 0x800u, 2134513043u)]
+        [TestCase(Hash32.Item, 0xA00u, 4215267446u)]
         public void TagsArePinnedAndTaggedMatchesTheGoldenValue(uint tag, uint pinned, uint golden)
         {
             Assert.That(tag, Is.EqualTo(pinned));
@@ -100,7 +101,7 @@ namespace xpTURN.Feedback.Tests.Motion
                 "Linear", "SineIn", "SineOut", "SineInOut", "QuadIn", "QuadOut", "QuadInOut", "CubicIn", "CubicOut", "CubicInOut",
                 "QuartIn", "QuartOut", "QuartInOut", "QuintIn", "QuintOut", "QuintInOut", "ExpoIn", "ExpoOut", "ExpoInOut",
                 "CircIn", "CircOut", "CircInOut", "BackIn", "BackOut", "BackInOut", "ElasticIn", "ElasticOut", "ElasticInOut",
-                "BounceIn", "BounceOut", "BounceInOut", "Custom",
+                "BounceIn", "BounceOut", "BounceInOut", "Custom", "Steps",
             };
             Assert.That(Enum.GetNames(typeof(EaseType)), Has.Length.EqualTo(ease.Length));
             for (int i = 0; i < ease.Length; i++)

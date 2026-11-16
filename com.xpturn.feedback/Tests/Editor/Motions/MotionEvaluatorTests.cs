@@ -15,10 +15,10 @@ namespace xpTURN.Feedback.Tests.Editor
         // the item's seconds — noise seconds off the lattice
         internal const float Item = 1.37f;
 
-        internal static MotionState Begin(MotionEvaluator e, Vector4 current, float intensity = 1f, uint seed = 12345u)
+        internal static MotionState Begin(MotionEvaluator e, Vector4 current, float intensity = 1f, uint seed = 12345u, bool endless = false)
         {
             var s = new MotionState();
-            var args = new MotionBegin { Seed = seed, Intensity = intensity };
+            var args = new MotionBegin { Seed = seed, Intensity = intensity, Endless = endless };
             e.Begin(ref s, current, args);
             return s;
         }
@@ -53,7 +53,7 @@ namespace xpTURN.Feedback.Tests.Editor
         static FlashParams Flash() => new FlashParams { m_Target = A, m_Attack = 0.2f, m_Hold = 0.3f, m_Release = 0.3f };
         static BlinkParams Blink() => new BlinkParams { m_Value = A, m_Period = 0.2f, m_Duty = 0.5f, m_StartOn = true };
 
-        // the eleven — Spring in both modes, Gradient in both writes
+        // the twelve — Spring in both modes, Gradient in both writes
         internal static MotionEvaluator[] All(int d) => new MotionEvaluator[]
         {
             new SetEvaluator(new SetParams { m_Value = A, m_Relative = true }, d),
@@ -69,6 +69,7 @@ namespace xpTURN.Feedback.Tests.Editor
             new WiggleEvaluator(new WiggleParams { m_Amplitude = A, m_Frequency = 3f, m_Octaves = 2 }, d),
             new SpringEvaluator(Spring(SpringMode.MoveTo), d),
             new SpringEvaluator(Spring(SpringMode.Bump), d),
+            new BounceEvaluator(new BounceParams { m_Amplitude = A, m_Count = 3, m_Restitution = 0.5f }, d),
         };
 
         internal static bool IsFinite(Vector4 v) => IsFinite(v.x) && IsFinite(v.y) && IsFinite(v.z) && IsFinite(v.w);
@@ -96,6 +97,8 @@ namespace xpTURN.Feedback.Tests.Editor
             Assert.That(At(move, Begin(move, start), 1f).Value, Is.EqualTo(new Vector4(3f, 6f, 9f, 0f)), "Spring MoveTo");
             var bump = new SpringEvaluator(Spring(SpringMode.Bump), 3);
             Assert.That(At(bump, Begin(bump, start), 1f).Value, Is.EqualTo(Vector4.zero), "Spring Bump");
+            var bounce = new BounceEvaluator(new BounceParams { m_Amplitude = A, m_Count = 3, m_Restitution = 0.5f }, 3);
+            Assert.That(At(bounce, Begin(bounce, start), 1f).Value, Is.EqualTo(Vector4.zero), "Bounce");
             var flash = new FlashEvaluator(Flash(), 3);
             Assert.That(At(flash, Begin(flash, start), 1f).Weight, Is.EqualTo(0f), "Flash");
             var blink = new BlinkEvaluator(Blink(), 3);
@@ -320,7 +323,7 @@ namespace xpTURN.Feedback.Tests.Editor
         public void F01_TheFactoryMakesEveryMotion()
         {
             var types = typeof(FeedbackMotion).Assembly.GetTypes().Where(t => typeof(FeedbackMotion).IsAssignableFrom(t) && !t.IsAbstract).ToArray();
-            Assert.That(types.Length, Is.EqualTo(11));
+            Assert.That(types.Length, Is.EqualTo(12));
             foreach (var t in types)
             {
                 var motion = (FeedbackMotion)Activator.CreateInstance(t, true);
@@ -355,6 +358,11 @@ namespace xpTURN.Feedback.Tests.Editor
                 var punch = new PunchEvaluator(Punch(A), 1);
                 punch.Evaluate(Begin(punch, Vector4.zero, I, seed), time, out MotionSample o);
                 Assert.That(o.Value.x, Is.EqualTo(A.x * (MotionKernels.Punch(t, 3f, 2f) * I)).Within(1e-6f), $"Punch {seconds}");
+
+                var bounce = new BounceEvaluator(new BounceParams { m_Amplitude = A, m_Count = 4, m_Restitution = 0.6f }, 1);
+                bounce.Evaluate(Begin(bounce, Vector4.zero, I, seed), time, out o);
+                Assert.That(o.Value.x, Is.EqualTo(A.x * (MotionKernels.Bounce(t, 4, 0.6f) * I)).Within(1e-6f), $"Bounce {seconds}");
+                Assert.That(bounce.EvaluateShape(Begin(bounce, Vector4.zero, I, seed), time), Is.EqualTo(MotionKernels.Bounce(t, 4, 0.6f) * I).Within(1e-6f), $"Bounce shape {seconds}");
 
                 var shake = new ShakeEvaluator(new ShakeParams { m_Amplitude = A, m_Frequency = 7f, m_Noise = ShakeNoise.Jitter, m_Falloff = Ease.Of(EaseType.QuadIn) }, 1);
                 shake.Evaluate(Begin(shake, Vector4.zero, I, seed), time, out o);
@@ -555,6 +563,337 @@ namespace xpTURN.Feedback.Tests.Editor
                 for (int i = 0; i <= 200; i++)
                     Assert.That(At(e, s, i / 200f).Weight, Is.InRange(0f, 1f), $"{ease} t {i / 200f}");
             }
+        }
+
+        static readonly double[] s_Seconds = { 0.0, 0.13, 0.5, Item, 7.25, 1234.567 };
+
+        // Per Axis off — the axis fields are not read: every component is the one wave, bit for bit
+        [Test]
+        public void PA01_PerAxisOffKeepsTheOneWave()
+        {
+            foreach (Waveform w in Enum.GetValues(typeof(Waveform)))
+            {
+                for (int d = 1; d <= 4; d++)
+                {
+                    var p = new OscillateParams { m_Amplitude = A, m_Frequency = 2f, m_Waveform = w, m_Phase = 0.1f };
+                    var off = p;
+                    off.m_AxisPhase = new Vector4(0.25f, 0.5f, 0.125f, 0.75f);
+                    off.m_AxisFrequency = new Vector4(3f, 0.5f, 2f, 7f);
+                    var plain = new OscillateEvaluator(p, d);
+                    var e = new OscillateEvaluator(off, d);
+                    foreach (float intensity in new[] { 1f, 0.6f })
+                    {
+                        MotionState s = Begin(e, Vector4.zero, intensity);
+                        MotionState s0 = Begin(plain, Vector4.zero, intensity);
+                        foreach (double seconds in s_Seconds)
+                        {
+                            var time = new MotionTime(0.4f, seconds);
+                            e.Evaluate(s, time, out MotionSample o);
+                            plain.Evaluate(s0, time, out MotionSample o0);
+                            float k = MotionKernels.Wave(w, 2f * seconds + 0.1f) * intensity;
+                            var expected = new Vector4(A.x * k, d > 1 ? A.y * k : 0f, d > 2 ? A.z * k : 0f, d > 3 ? A.w * k : 0f);
+                            string at = $"{w} d {d} I {intensity} s {seconds}";
+                            Assert.That((o.Value, o.Weight, o0.Value), Is.EqualTo((expected, 1f, expected)), at);
+                            Assert.That(e.EvaluateShape(s, time), Is.EqualTo(k), at + " shape");
+                        }
+                    }
+                }
+            }
+        }
+
+        // Per Axis on — component c is A_c · Wave(F · k_c · Seconds + Phase + o_c): with a Sine, o = (0, 0.25) circles and
+        // k = (1, 2) traces a figure eight; the shape is component 0's; the axis fields are cut when made
+        [Test]
+        public void PA02_PerAxisGivesEachComponentItsOwnWave()
+        {
+            var o = new Vector4(0.1f, 0.35f, 0.6f, 0.85f);
+            var k = new Vector4(3f, 0.5f, 2f, 1.25f);
+            foreach (Waveform w in Enum.GetValues(typeof(Waveform)))
+            {
+                var e = new OscillateEvaluator(new OscillateParams { m_Amplitude = A, m_Frequency = 2f, m_Waveform = w, m_Phase = 0.2f, m_PerAxis = true, m_AxisPhase = o, m_AxisFrequency = k }, 4);
+                MotionState s = Begin(e, Vector4.zero, 0.8f);
+                foreach (double seconds in s_Seconds)
+                {
+                    var time = new MotionTime(0.4f, seconds);
+                    e.Evaluate(s, time, out MotionSample sample);
+                    for (int c = 0; c < 4; c++)
+                    {
+                        float expected = A[c] * (MotionKernels.Wave(w, 2f * k[c] * seconds + 0.2f + o[c]) * 0.8f);
+                        Assert.That(sample.Value[c], Is.EqualTo(expected).Within(1e-6f), $"{w} s {seconds} c{c}");
+                    }
+                    Assert.That(e.EvaluateShape(s, time), Is.EqualTo(MotionKernels.Wave(w, 2f * k.x * seconds + 0.2f + o.x) * 0.8f).Within(1e-6f), $"{w} s {seconds} shape");
+                }
+            }
+
+            var circle = new OscillateEvaluator(new OscillateParams { m_Amplitude = new Vector4(1.5f, 1.5f, 0f, 0f), m_Frequency = 0.7f, m_PerAxis = true, m_AxisPhase = new Vector4(0f, 0.25f, 0f, 0f), m_AxisFrequency = Vector4.one }, 2);
+            var eight = new OscillateEvaluator(new OscillateParams { m_Amplitude = new Vector4(1.5f, 0.5f, 0f, 0f), m_Frequency = 0.7f, m_PerAxis = true, m_AxisFrequency = new Vector4(1f, 2f, 1f, 1f) }, 2);
+            MotionState sc = Begin(circle, Vector4.zero), se = Begin(eight, Vector4.zero);
+            float least = float.MaxValue, most = float.MinValue;
+            for (int i = 0; i <= 200; i++)
+            {
+                double seconds = i / 100.0;
+                circle.Evaluate(sc, new MotionTime(0f, seconds), out MotionSample c);
+                Assert.That(c.Value.x * c.Value.x + c.Value.y * c.Value.y, Is.EqualTo(1.5f * 1.5f).Within(1.5f * 1.5f * 1e-5f), $"circle s {seconds}");
+                eight.Evaluate(se, new MotionTime(0f, seconds), out MotionSample g);
+                float x = g.Value.x / 1.5f, y = g.Value.y / 0.5f;
+                Assert.That(y * y, Is.EqualTo(4f * x * x * (1f - x * x)).Within(1e-5f), $"eight s {seconds}");
+                least = Mathf.Min(least, g.Value.y);
+                most = Mathf.Max(most, g.Value.y);
+            }
+            Assert.That((least < -0.49f, most > 0.49f), Is.EqualTo((true, true)), "the eight reaches both lobes");
+
+            var cut = new OscillateEvaluator(new OscillateParams { m_Amplitude = A, m_Frequency = 2f, m_Phase = 0.2f, m_PerAxis = true, m_AxisPhase = new Vector4(float.NaN, float.PositiveInfinity, 0.25f, 0f), m_AxisFrequency = new Vector4(float.NaN, -2f, float.PositiveInfinity, 1f) }, 4);
+            MotionState st = Begin(cut, Vector4.zero);
+            foreach (double seconds in s_Seconds)
+            {
+                cut.Evaluate(st, new MotionTime(0.4f, seconds), out MotionSample v);
+                var expected = new Vector4(A.x * MotionKernels.Wave(Waveform.Sine, 0.2f), A.y * MotionKernels.Wave(Waveform.Sine, 0.2f), A.z * MotionKernels.Wave(Waveform.Sine, 0.2f + 0.25f), A.w * MotionKernels.Wave(Waveform.Sine, 2f * seconds + 0.2f));
+                Near(expected, v.Value, $"cut s {seconds}", 1e-6f);
+            }
+        }
+
+        // ---- the envelope
+
+        static OscillateParams FadeOscillate(bool perAxis) => new OscillateParams
+        {
+            m_Amplitude = A, m_Frequency = 2f, m_Waveform = Waveform.Triangle, m_Phase = 0.1f, m_PerAxis = perAxis,
+            m_AxisPhase = new Vector4(0.1f, 0.35f, 0.6f, 0.85f), m_AxisFrequency = new Vector4(3f, 0.5f, 2f, 1.25f),
+        };
+
+        static ShakeParams FadeShake(ShakeNoise noise) => new ShakeParams { m_Amplitude = A, m_Frequency = 7f, m_Noise = noise, m_Falloff = Ease.Of(EaseType.QuadIn) };
+
+        // the five shapes, each made twice — without the fade fields and with them (a Shake takes no Fade Out)
+        static (string Name, MotionEvaluator Plain, MotionEvaluator Faded)[] Fades(float fadeIn, float fadeOut, Ease ease)
+        {
+            OscillateParams Oscillate(bool perAxis, bool fade)
+            {
+                OscillateParams p = FadeOscillate(perAxis);
+                if (fade)
+                {
+                    p.m_FadeIn = fadeIn;
+                    p.m_FadeOut = fadeOut;
+                    p.m_FadeEase = ease;
+                }
+                return p;
+            }
+            WiggleParams Wiggle(bool fade)
+            {
+                var p = new WiggleParams { m_Amplitude = A, m_Frequency = 3f, m_Octaves = 2 };
+                if (fade)
+                {
+                    p.m_FadeIn = fadeIn;
+                    p.m_FadeOut = fadeOut;
+                    p.m_FadeEase = ease;
+                }
+                return p;
+            }
+            ShakeParams Shake(ShakeNoise noise, bool fade)
+            {
+                ShakeParams p = FadeShake(noise);
+                if (fade)
+                {
+                    p.m_FadeIn = fadeIn;
+                    p.m_FadeEase = ease;
+                }
+                return p;
+            }
+            return new (string, MotionEvaluator, MotionEvaluator)[]
+            {
+                ("Oscillate", new OscillateEvaluator(Oscillate(false, false), 4), new OscillateEvaluator(Oscillate(false, true), 4)),
+                ("Oscillate Per Axis", new OscillateEvaluator(Oscillate(true, false), 4), new OscillateEvaluator(Oscillate(true, true), 4)),
+                ("Wiggle", new WiggleEvaluator(Wiggle(false), 4), new WiggleEvaluator(Wiggle(true), 4)),
+                ("Shake Smooth", new ShakeEvaluator(Shake(ShakeNoise.Smooth, false), 4), new ShakeEvaluator(Shake(ShakeNoise.Smooth, true), 4)),
+                ("Shake Jitter", new ShakeEvaluator(Shake(ShakeNoise.Jitter, false), 4), new ShakeEvaluator(Shake(ShakeNoise.Jitter, true), 4)),
+            };
+        }
+
+        // the five as the evaluators write them — the products in the same order and cut to float where they are (an argument,
+        // a return), so they match bit for bit: Mono keeps a float product wide until it is stored
+        static float Noise5(string name, uint seed, int c, double seconds)
+        {
+            uint channel = Hash32.Tagged(seed, Hash32.Component, (uint)c);
+            return name == "Wiggle" ? Noise.Fbm(channel, 3f, seconds, 2)
+                : name == "Shake Jitter" ? Noise.Jitter(channel, 7f, seconds) : Noise.SmoothHz(channel, 7f, seconds);
+        }
+
+        static Vector4 Formula(string name, in MotionState s, in MotionTime time)
+        {
+            OscillateParams o = FadeOscillate(true);
+            float f = Falloff(time.T);
+            float falloff = f * s.Intensity;
+            float wave = Cut(MotionKernels.Wave(Waveform.Triangle, 2f * time.Seconds + 0.1f) * s.Intensity);
+            Vector4 v = default;
+            for (int c = 0; c < 4; c++)
+            {
+                switch (name)
+                {
+                    case "Oscillate": v[c] = A[c] * wave; break;
+                    case "Oscillate Per Axis": v[c] = A[c] * (MotionKernels.Wave(Waveform.Triangle, 2f * o.m_AxisFrequency[c] * time.Seconds + 0.1f + o.m_AxisPhase[c]) * s.Intensity); break;
+                    case "Wiggle": v[c] = A[c] * Noise5(name, s.Seed, c, time.Seconds) * s.Intensity; break;
+                    default: v[c] = A[c] * Noise5(name, s.Seed, c, time.Seconds) * falloff; break;
+                }
+            }
+            return v;
+        }
+
+        static float FormulaShape(string name, in MotionState s, in MotionTime time)
+        {
+            OscillateParams o = FadeOscillate(true);
+            switch (name)
+            {
+                case "Oscillate": return MotionKernels.Wave(Waveform.Triangle, 2f * time.Seconds + 0.1f) * s.Intensity;
+                case "Oscillate Per Axis": return MotionKernels.Wave(Waveform.Triangle, 2f * o.m_AxisFrequency.x * time.Seconds + 0.1f + o.m_AxisPhase.x) * s.Intensity;
+                case "Wiggle": return Noise5(name, s.Seed, 0, time.Seconds) * s.Intensity;
+                default: return Noise5(name, s.Seed, 0, time.Seconds) * Falloff(time.T) * s.Intensity;
+            }
+        }
+
+        static float Falloff(float t) => 1f - Easing.Evaluate(EaseType.QuadIn, 0f, 0f, t);
+
+        static float Cut(float x) => x;
+
+        // the envelope's height by hand — 0 at a faded end, linear on the slopes, the fall the rise run backwards, cut to 0 ~ 1
+        static float Height(float t, float fadeIn, float fadeOut, Ease ease)
+        {
+            if ((t <= 0f && fadeIn > 0f) || (t >= 1f && fadeOut > 0f))
+                return 0f;
+            if (t < fadeIn)
+                return Mathf.Clamp01(ease.Evaluate(t / fadeIn));
+            if (t > 1f - fadeOut)
+                return Mathf.Clamp01(ease.Evaluate((1f - t) / fadeOut));
+            return 1f;
+        }
+
+        // Fade 0 is the motion as it was, bit for bit: the formula and the twin made without the fields. A Fade Ease alone
+        // changes nothing, and an endless state takes no fade at all — the value and the shape
+        [Test]
+        public void FD01_NoFadeKeepsTheMotionBitForBit()
+        {
+            var eased = Fades(0f, 0f, Ease.Of(EaseType.ElasticOut));
+            var endless = Fades(0.3f, 0.4f, Ease.Of(EaseType.QuadIn));
+            for (int k = 0; k < eased.Length; k++)
+            {
+                string name = eased[k].Name;
+                MotionEvaluator plain = eased[k].Plain;
+                MotionState s = Begin(plain, Vector4.zero, 0.8f);
+                MotionState se = Begin(endless[k].Faded, Vector4.zero, 0.8f, endless: true);
+                foreach (float t in new[] { 0f, 0.1f, 0.5f, 0.85f, 1f })
+                {
+                    foreach (double seconds in s_Seconds)
+                    {
+                        var time = new MotionTime(t, seconds);
+                        plain.Evaluate(s, time, out MotionSample p);
+                        eased[k].Faded.Evaluate(s, time, out MotionSample e);
+                        endless[k].Faded.Evaluate(se, time, out MotionSample n);
+                        string at = $"{name} t {t} s {seconds}";
+                        Assert.That((p.Value, p.Weight), Is.EqualTo((Formula(name, s, time), 1f)), at + " formula");
+                        Assert.That((e.Value, e.Weight, n.Value, n.Weight), Is.EqualTo((p.Value, 1f, p.Value, 1f)), at + " a Fade Ease alone · endless");
+                        float shape = plain.EvaluateShape(s, time);
+                        Assert.That((shape, eased[k].Faded.EvaluateShape(s, time), endless[k].Faded.EvaluateShape(se, time)), Is.EqualTo((FormulaShape(name, s, time), shape, shape)), at + " shape");
+                    }
+                }
+            }
+        }
+
+        // the envelope — T and Seconds apart: 0 s is on the noise's lattice and a Sine's zero, where a motion is 0 with no fade.
+        // The value and the shape are the plain motion's times the height (a Shake's falloff kept); a faded end is exactly 0
+        // where the plain one is not; Fade Out alone
+        [Test]
+        public void FD02_TheEnvelopeFadesInAndOut()
+        {
+            const float In = 0.3f, Out = 0.4f;
+            Ease quad = Ease.Of(EaseType.QuadIn);
+            foreach (var (name, plain, faded) in Fades(In, Out, quad))
+            {
+                float fadeOut = name.StartsWith("Shake", StringComparison.Ordinal) ? 0f : Out;
+                MotionState s = Begin(plain, Vector4.zero, 0.8f);
+                for (int i = 0; i <= 40; i++)
+                {
+                    float t = i / 40f;
+                    var time = new MotionTime(t, 0.37 + t * 1.37);
+                    plain.Evaluate(s, time, out MotionSample p);
+                    faded.Evaluate(s, time, out MotionSample f);
+                    float h = Height(t, In, fadeOut, quad);
+                    string at = $"{name} t {t}";
+                    Near(p.Value * h, f.Value, at, 1e-6f);
+                    Assert.That(faded.EvaluateShape(s, time), Is.EqualTo(plain.EvaluateShape(s, time) * h).Within(1e-6f), at + " shape");
+                }
+                var start = new MotionTime(0f, 0.37);
+                plain.Evaluate(s, start, out MotionSample p0);
+                faded.Evaluate(s, start, out MotionSample f0);
+                Assert.That((f0.Value, faded.EvaluateShape(s, start), p0.Value != Vector4.zero), Is.EqualTo((Vector4.zero, 0f, true)), name + " the start");
+                if (fadeOut > 0f)
+                {
+                    var end = new MotionTime(1f, 1.74);
+                    plain.Evaluate(s, end, out MotionSample p1);
+                    faded.Evaluate(s, end, out MotionSample f1);
+                    Assert.That((f1.Value, faded.EvaluateShape(s, end), p1.Value != Vector4.zero), Is.EqualTo((Vector4.zero, 0f, true)), name + " the end");
+                }
+            }
+
+            foreach (var (name, plain, faded) in Fades(0f, Out, quad).Where(f => !f.Name.StartsWith("Shake", StringComparison.Ordinal)))
+            {
+                MotionState s = Begin(plain, Vector4.zero, 0.8f);
+                var start = new MotionTime(0f, 0.37);
+                var end = new MotionTime(1f, 1.74);
+                plain.Evaluate(s, start, out MotionSample p0);
+                faded.Evaluate(s, start, out MotionSample f0);
+                plain.Evaluate(s, end, out MotionSample p1);
+                faded.Evaluate(s, end, out MotionSample f1);
+                Assert.That((f0.Value, f1.Value, p1.Value != Vector4.zero), Is.EqualTo((p0.Value, Vector4.zero, true)), name + " Fade Out alone");
+            }
+        }
+
+        // an overshooting Fade Ease is cut to 0 ~ 1 — the faded motion never passes the plain one nor turns it over; a curve at
+        // 0.5 at its 0 still ends at exactly 0
+        [Test]
+        public void FD03_TheHeightStaysWithinZeroAndOne()
+        {
+            Ease over = Ease.Of(EaseType.Custom);
+            over.m_Curve = new AnimationCurve(new Keyframe(0f, -0.4f), new Keyframe(0.5f, 1.6f), new Keyframe(1f, 1f));
+            foreach (Ease ease in new[] { Ease.Of(EaseType.BackIn), Ease.Of(EaseType.ElasticOut), over })
+            {
+                foreach (var (name, plain, faded) in Fades(0.3f, 0.4f, ease))
+                {
+                    MotionState s = Begin(plain, Vector4.zero, 0.8f);
+                    for (int i = 0; i <= 200; i++)
+                    {
+                        float t = i / 200f;
+                        var time = new MotionTime(t, 0.37 + t * 1.37);
+                        float a = plain.EvaluateShape(s, time), b = faded.EvaluateShape(s, time);
+                        string at = $"{ease.m_Type} {name} t {t}";
+                        Assert.That(Mathf.Abs(b), Is.LessThanOrEqualTo(Mathf.Abs(a) * (1f + 1e-6f)), at + " not past");
+                        Assert.That(a * b, Is.GreaterThanOrEqualTo(0f), at + " not turned over");
+                    }
+                }
+            }
+            Ease half = Ease.Of(EaseType.Custom);
+            half.m_Curve = AnimationCurve.Constant(0f, 1f, 0.5f);
+            foreach (var (name, plain, faded) in Fades(0.3f, 0.4f, half))
+            {
+                MotionState s = Begin(plain, Vector4.zero, 0.8f);
+                faded.Evaluate(s, new MotionTime(0f, 0.37), out MotionSample f0);
+                faded.Evaluate(s, new MotionTime(0.15f, 0.37 + 0.15 * 1.37), out MotionSample mid);
+                plain.Evaluate(s, new MotionTime(0.15f, 0.37 + 0.15 * 1.37), out MotionSample pmid);
+                Assert.That(f0.Value, Is.EqualTo(Vector4.zero), name + " the start");
+                Near(pmid.Value * 0.5f, mid.Value, name + " the slope", 1e-6f);
+                if (!name.StartsWith("Shake", StringComparison.Ordinal))
+                {
+                    faded.Evaluate(s, new MotionTime(1f, 1.74), out MotionSample f1);
+                    Assert.That(f1.Value, Is.EqualTo(Vector4.zero), name + " the end");
+                }
+            }
+        }
+
+        // the begin's Endless reaches the state; an endless state's first evaluation (0 s) skips the fade
+        [Test]
+        public void FD04_AnEndlessStateSkipsTheFade()
+        {
+            var e = new OscillateEvaluator(new OscillateParams { m_Amplitude = A, m_Frequency = 1f, m_Waveform = Waveform.Square, m_FadeIn = 0.5f }, 4);
+            MotionState endless = Begin(e, Vector4.zero, endless: true), finite = Begin(e, Vector4.zero);
+            Assert.That((endless.Endless, finite.Endless), Is.EqualTo((true, false)), "the state");
+            Assert.That(Eval(e, endless, 0f, 0.0).Value, Is.EqualTo(A), "endless — the first value");
+            Assert.That(Eval(e, finite, 0f, 0.0).Value, Is.EqualTo(Vector4.zero), "finite — the fade's start");
         }
     }
 }

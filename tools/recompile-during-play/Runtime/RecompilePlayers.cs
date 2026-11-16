@@ -10,13 +10,14 @@ namespace RecompileCheck
 {
     // players across the reload — all Awake-initialized but lz (Lazy). cont plays at the reload · det's object is destroyed
     // at frame 30 (its finite play goes on, detached) · en plays on enable · st plays on start · res ended before the reload ·
-    // ini wrote its first frame and plays at the reload · tog turned its Toggle cell · lz played once. The package's fields
+    // ini wrote its first frame and plays at the reload · tog turned its Toggle cell · lz played once · vr holds two Variants
+    // (presets made here, a tween of its own target each — its list and both prepared, again after the reload). The package's fields
     // and its runtime are internal and this assembly is not a friend: reflection, like the record's scheduler
     public static class RecompilePlayers
     {
         const BindingFlags Any = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
         static readonly Assembly s_Core = typeof(FeedbackPlayer).Assembly;
-        static readonly string[] s_Names = { "cont", "det", "en", "st", "res", "ini", "tog", "lz" };
+        static readonly string[] s_Names = { "cont", "det", "en", "st", "res", "ini", "tog", "lz", "vr" };
 
         static void Set(object target, string field, object value) => target.GetType().GetField(field, Any).SetValue(target, value);
 
@@ -71,6 +72,42 @@ namespace RecompileCheck
             Make("ini", new Vector3(1f, 0f, 0f), TweenMode.From, new Vector3(0f, 5f, 0f), 10f, p => Set(p, "m_ApplyInitialState", true)).Play();
             Make("tog", Vector3.zero, TweenMode.To, ten, 0.2f, p => Set(p, "m_Direction", PlayerDirection.Toggle)).Play();
             Make("lz", Vector3.zero, TweenMode.To, ten, 0.5f, p => Set(p, "m_Initialization", PlayerInitialization.Lazy)).Play();
+            Make("vr", Vector3.zero, TweenMode.To, ten, 0.5f, p => Set(p, "m_Variants", new System.Collections.Generic.List<FeedbackPreset> { Variant("vr-a"), Variant("vr-b") }))
+                .VariantKey = "vr-b";
+        }
+
+        // a preset of one tween of its own target (name-t), its alias the name
+        static FeedbackPreset Variant(string name)
+        {
+            var target = new GameObject(name + "-t");
+            var preset = ScriptableObject.CreateInstance<FeedbackPreset>();
+            preset.name = name;
+            Set(preset, "m_Alias", name);
+            object items = preset.GetType().GetField("m_Items", Any).GetValue(preset);
+            items.GetType().GetMethod("Add").Invoke(items, new object[] { Tween(target.transform, TweenMode.To, new Vector3(10f, 0f, 0f), 0.5f) });
+            return preset;
+        }
+
+        // vr's Variants — count=the runtimes' slots ready=the ones prepared accepted=a Play() by the player's key (when asked)
+        // key=the player's key b=the second's target self=the player's own target
+        public static string Variants(bool play)
+        {
+            FeedbackPlayer vr = Player("vr");
+            if (vr == null)
+                return "count=- ready=- accepted=- key=- b=" + Place("vr-b") + " self=" + Place("vr");
+            int count = (int)typeof(FeedbackPlayer).GetProperty("VariantRuntimeCount", Any).GetValue(vr);
+            MethodInfo at = typeof(FeedbackPlayer).GetMethod("VariantRuntime", Any);
+            int ready = 0;
+            for (int k = 0; k < count; k++)
+            {
+                if (at.Invoke(vr, new object[] { k }) != null)
+                    ready++;
+            }
+            string accepted = "-";
+            if (play)
+                accepted = vr.Play() != default ? "1" : "0";
+            return "count=" + count + " ready=" + ready + " accepted=" + accepted + " key=" + (vr.VariantKey.Length > 0 ? vr.VariantKey : "-")
+                + " b=" + Place("vr-b") + " self=" + Place("vr");
         }
 
         // two receivers across the reload — rx (a FeedbackReceiver on its own Awake player, channel 1) and shk (a

@@ -19,6 +19,8 @@ namespace xpTURN.Feedback
         internal const string ArgumentWarning = "A FeedbackPlayer call had an invalid argument and was ignored: ";
         internal const string ReverseWarning = "A FeedbackPlayer list cannot play backward (an endless repeat or item, a signal wait without a timeout, or a wait on another player) — the backward play was refused.";
         internal const string SignalWarning = "FeedbackPlayer.Signal found no play waiting — a wait that has not begun yet does not take the signal.";
+        internal const string VariantWarning = "FeedbackPlayer.Play was given a preset that is neither the linked preset nor one of the player's Variants (or was added after the player prepared — Rebuild) — the play was refused.";
+        internal const string VariantKeyWarning = "FeedbackPlayer.VariantKey was set outside Play mode and was ignored.";
 
         [SerializeReference] internal List<FeedbackItem> m_Items = new List<FeedbackItem>();
         [SerializeField] internal FeedbackPreset m_Preset;
@@ -51,10 +53,25 @@ namespace xpTURN.Feedback
         [SerializeField] internal PlayerDirection m_Direction;
         [SerializeField] internal bool m_ApplyInitialState;
         [SerializeField] internal PlayerDisableBehavior m_DisableBehavior;
+        // the output group of the Play At Point sounds whose item names none — an AudioMixerGroup (the module's type Core can't
+        // name), read at the prepare
+        [SerializeField] internal UnityEngine.Object m_AudioOutput;
+        // the presets a Play can pick instead of the list — PlayArgs.WithPreset, a Timeline clip's Preset. Read at the prepare
+        [SerializeField] internal List<FeedbackPreset> m_Variants = new List<FeedbackPreset>();
+        // the alias of the player's own list — a linked player's is its preset's
+        [SerializeField] internal string m_ListAlias = "";
 
         // the runtime state is one unserialized object — "prepared" is this reference: a plain private field would survive a
         // recompile during play while the objects it points to do not
         [NonSerialized] PlayerRuntime m_Runtime;
+        // the Variants' runtimes, made and released with it, by m_Variants index — null for an empty, missing, repeated or
+        // linked slot
+        [NonSerialized] PlayerRuntime[] m_VariantRuntimes;
+        // what the runtimes share: the cooldown's last play, the Toggle cell (Rebuild keeps it) and the stamp of the last
+        // accepted play
+        [NonSerialized] internal double m_LastPlay = double.NegativeInfinity;
+        [NonSerialized] internal bool m_ToggleBackward;
+        [NonSerialized] internal long m_Stamp;
         // runtimes made — the inspector's play-mode edit banner clears when it moves, a Rebuild from anywhere
         [NonSerialized] int m_PrepareCount;
         [NonSerialized] FeedbackScheduler m_Bound;
@@ -66,11 +83,16 @@ namespace xpTURN.Feedback
         // Play runs) — the Preview kind reads them
         [NonSerialized] internal byte[] m_PreviewMasks;
         [NonSerialized] internal int m_PreviewSoloOnce = -1;
+        // the owner of the list the masks are by — null is the player's list (its own or the linked preset's)
+        [NonSerialized] internal UnityEngine.Object m_PreviewMaskOwner;
         // the first frame's marks: plain private fields on purpose — they survive a recompile during
         // play, so the prepare after it does not write the first frame over a play again, and they are not saved (a copy
         // writes its own). Written · a play accepted since
         bool m_InitialWritten;
         bool m_InitialPlayed;
+        // the alias a play that names no preset picks — a plain private field: it survives a recompile during play and is not
+        // saved
+        internal string m_VariantKey;
         // the Signal calls that ended no wait — the direct one (its warning's cue) and the quiet one (a channel's broadcast,
         // the preview's), for the debugger
         [NonSerialized] int m_MissedSignals;
@@ -92,9 +114,16 @@ namespace xpTURN.Feedback
             Argument,
             Reverse,
             Signal,
+            Variant,
+            VariantKey,
         }
 
         internal PlayerRuntime Runtime => m_Runtime;
+
+        // the Variants' runtimes by m_Variants index — none before the prepare
+        internal int VariantRuntimeCount => m_VariantRuntimes != null ? m_VariantRuntimes.Length : 0;
+
+        internal PlayerRuntime VariantRuntime(int index) => m_VariantRuntimes[index];
 
         internal int PrepareCount => m_PrepareCount;
 
@@ -112,6 +141,12 @@ namespace xpTURN.Feedback
         // the list's owner of PresetLinks
         internal List<FeedbackItem> Items => m_Preset != null ? m_Preset.m_Items : m_Items;
 
+        // the object whose serialized data holds that list — its items' managed reference ids are this object's
+        internal UnityEngine.Object ItemsOwner => m_Preset != null ? m_Preset : (UnityEngine.Object)this;
+
+        // the owner of the list a preview's masks are by — the shown list's
+        internal UnityEngine.Object MaskOwner => m_PreviewMaskOwner != null ? m_PreviewMaskOwner : ItemsOwner;
+
         // the play records and the scheduler's reservation: Ignore · Restart play one at a time
         internal int MaxOverlap => m_Policy == PlayPolicy.Overlap ? Mathf.Clamp(m_MaxOverlap, 1, OverlapLimit) : 1;
 
@@ -127,17 +162,20 @@ namespace xpTURN.Feedback
             // inside its own Play the pipeline's runtime would be released under it
             if (m_InPlay)
                 return false;
-            m_Runtime?.StopAll(StopMode.Hold);
-            // the new runtime takes the old one's snapshots and Toggle cell, then the old one goes
+            StopRuntimes(StopMode.Hold);
+            // the new runtimes take the old ones' snapshots and the Toggle cell stays, then the old ones go
             PlayerRuntime old = m_Runtime;
+            PlayerRuntime[] oldVariants = m_VariantRuntimes;
             m_Runtime = null;
+            m_VariantRuntimes = null;
             try
             {
-                return Prepare(old) == Refusal.None;
+                return Prepare(old, oldVariants) == Refusal.None;
             }
             finally
             {
                 old?.Release(PlaybackEnd.Stopped);
+                Release(oldVariants, PlaybackEnd.Stopped);
             }
         }
 
@@ -206,10 +244,10 @@ namespace xpTURN.Feedback
 
         // prepares if it has not — "at the latest at the configured time": an earlier call prepares, Play too.
         // false leaves no runtime
-        internal bool EnsureRuntime() => Prepare(null) == Refusal.None;
+        internal bool EnsureRuntime() => Prepare(null, null) == Refusal.None;
 
-        // old: Rebuild's runtime — the new one takes its snapshots
-        Refusal Prepare(PlayerRuntime old)
+        // old · oldVariants: Rebuild's runtimes — the new ones of the same lists take their snapshots
+        Refusal Prepare(PlayerRuntime old, PlayerRuntime[] oldVariants)
         {
             // the C# object of a destroyed component can still be called · a prepare does not enter itself
             if (m_Destroyed)
@@ -251,6 +289,15 @@ namespace xpTURN.Feedback
                 preset.m_WarnedFormat = true;
                 Debug.LogWarning(FeedbackPreset.NewerFormatWarning + preset.name + " " + preset.m_FormatVersion + " > " + FeedbackFormat.Current, preset);
             }
+            for (int k = 0; m_Variants != null && k < m_Variants.Count; k++)
+            {
+                FeedbackPreset variant = m_Variants[k];
+                if (variant != null && variant.m_FormatVersion > FeedbackFormat.Current && !variant.m_WarnedFormat)
+                {
+                    variant.m_WarnedFormat = true;
+                    Debug.LogWarning(FeedbackPreset.NewerFormatWarning + variant.name + " " + variant.m_FormatVersion + " > " + FeedbackFormat.Current, variant);
+                }
+            }
 #endif
             // the first frame: at the first prepare and at a Rebuild before any play since it wrote — not at the prepare after
             // a recompile (the marks survive it) and not over a play
@@ -258,7 +305,12 @@ namespace xpTURN.Feedback
             m_Preparing = true;
             try
             {
-                m_Runtime = new PlayerRuntime(this, scheduler, old, initial);
+                // a new runtime has no cooldown yet; the Toggle cell goes on through a Rebuild
+                m_LastPlay = double.NegativeInfinity;
+                if (old == null)
+                    m_ToggleBackward = false;
+                m_Runtime = new PlayerRuntime(this, Items, ItemsOwner, scheduler, old, initial);
+                m_VariantRuntimes = PrepareVariants(scheduler, oldVariants);
                 m_PrepareCount++;
             }
             finally
@@ -273,14 +325,52 @@ namespace xpTURN.Feedback
             return Refusal.None;
         }
 
-        // once: the reference goes first
+        // a runtime for each live slot of the Variants — none for an empty or missing slot, a repeat (its first slot plays it)
+        // or the linked preset (the list's runtime plays it). A variant writes no first frame
+        PlayerRuntime[] PrepareVariants(FeedbackScheduler scheduler, PlayerRuntime[] oldVariants)
+        {
+            List<FeedbackPreset> variants = m_Variants;
+            int count = variants != null ? variants.Count : 0;
+            if (count == 0)
+                return null;
+            var made = new PlayerRuntime[count];
+            for (int k = 0; k < count; k++)
+            {
+                FeedbackPreset preset = variants[k];
+                if (preset == null || ReferenceEquals(preset, m_Preset) || variants.IndexOf(preset) != k)
+                    continue;
+                made[k] = new PlayerRuntime(this, preset.m_Items, preset, scheduler, Of(oldVariants, preset), false);
+            }
+            return made;
+        }
+
+        static PlayerRuntime Of(PlayerRuntime[] runtimes, UnityEngine.Object owner)
+        {
+            for (int i = 0; runtimes != null && i < runtimes.Length; i++)
+            {
+                if (runtimes[i] != null && ReferenceEquals(runtimes[i].ItemsOwner, owner))
+                    return runtimes[i];
+            }
+            return null;
+        }
+
+        static void Release(PlayerRuntime[] runtimes, PlaybackEnd end)
+        {
+            for (int i = 0; runtimes != null && i < runtimes.Length; i++)
+                runtimes[i]?.Release(end);
+        }
+
+        // once: the references go first
         internal void ReleaseRuntime()
         {
             PlayerRuntime runtime = m_Runtime;
+            PlayerRuntime[] variants = m_VariantRuntimes;
             if (runtime == null)
                 return;
             m_Runtime = null;
+            m_VariantRuntimes = null;
             runtime.Release(PlaybackEnd.Stopped);
+            Release(variants, PlaybackEnd.Stopped);
         }
 
         // ---- the lifetime
@@ -322,7 +412,7 @@ namespace xpTURN.Feedback
             m_Disabling = true;
             try
             {
-                m_Runtime.StopAll(behavior == PlayerDisableBehavior.StopRevert ? StopMode.Revert : StopMode.Hold);
+                StopRuntimes(behavior == PlayerDisableBehavior.StopRevert ? StopMode.Revert : StopMode.Hold);
             }
             finally
             {
@@ -336,10 +426,20 @@ namespace xpTURN.Feedback
         {
             m_Destroyed = true;
             PlayerRuntime runtime = m_Runtime;
+            PlayerRuntime[] variants = m_VariantRuntimes;
             if (runtime == null)
                 return;
             m_Runtime = null;
-            if (m_DisableBehavior != PlayerDisableBehavior.StopHold && m_DisableBehavior != PlayerDisableBehavior.StopRevert && runtime.Detach())
+            m_VariantRuntimes = null;
+            bool detach = m_DisableBehavior != PlayerDisableBehavior.StopHold && m_DisableBehavior != PlayerDisableBehavior.StopRevert;
+            Destroyed(runtime, detach);
+            for (int i = 0; variants != null && i < variants.Length; i++)
+                Destroyed(variants[i], detach);
+        }
+
+        static void Destroyed(PlayerRuntime runtime, bool detach)
+        {
+            if (runtime == null || (detach && runtime.Detach()))
                 return;
             runtime.Release(PlaybackEnd.Destroyed);
         }

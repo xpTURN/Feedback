@@ -660,14 +660,14 @@ namespace xpTURN.Feedback.Tests.Editor
             "m_Items", "m_Preset", "m_Anchors", "m_FormatVersion", "m_Initialization", "m_Policy", "m_MaxOverlap", "m_DurationMultiplier", "m_StartDelay",
             "m_AutoPlay", "m_TimeMode", "m_Speed", "m_RandomizeDuration", "m_DurationRange", "m_Cooldown", "m_Chance", "m_Intensity", "m_RemapIntensity",
             "m_IntensityRemap", "m_UseDistanceGate", "m_GateReference", "m_GateAnchor", "m_GateDistance", "m_UseGateFalloff", "m_GateFalloff", "m_UnityEvents",
-            "m_Direction", "m_ApplyInitialState", "m_DisableBehavior",
+            "m_Direction", "m_ApplyInitialState", "m_DisableBehavior", "m_AudioOutput", "m_Variants", "m_ListAlias",
         };
         static readonly string[] AnchorFields = { "m_Name", "m_Object" };
 
         [Test]
         public void CE12_GoldenAndSurface()
         {
-            Check(DataModelTraitsTests.SavedFieldInfos(typeof(FeedbackPlayer)).Select(f => f.Name).OrderBy(n => n).SequenceEqual(PlayerFields.OrderBy(n => n)), "the player's saved fields are the twenty-nine");
+            Check(DataModelTraitsTests.SavedFieldInfos(typeof(FeedbackPlayer)).Select(f => f.Name).OrderBy(n => n).SequenceEqual(PlayerFields.OrderBy(n => n)), "the player's saved fields are the thirty-two");
             Check(DataModelTraitsTests.SavedFieldInfos(typeof(PlayerAnchor)).Select(f => f.Name).OrderBy(n => n).SequenceEqual(AnchorFields.OrderBy(n => n)), "the anchor's saved fields are the two");
             foreach (Type type in new[] { typeof(FeedbackPlayer), typeof(PlayerAnchor) })
             {
@@ -678,12 +678,12 @@ namespace xpTURN.Feedback.Tests.Editor
             Check((int)PlayPolicy.Ignore == 0 && (int)PlayPolicy.Restart == 1 && (int)PlayPolicy.Overlap == 2 && Enum.GetNames(typeof(PlayPolicy)).Length == 3, "PlayPolicy's values");
             Check(typeof(FeedbackPlayer).IsPublic && typeof(PlayerInitialization).IsPublic && typeof(PlayPolicy).IsPublic, "the three public types");
             Check(!typeof(PlayerAnchor).IsPublic && !typeof(PlayerRuntime).IsPublic && !typeof(PlaybackRecord).IsPublic && !typeof(TimelineConversion).IsPublic && !typeof(PrepareContext).IsPublic, "the rest is internal");
-            // the surface: the playback API, two properties, six events, Seek · Skip · Restore · Signal, SetListener, the token
-            // Play and PlayAsync, PlayFromEvent's three
+            // the surface: the playback API, four properties, six events, Seek · Skip · Restore · Signal, SetListener, the token
+            // Play and PlayAsync, PlayFromEvent's four, TryGetVariant
             const BindingFlags Declared = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.DeclaredOnly;
             Check(typeof(FeedbackPlayer).GetMethods(Declared).Where(m => !m.IsSpecialName).Select(m => m.Name).OrderBy(n => n, StringComparer.Ordinal)
-                .SequenceEqual(new[] { "GetDuration", "Pause", "Play", "Play", "Play", "PlayAsync", "PlayAsync", "PlayAsync", "PlayFromEvent", "PlayFromEvent", "PlayFromEvent", "Rebuild", "Restore", "Resume", "Seek", "SetAnchor", "SetListener", "Signal", "Skip", "Stop", "Stop" }), "the declared public methods");
-            Check(typeof(FeedbackPlayer).GetProperties(Declared).Select(p => p.Name).OrderBy(n => n, StringComparer.Ordinal).SequenceEqual(new[] { "IsPlaying", "TotalDuration" }), "the two public properties");
+                .SequenceEqual(new[] { "GetDuration", "Pause", "Play", "Play", "Play", "PlayAsync", "PlayAsync", "PlayAsync", "PlayFromEvent", "PlayFromEvent", "PlayFromEvent", "PlayFromEvent", "Rebuild", "Restore", "Resume", "Seek", "SetAnchor", "SetListener", "Signal", "Skip", "Stop", "Stop", "TryGetVariant" }), "the declared public methods");
+            Check(typeof(FeedbackPlayer).GetProperties(Declared).Select(p => p.Name).OrderBy(n => n, StringComparer.Ordinal).SequenceEqual(new[] { "Intensity", "IsPlaying", "TotalDuration", "VariantKey" }), "the four public properties");
             Check(typeof(FeedbackPlayer).GetEvents(Declared).Select(e => e.Name).OrderBy(n => n, StringComparer.Ordinal)
                 .SequenceEqual(new[] { "Completed", "Looped", "Paused", "Played", "Resumed", "Stopped" }), "the six public events");
             Check(typeof(FeedbackPlayer).GetFields(Declared).Length == 0 && typeof(FeedbackPlayer).IsSealed, "no public field, sealed");
@@ -693,12 +693,20 @@ namespace xpTURN.Feedback.Tests.Editor
                   && player.m_DurationMultiplier == 1f && player.m_StartDelay == 0f && player.m_FormatVersion == FeedbackFormat.Current
                   && player.m_Items != null && player.m_Items.Count == 0 && player.m_Anchors != null && player.m_Anchors.Count == 0, "a new component's defaults");
 
-            // every saved field of the player has a reader in Core
+            // every saved field of the player has a reader in Core — the Play At Point sounds' output in the Audio assembly
+            // (where its module is on)
             var read = new HashSet<FieldInfo>(FieldReads(typeof(FeedbackPlayer).Assembly));
+            Assembly audio = Type.GetType("xpTURN.Feedback.AudioImplementations, xpTURN.Feedback.Audio")?.Assembly;
+            if (audio != null)
+                read.UnionWith(FieldReads(audio).Where(f => f.Name == "m_AudioOutput"));
             foreach (Type type in new[] { typeof(FeedbackPlayer), typeof(PlayerAnchor) })
             {
                 foreach (FieldInfo field in DataModelTraitsTests.SavedFieldInfos(type))
+                {
+                    if (audio == null && field.Name == "m_AudioOutput")
+                        continue;
                     Check(read.Contains(field), type.Name + "." + field.Name + " has a reader");
+                }
             }
             // the control: a field only the inspector reads
             Check(!read.Contains(typeof(FeedbackItem).GetField("m_Label", BindingFlags.Instance | BindingFlags.NonPublic)), "the control (m_Label) has no reader in Core");

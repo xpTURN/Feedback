@@ -229,6 +229,45 @@ namespace xpTURN.Feedback.Tests.Editor
             Assert.That(m_Errors, Is.Empty);
         }
 
+        // a selected item looks like the others: no selection color with the list focused or not, the list's hover under the
+        // pointer
+        [UnityTest]
+        public IEnumerator IX04d_TheSelectionKeepsTheBackground()
+        {
+            FeedbackPlayer p = Player("Selection", new WaitItem { m_Label = "a" }, new WaitItem { m_Label = "b" });
+            InspectorElement inspector = InspectorTesting.Inspector(m_Window, p);
+            yield return InspectorTesting.Wait(0.3);
+            ListView list = inspector.Q<ItemListView>().List;
+            list.SetSelection(0);
+            list.Focus();
+            yield return InspectorTesting.Wait(0.2);
+            VisualElement selected = list.Q(className: BaseVerticalCollectionView.itemSelectedVariantUssClassName);
+            VisualElement other = list.Query(className: BaseVerticalCollectionView.itemUssClassName).Where(e => e != selected).First();
+            // the pointer an earlier test left may be over a row
+            Hover(selected, false);
+            Hover(other, false);
+            yield return InspectorTesting.Wait(0.2);
+            Assert.That(selected.resolvedStyle.backgroundColor, Is.EqualTo(other.resolvedStyle.backgroundColor), "the list focused");
+            Hover(selected, true);
+            Hover(other, true);
+            yield return InspectorTesting.Wait(0.2);
+            Assert.That(other.resolvedStyle.backgroundColor.a, Is.GreaterThan(0f), "the hover tints an item");
+            Assert.That(selected.resolvedStyle.backgroundColor, Is.EqualTo(other.resolvedStyle.backgroundColor), "under the pointer");
+            Hover(selected, false);
+            Hover(other, false);
+            list.Blur();
+            yield return InspectorTesting.Wait(0.2);
+            Assert.That(selected.resolvedStyle.backgroundColor, Is.EqualTo(other.resolvedStyle.backgroundColor), "the list not focused");
+        }
+
+        static void Hover(VisualElement e, bool on)
+        {
+            System.Reflection.PropertyInfo states = typeof(VisualElement).GetProperty("pseudoStates", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            int hover = System.Convert.ToInt32(System.Enum.Parse(states.PropertyType, "Hover"));
+            int now = System.Convert.ToInt32(states.GetValue(e));
+            states.SetValue(e, System.Enum.ToObject(states.PropertyType, on ? now | hover : now & ~hover));
+        }
+
         static void Execute(ItemListView list, string command)
         {
             using (var e = ExecuteCommandEvent.GetPooled(command))

@@ -11,8 +11,8 @@ A [`FeedbackPlayer`](ScriptingAPI.md#feedbackplayer) plays a list of items — i
 list. An item is one of three kinds:
 
 - **Target items** drive a value of something in your scene — a transform's position, a material's color, a light's
-  intensity — with one motion. They are <!-- gen:count:targets -->141<!-- /gen:count:targets --> of the Add menu's
-  <!-- gen:count:feedbacks -->157<!-- /gen:count:feedbacks --> feedbacks.
+  intensity — with one motion. They are <!-- gen:count:targets -->157<!-- /gen:count:targets --> of the Add menu's
+  <!-- gen:count:feedbacks -->173<!-- /gen:count:feedbacks --> feedbacks.
 - **Actions** do one thing when the play reaches them: call a UnityEvent, play another player, send a signal, stop time
   for a hit stop, send a Cinemachine impulse.
 - **Flow items** shape the list itself: `Flow/Wait`, `Flow/Wait For Signal`, `Flow/Loop Start`, `Flow/Loop End` and
@@ -20,8 +20,8 @@ list. An item is one of three kinds:
 
 ![A list of target items, a wait and a UnityEvent action, each with its header](images/items.png)
 
-The package plays no sound and drives no phone vibration. Add those — a sound, an FMOD or Wwise event, a platform's
-haptics — as an action or an effect of your own; the player plays it like its own items. See
+The Audio feedbacks play Unity's own sounds, with the Audio module. The package drives no FMOD or Wwise event and no
+phone vibration: add those as an action or an effect of your own; the player plays it like its own items. See
 [Your own feedbacks](ScriptingAPI.md#your-own-feedbacks).
 
 The player's settings apply to every play: when it prepares (**Initialization**), what a new play does to the plays that
@@ -38,6 +38,29 @@ A few names appear on both, with different meanings:
 - **Direction** — on the player, the way the list plays; on an item, a condition (**Always**, **Forward Only**,
   **Reverse Only**) on which plays include it. An item's own **Play Direction** sets how it plays inside the list.
 
+### Variants
+
+A player can hold presets besides its list — its **Variants** — and each play picks one: `PlayArgs.WithPreset`,
+`PlayFromEvent(FeedbackPreset)` from a UnityEvent, or a Timeline clip's **Preset**. A play that picks none plays the
+player's list. A variant plays on the player's anchors and settings, so one character's light and heavy hits can be
+lists of their own on the same anchors. The player's **Policy**, **Cooldown** and a **Toggle** direction's turn span all
+its lists: under **Restart**, a play of one list stops the plays of the others. **Apply Initial State** writes the
+player's list only, and the player prepares every variant when it prepares — each costs its preparation and memory. A
+play of a preset that is neither the linked one nor in **Variants** is refused, with a warning in the Editor and
+development builds.
+
+A list can carry an alias — a preset's **Alias**, and for a player's own list the **Alias** under **Show** in the player's
+inspector (a linked player's list takes its preset's; with a Variant or a linked preset shown, the field shows its alias). A Variant key picks a player's list by its alias: `PlayArgs.WithVariant` gives one play a key, ahead
+of the play's preset, and the player's `VariantKey`, set in Play mode, is the key of every play that names no preset —
+`Play()`, `PlayFromEvent`, a channel's play, a Timeline clip with an empty **Preset**. A key that none of a player's lists
+has leaves the play as it was, so one key reaches players with different lists and each plays its own list of that
+alias — light, normal or heavy across a whole scene. Keys match the exact text; when two of a player's lists share an
+alias, the first one plays it — the own list, then the Variants in slot order — and the inspector warns.
+
+In the inspector, **Variants** lists the presets and warns about a slot that plays nothing — empty, its preset deleted,
+a repeat of an earlier slot or the linked preset. **Show** picks the list the inspector shows, a variant read-only as a
+linked list is, and the list its preview plays.
+
 ## Targets and motions
 
 A target item reads a value from its target, plays a motion on it and writes the result back. The value is one of six
@@ -45,30 +68,32 @@ kinds — a number (Float), two, three or four numbers (Vector2, Vector3, Vector
 [feedback reference](Feedbacks.md) gives each target's kind and the motions it takes. In the Add menu a target item is
 `Group/Target/Motion` — `Transform/Scale/Punch` — and actions and flow items are `Group/Name`.
 
-<!-- gen:count:targets -->141<!-- /gen:count:targets --> targets take
-<!-- gen:count:motions -->11<!-- /gen:count:motions --> motions in
-<!-- gen:count:combinations -->361<!-- /gen:count:combinations --> combinations:
+<!-- gen:count:targets -->157<!-- /gen:count:targets --> targets take
+<!-- gen:count:motions -->12<!-- /gen:count:motions --> motions in
+<!-- gen:count:combinations -->467<!-- /gen:count:combinations --> combinations:
 
 <!-- gen:motions:all -->
 | Motion | Kind | Writes | Targets | Description |
 |---|---|---|---|---|
-| `Set` | Instant | Persist | 41 | Writes its value at its moment in the list; with **Relative** it adds the value instead. |
-| `Tween` | Timed | Persist | 106 | Goes to its value (**To**), from it (**From**), between two (**From To**) or by an amount (**By**) along an **Ease**, and stays at the end. |
-| `Punch` | Timed | Offset | 38 | Kicks the value out by its **Amplitude** and lets it ring back to rest by the end. |
-| `Shake` | Timed | Offset | 11 | Moves the value around with noise — **Smooth** or **Jitter** — fading out by the end; an endless item keeps shaking. |
-| `Curve` | Timed | Offset | 19 | Adds a curve you draw, mapped from **Remap Zero** to **Remap One**. |
-| `Flash` | Timed | Override | 46 | Goes to its **Target** and back — **Attack**, **Hold**, **Release** — over the item. |
-| `Gradient` | Timed | Override · Persist (Mode: Persist) | 5 | Colors the value along a gradient over the item; with **Mode** Persist the last color stays. |
-| `Oscillate` | Timed | Offset | 39 | Swings the value in a wave — Sine, Triangle, Square, Saw or Ping Pong — at its **Frequency**. |
-| `Blink` | Timed | Override | 13 | Switches to its **Value** and back every **Period**, holding it for the **Duty** share. |
-| `Wiggle` | Timed | Offset | 8 | Drifts the value with smooth noise, layered in **Octaves**. |
-| `Spring` | Timed | Offset · Persist (Mode: Move To) | 35 | Springs the value with **Frequency** and **Damping**: **Bump** kicks it and it settles back, **Move To** springs it to its value, which stays. |
+| [`Set`](Motions.md#set) | Instant | Persist | 47 | Writes its value at its moment in the list; with **Relative** it adds the value instead. |
+| [`Tween`](Motions.md#tween) | Timed | Persist | 116 | Goes to its value (**To**), from it (**From**), between two (**From To**) or by an amount (**By**) along an **Ease**, and stays at the end. |
+| [`Punch`](Motions.md#punch) | Timed | Offset | 48 | Kicks the value out by its **Amplitude** and lets it ring back to rest by the end. |
+| [`Shake`](Motions.md#shake) | Timed | Offset | 14 | Moves the value around with noise — **Smooth** or **Jitter** — fading out by the end, and in with **Fade In**; an endless item keeps shaking. |
+| [`Curve`](Motions.md#curve) | Timed | Offset | 29 | Adds a curve you draw, mapped from **Remap Zero** to **Remap One**. |
+| [`Flash`](Motions.md#flash) | Timed | Override | 46 | Goes to its **Target** and back — **Attack**, **Hold**, **Release** — over the item. |
+| [`Gradient`](Motions.md#gradient) | Timed | Override · Persist (Mode: Persist) | 5 | Colors the value along a gradient over the item; with **Mode** Persist the last color stays. |
+| [`Oscillate`](Motions.md#oscillate) | Timed | Offset | 48 | Swings the value in a wave — Sine, Triangle, Square, Saw or Ping Pong — at its **Frequency**, each component on its own with **Per Axis**. |
+| [`Blink`](Motions.md#blink) | Timed | Override | 13 | Switches to its **Value** and back every **Period**, holding it for the **Duty** share. |
+| [`Wiggle`](Motions.md#wiggle) | Timed | Offset | 8 | Drifts the value with smooth noise, layered in **Octaves**, fading in and out with **Fade In** and **Fade Out**. |
+| [`Spring`](Motions.md#spring) | Timed | Offset · Persist (Mode: Move To) | 45 | Springs the value with **Frequency** and **Damping**: **Bump** kicks it and it settles back, **Move To** springs it to its value, which stays. |
+| [`Bounce`](Motions.md#bounce) | Timed | Offset | 48 | Hops the value up and lets it fall back **Count** times, each hop lower — a ball settling; it starts and ends at rest. |
 <!-- /gen:motions:all -->
 
 **Kind** — a timed motion runs over the item's **Duration** (a Spring over the time it takes to settle); an instant one
 happens at its moment in the list. **Writes** — an **Offset** adds to your value while it plays, an **Override**
 replaces it for a while, and a **Persist** leaves its value written; a mode in brackets changes it. **Targets** — how
-many targets take the motion. [How values are written](#how-values-are-written) shows how each is written.
+many targets take the motion. [How values are written](#how-values-are-written) shows how each is written. The
+[motion reference](Motions.md) gives each motion's shape and parameters, and the eases.
 
 An amplitude is in the target's own units: the same 1 is one unit of position, one degree of rotation, and twice the
 size for a scale, whose offsets multiply. The Add menu starts each item with values that fit its target — 30° for a
@@ -176,7 +201,8 @@ A **Cooldown** counts on unscaled time from each accepted play, whatever the **T
 
 `Time/Hit Stop` sets the game's time scale for its **Freeze Duration** of real time, divided by the player's **Speed**.
 It is skipped in a backward play, at **Speed** 0, and while the game already runs slower than its **Minimum Time Scale**
-— so a second hit stop in the same frame is skipped when the first is slower than that minimum. Time feedbacks scale
+— with the defaults, that is while another hit stop holds time at 0. A player played again under **Restart** keeps the
+freeze: its new play's hit stop takes over. Time feedbacks scale
 from [`FeedbackTimeScale.BaseScale`](ScriptingAPI.md#feedbacktimescale) — set your pause and slow motion there.
 
 ## Playback
@@ -193,10 +219,13 @@ from [`FeedbackTimeScale.BaseScale`](ScriptingAPI.md#feedbacktimescale) — set 
 
 A `Play` is refused, returning `default`, for an argument out of range, a canceled token, the **Cooldown**, the distance
 gate, **Ignore**, the player's **Chance**, a backward play of a list that cannot play backward, a `Play` inside the
-player's own `Play`, or a player that is not ready (in edit mode, never awake or destroyed). Each accepted play has a
-handle and ends once, for one [`PlaybackEnd`](ScriptingAPI.md#playbackend) reason. An endless list, a signal wait
-without a time limit, a wait on another player, a wait a signal ended early and a play whose scaled and unscaled items
-drifted apart under a hit stop cannot be sought.
+player's own `Play`, a preset that is not one of its lists, or a player that is not ready (in edit mode, never awake or
+destroyed). Each accepted play has a handle and ends once, for one [`PlaybackEnd`](ScriptingAPI.md#playbackend) reason.
+An endless list, a signal wait without a time limit, a wait on another player, a wait a signal ended early and a play
+whose scaled and unscaled items drifted apart under a hit stop cannot be sought.
+
+On a player with [Variants](#variants), each call of the table reaches the plays of every list. `Restore` puts the lists
+back in the reverse order of their first plays, so the values from before the first play come back.
 
 Each target keeps room for the plays that can overlap on it — **Max Overlap** under **Overlap**, one otherwise; under
 **Overlap** a play past it stops the oldest. When plays are replaced and started again many times within one frame, the
@@ -212,21 +241,24 @@ earlier wins in a forward play and the later in a backward one.
 
 A play's intensity is its strength: the intensity of its `PlayArgs` (1 by default), through the player's
 **Intensity Remap** curve when **Remap Intensity** is on, times the player's **Intensity**, times the distance gate's
-falloff.
+falloff. A script sets the player's **Intensity** with `FeedbackPlayer.Intensity`: the next plays take it, and a play that
+runs keeps its own. Outside its keys the remap curve keeps its end value, so an argument above 1 — a timeline's clip
+times its director's options — needs the last key moved.
 
 It scales an Offset's amplitude in proportion, an Override's weight up to 1, a Tween's change only with **By**, and a
 Set or a Spring's Move To only when **Relative**; a Tween To, From or From To reaches its values whatever the intensity.
 A category's scale then multiplies an Offset's output and an Override's weight; Persist writes do not take it. An item
 whose **Intensity** is **Ignore** plays at 1, times its random output if it has one, and
-**Use Intensity Range** skips an item when the play's intensity is outside its **Intensity Range**.
+**Use Intensity Range** skips an item when the play's intensity is outside its **Intensity Range**. An item's **Graph**
+in the inspector draws the result for that item — see [The graphs](GettingStarted.md#the-graphs).
 
 Randomness draws at each play: the player's and an item's **Chance**, **Randomize Duration** within **Duration Range**,
 and an item's **Randomize Output** within **Output Range**.
 
 A play given a seed with `PlayArgs.WithSeed` repeats its random parts — an item's chance, the durations, the output, a
 Shake's noise — except the player's own **Chance**, which is drawn before the seed is read. The same seed gives the same
-play within one version of the package. Items take their random parts by their place in the list, so an item inserted
-before others changes theirs.
+play within one version of the package. Each item keeps its random parts when others are added, removed or moved in the
+list; a copy made with Duplicate, Paste, Save As Preset or Unlink takes new ones.
 
 ## Channels and signals
 
@@ -247,6 +279,10 @@ Two things are called signals:
 A `Camera/Shake` sent to a channel moves the [`CameraShakeReceiver`](ScriptingAPI.md#camerashakereceiver) components on
 it — at most the settings' **Shake Receivers Per Play** of them.
 
+A shake plays its own shape and adds to the others; a [trauma](ScriptingAPI.md#feedbacktrauma) is a level each hit
+raises and time lowers, shaking its camera or transform through one noise. Use a shake for a hit that should look the
+same each time, and a trauma for hits that pile up — a fight's camera, an enemy taking blow after blow.
+
 **Use Distance Gate** refuses a play farther than **Gate Distance** from its **Gate Reference** — the **Main Camera**,
 an **Anchor**, the **Play Position**, or **Global**, the transform set in
 [`FeedbackRange.Center`](ScriptingAPI.md#feedbackrange). The distance runs from the play's position, else the player's,
@@ -256,7 +292,7 @@ the play through.
 
 ## Categories and accessibility
 
-Every effect counts in a category — Motion, Camera, Flash, PostFX, Time, Particles, UI, Haptics, or none — and
+Every effect counts in a category — Motion, Camera, Flash, PostFX, Time, Particles, UI, Haptics, Audio, or none — and
 [`FeedbackCategories`](ScriptingAPI.md#feedbackcategories) turns categories off or scales them, for an options menu. The
 [feedback reference](Feedbacks.md#feedback-reference) gives each feedback's own category and how an item's override and
 flashes change it.
@@ -286,13 +322,14 @@ container, the overlay canvases and volumes — when first used, and clean up wh
 Once a player has prepared, a play allocates nothing: playing, pausing and stopping every target and motion is tested to
 allocate no memory, and seeking, skipping and restoring on a list that mixes them. Allocations come when a player
 prepares — a **Lazy** player at its first play —, at the first play after the main camera changes, when plays are
-replaced many times within one frame, and at a UnityEvent's first call. [Performance](Performance.md) has the numbers.
+replaced many times within one frame, when a pool runs out and makes one more, and at a UnityEvent's first call.
+[Performance](Performance.md) has the numbers.
 
 ## Unity Timeline
 
 With the Timeline package (1.8 or later), a timeline plays your players. A **Feedback Track** is bound to one
-`FeedbackPlayer`, and each clip on it is one play of that player — its list, its settings and its events. A clip's
-**Timing** decides whose clock the play follows:
+`FeedbackPlayer`, and each clip on it is one play of that player — of its list or, with the clip's **Preset**, of one of
+its [Variants](#variants) — with its settings and its events. A clip's **Timing** decides whose clock the play follows:
 
 ![The Timeline window with three Feedback tracks, each bound to a player, and their clips](images/timeline-track.png)
 
@@ -308,10 +345,20 @@ With the Timeline package (1.8 or later), a timeline plays your players. A **Fee
 When the timeline leaves a clip, its **End** — **Revert**, **Hold** or **Complete** — ends the play, as the player's
 stops do; stopping the director reverts.
 
+A `FeedbackTimelineOptions` next to the director changes what every clip of that timeline plays, in Play mode. Its
+**Variant Key** picks each clip's list by alias on the clip's player, ahead of the clip's **Preset** — a player with no
+list of that alias plays the clip as it is — and its **Intensity** multiplies each clip's. A clip's **Hit Key** names its
+row in the options' **Hits**: the clips with that key take the row's intensity too, and its **Variant Key** ahead of the
+director's when their player has that alias — one hit of a combo heavier than the rest. A clip reads the options when it
+starts its play, so a change reaches its next entry, and a Driven clip shows the same values at the same time while
+they stay. The Timeline window's preview plays what the clips hold, and a Control track's inner timeline reads its own
+director's options.
+
 In Edit mode the Timeline window previews the track with the same runtime code: Driven clips follow scrubbing,
 Triggered clips play while the window plays, and turning the preview off puts the scene back. The window's preview and
-a player's Inspector **Preview** do not run together. In the window a clip's length is its player's list — a new clip
-takes it and **Match Content** fits the clip to it.
+a player's Inspector **Preview** do not run together. In the window a clip's length is the list it plays — a new clip
+takes it and **Match Content** fits the clip to it. A clip whose **Preset** the bound player does not list shows an
+error and plays nothing; the clip's Inspector offers **Add to Variants**.
 
 A clip is one play with one **Intensity**: a Feedback track has no markers and a clip no intensity curve. To play a
 player at a moment of the timeline, put a Signal on a Signal track and let a Signal Receiver call its
@@ -327,6 +374,9 @@ AnimationMode records each property before its first write and puts it back when
 own copy of what AnimationMode cannot hold — render settings, shader globals, a renderer's property block and others. A
 preview cannot start while Timeline or the Animation window holds AnimationMode.
 
-Some things differ from Play mode: UnityEvents are not called, a hit stop slows only the preview's clock, and rumble and
-video do nothing — the [feedback reference](Feedbacks.md#feedback-reference) gives each feedback's preview. The bar
-scrubs a play, pausing it; a play with simulated particles or animators cannot be scrubbed.
+Some things differ from Play mode: UnityEvents are not called, a hit stop slows only the preview's clock, and rumble,
+video, the listener's volume and the mixers do nothing — the [feedback reference](Feedbacks.md#feedback-reference) gives
+each feedback's preview. The bar scrubs a play, pausing it; a play with simulated particles or animators cannot be
+scrubbed. On a player with [Variants](#variants), the inspector's **Show** picks the list the preview plays, and an
+item's ▶, **Mute** and **Solo** are that list's. The preview plays every category on and at ×1 and does not cap camera
+shakes; the inspector's [graphs](GettingStarted.md#the-graphs) draw the game's values and note the difference.

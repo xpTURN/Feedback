@@ -20,7 +20,13 @@ MonoBehaviour:
   See: "A Feedback track for each player on one timeline (the Unity Timeline package).
     Driven clips \u2014 the camera shake and the hero's looping spring \u2014 take
     the timeline's time: a scrub, a pause and the director's speed show the same
-    values, and the clip's Seed gives the same shake each time. A Triggered clip
+    values, and the clip's Seed gives the same shake each time. The camera shake hits
+    three times on one player: the middle clip plays its own list, and the light and
+    the heavy clips pick its Variants with their Preset \u2014 the heavy one kicks the
+    field of view too. In Play mode the Cutscene's Feedback Timeline Options picks
+    for every clip: a Variant Key of heavy, light or normal plays that list in all
+    three hits, and a Hits row \u2014 hit3 with Variant Key light \u2014 changes that
+    hit alone. A Triggered clip
     \u2014 the screen flash \u2014 starts with its clip and runs on its player's
     clock. A Signal at 4.5 s calls the burst's PlayFromEvent through a Signal Receiver,
     in Play mode only: the Timeline window's preview sends no signal while scrubbing,

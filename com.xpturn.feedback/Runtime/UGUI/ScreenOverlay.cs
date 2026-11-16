@@ -56,6 +56,7 @@ namespace xpTURN.Feedback
             internal float ScaleStart;
             internal float AlphaStart;
             internal bool Unscaled;
+            internal uint Seed;
         }
 
         Live[] m_Live = new Live[8];
@@ -78,6 +79,7 @@ namespace xpTURN.Feedback
         internal int LiveCount => m_LiveCount;
         internal int LiveCapacity => m_Live.Length;
         internal FloatingTextInstance LiveAt(int i) => m_Live[i].Instance;
+        internal uint SeedAt(int i) => m_Live[i].Seed;
         internal float LateApplyAlpha;     // the first rented image's alpha as LateApply saw it (the order's net)
         internal int LateApplies;
 
@@ -408,6 +410,7 @@ namespace xpTURN.Feedback
                 ScaleStart = ScaleStartOf(st, seed),
                 AlphaStart = AlphaStartOf(st, seed),
                 Unscaled = unscaled,
+                Seed = seed,
             };
             Place(m_LiveCount);
             m_LiveCount++;
@@ -639,7 +642,6 @@ namespace xpTURN.Feedback
         bool m_Unscaled;
         long[] m_Serials;
         long m_Origin = -1;
-        uint m_Spawns;
 
         internal FloatingTextBinding(FloatingTextItem item)
         {
@@ -713,7 +715,7 @@ namespace xpTURN.Feedback
             if (m_Target == null)
                 return;
             Vector3 world = context.HasPosition ? context.Position : m_Target.TransformPoint(m_Item.m_Offset);
-            uint seed = Hash32.Tagged(context.ItemSeed, 0x46544558u, m_Spawns++);
+            uint seed = Hash32.Tagged(context.ItemSeed, 0x46544558u, Hash32.Fold(context.Occurrence));
             float life = ScreenOverlayService.LifeOf(in m_Look, seed);
             GameObject go = pools.Spawn(m_Template, true, Vector3.zero, Quaternion.identity, m_Service.Texts, life, m_Unscaled, this, record, context.Serial);
             if (go == null)

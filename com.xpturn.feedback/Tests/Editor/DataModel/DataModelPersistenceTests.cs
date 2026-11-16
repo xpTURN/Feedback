@@ -124,6 +124,11 @@ namespace xpTURN.Feedback.Tests.Editor
             shakeMotion.m_Params.m_Falloff.m_Curve = new AnimationCurve(new Keyframe(0f, 0.5f), new Keyframe(1f, 0.5f));
             shakeMotion.m_Params.m_Amplitude = new Vector4(0.3f, 0.3f, 0.3f, 0f);
             shakeMotion.m_Params.m_Frequency = 12f;
+            shakeMotion.m_Params.m_FadeIn = 0.15f;
+            shakeMotion.m_Params.m_FadeEase = Ease.Of(EaseType.BackIn);
+            shakeMotion.m_Params.m_FadeEase.m_P1 = 2.5f;
+            shakeMotion.m_Params.m_FadeEase.m_P2 = 0.2f;
+            shakeMotion.m_Params.m_FadeEase.m_Curve = new AnimationCurve(new Keyframe(0f, 0.25f), new Keyframe(1f, 0.75f));
             shake.m_Motion = shakeMotion;
             var setMotion = new SetMotion();
             setMotion.m_Params.m_Relative = true;
@@ -138,12 +143,27 @@ namespace xpTURN.Feedback.Tests.Editor
             wiggle.m_Params.m_Octaves = 3;
             wiggle.m_Params.m_Amplitude = new Vector4(0.4f, 0.4f, 0.4f, 0f);
             wiggle.m_Params.m_Frequency = 3f;
+            wiggle.m_Params.m_FadeIn = 0.2f;
+            wiggle.m_Params.m_FadeOut = 0.3f;
+            wiggle.m_Params.m_FadeEase = Ease.Of(EaseType.ElasticIn);
+            wiggle.m_Params.m_FadeEase.m_P1 = 1.5f;
+            wiggle.m_Params.m_FadeEase.m_P2 = 0.4f;
+            wiggle.m_Params.m_FadeEase.m_Curve = new AnimationCurve(new Keyframe(0f, 0.1f), new Keyframe(1f, 0.9f));
             var scale2 = new ScaleItem { m_Motion = wiggle };
             var oscillate = new OscillateMotion();
             oscillate.m_Params.m_Waveform = Waveform.PingPong;
             oscillate.m_Params.m_Phase = 0.25f;
             oscillate.m_Params.m_Amplitude = new Vector4(0.6f, 0f, 0f, 0f);
             oscillate.m_Params.m_Frequency = 2f;
+            oscillate.m_Params.m_PerAxis = true;
+            oscillate.m_Params.m_AxisPhase = new Vector4(0.1f, 0.2f, 0.3f, 0.4f);
+            oscillate.m_Params.m_AxisFrequency = new Vector4(2f, 3f, 4f, 5f);
+            oscillate.m_Params.m_FadeIn = 0.25f;
+            oscillate.m_Params.m_FadeOut = 0.35f;
+            oscillate.m_Params.m_FadeEase = Ease.Of(EaseType.BackOut);
+            oscillate.m_Params.m_FadeEase.m_P1 = 3f;
+            oscillate.m_Params.m_FadeEase.m_P2 = 0.6f;
+            oscillate.m_Params.m_FadeEase.m_Curve = new AnimationCurve(new Keyframe(0f, 0.3f), new Keyframe(1f, 0.6f));
             var light2 = new LightIntensityItem { m_Motion = oscillate };
             var blink = new BlinkMotion();
             blink.m_Params.m_StartOn = false;
@@ -152,16 +172,21 @@ namespace xpTURN.Feedback.Tests.Editor
             blink.m_Params.m_Period = 0.3f;
             blink.m_Params.m_Duty = 0.4f;
             var setActive2 = new SetActiveItem { m_Motion = blink };
+            var bounce = new BounceMotion();
+            bounce.m_Params.m_Amplitude = new Vector4(0f, 0.5f, 0f, 0f);
+            bounce.m_Params.m_Count = 5;
+            bounce.m_Params.m_Restitution = 0.7f;
+            var scale3 = new ScaleItem { m_Motion = bounce };
             var unityEvent = new UnityEventItem();
             UnityEventTools.AddVoidPersistentListener(unityEvent.m_Event, child.OnTestEvent);
-            var hitStop = new HitStopItem { m_FreezeDuration = 0.35f, m_MinimumTimeScale = 0.2f, m_TimeScale = 0.05f };
+            var hitStop = new HitStopItem { m_FreezeDuration = 0.35f, m_MinimumTimeScale = 0.2f, m_TimeScale = 0.05f, m_Overlap = HitStopOverlap.Extend };
             var wait = new WaitItem();
             wait.m_Timing.m_Duration = 2.5f;
             var loopEnd = new LoopEndItem { m_LoopCount = 4, m_LoopGap = 0.5f };
 
             var items = new List<FeedbackItem>
             {
-                position, rotation, scale, material, light, shake, setActive, rotation2, scale2, light2, setActive2, unityEvent, hitStop,
+                position, rotation, scale, material, light, shake, setActive, rotation2, scale2, light2, setActive2, scale3, unityEvent, hitStop,
                 wait, new WaitForSignalItem { m_Timeout = 3f }, new LoopStartItem(), loopEnd, new HoldItem(),
             };
             for (int i = 0; i < items.Count; i++)
@@ -180,7 +205,7 @@ namespace xpTURN.Feedback.Tests.Editor
 
             // reopened motions share no curve or gradient with each other or with a new Default
             var shared = back.m_Items.OfType<TargetItem>().Select(i => i.m_Motion).Where(m => m != null).SelectMany(ReferenceParams).ToList();
-            Assert.That(shared.Count, Is.GreaterThanOrEqualTo(5), "reference parameters found");
+            Assert.That(shared.Count, Is.GreaterThanOrEqualTo(8), "reference parameters found");
             for (int i = 0; i < shared.Count; i++)
             {
                 Assert.That(shared[i], Is.Not.Null, $"reference {i}");
@@ -283,7 +308,9 @@ namespace xpTURN.Feedback.Tests.Editor
             switch (motion)
             {
                 case TweenMotion t: yield return t.m_Params.m_Ease.m_Curve; break;
-                case ShakeMotion s: yield return s.m_Params.m_Falloff.m_Curve; break;
+                case ShakeMotion s: yield return s.m_Params.m_Falloff.m_Curve; yield return s.m_Params.m_FadeEase.m_Curve; break;
+                case OscillateMotion o: yield return o.m_Params.m_FadeEase.m_Curve; break;
+                case WiggleMotion w: yield return w.m_Params.m_FadeEase.m_Curve; break;
                 case FlashMotion f: yield return f.m_Params.m_Ease.m_Curve; break;
                 case CurveMotion c: yield return c.m_Params.m_Curve; break;
                 case GradientMotion g: yield return g.m_Params.m_Gradient; break;
@@ -344,6 +371,213 @@ namespace xpTURN.Feedback.Tests.Editor
                 PrefabUtility.UnloadPrefabContents(contents);
             }
             Assert.That(OpenScenes(), Is.EqualTo(before), "the editor's scenes are as before");
+        }
+
+        // an Oscillate saved before Per Axis — its three fields cut from the file — loads them at their defaults and the saved
+        // fields as saved, read again from the file (an asset and a scene)
+        static OscillateMotion SavedOscillate()
+        {
+            var m = new OscillateMotion();
+            m.m_Params.m_Amplitude = new Vector4(2f, 2f, 2f, 0f);
+            m.m_Params.m_Frequency = 3f;
+            m.m_Params.m_PerAxis = true;
+            m.m_Params.m_AxisPhase = new Vector4(0.1f, 0.2f, 0.3f, 0.4f);
+            m.m_Params.m_AxisFrequency = new Vector4(2f, 3f, 4f, 5f);
+            return m;
+        }
+
+        static int CutPerAxis(string path)
+        {
+            string file = Path.GetFullPath(path);
+            string[] lines = File.ReadAllLines(file);
+            string[] kept = lines.Where(l => !new[] { "m_PerAxis:", "m_AxisPhase:", "m_AxisFrequency:" }.Any(l.TrimStart().StartsWith)).ToArray();
+            File.WriteAllLines(file, kept);
+            return lines.Length - kept.Length;
+        }
+
+        static void AssertOlderOscillate(FeedbackItem item)
+        {
+            var back = (OscillateMotion)((PositionItem)item).m_Motion;
+            Assert.That((back.m_Params.m_PerAxis, back.m_Params.m_AxisPhase, back.m_Params.m_AxisFrequency), Is.EqualTo((false, Vector4.zero, Vector4.one)), "the cut fields at their defaults");
+            Assert.That((back.m_Params.m_Amplitude, back.m_Params.m_Frequency), Is.EqualTo((new Vector4(2f, 2f, 2f, 0f), 3f)), "the saved fields as saved");
+        }
+
+        [Test]
+        public void AnOscillateAssetSavedBeforePerAxisLoadsItsDefaults()
+        {
+            var holder = ScriptableObject.CreateInstance<DataModelFormatHolder>();
+            holder.m_Items.Add(new PositionItem { m_Motion = SavedOscillate() });
+            AssetDatabase.CreateAsset(holder, AssetPath);
+            AssetDatabase.SaveAssets();
+            Assert.That(CutPerAxis(AssetPath), Is.EqualTo(3), "the three lines cut");
+
+            var back = ReloadAsset(holder);
+            Assert.That(back, Is.Not.SameAs(holder), "the asset was read again");
+            AssertOlderOscillate(back.m_Items.Single());
+        }
+
+        [Test]
+        public void AnOscillateSceneSavedBeforePerAxisLoadsItsDefaults()
+        {
+            var before = OpenScenes();
+            var scene = OpenEmptyScene(ScenePath);
+            var root = CreateContainer(scene, RootName, null);
+            root.m_Items.Add(new PositionItem { m_Motion = SavedOscillate() });
+            Assert.That(EditorSceneManager.SaveScene(scene), Is.True);
+            EditorSceneManager.CloseScene(scene, true);
+            Assert.That(CutPerAxis(ScenePath), Is.EqualTo(3), "the three lines cut");
+
+            var reopened = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Additive);
+            var back = reopened.GetRootGameObjects().Single(g => g.name == RootName).GetComponent<DataModelTestContainer>();
+            Assert.That(back, Is.Not.SameAs(root), "the container was read again");
+            AssertOlderOscillate(back.m_Items.Single());
+            EditorSceneManager.CloseScene(reopened, true);
+            Assert.That(OpenScenes(), Is.EqualTo(before), "the editor's scenes are as before");
+        }
+
+        // the fade motions saved before the envelope — Fade In · Fade Out and the Fade Ease with the lines under it cut from the
+        // file — load the fields at their defaults and the rest as saved, read again from the file (an asset and a scene)
+        static Ease SavedFadeEase()
+        {
+            Ease e = Ease.Of(EaseType.ElasticOut);
+            e.m_P1 = 2f;
+            e.m_Curve = new AnimationCurve(new Keyframe(0f, 0.2f), new Keyframe(0.5f, 0.9f), new Keyframe(1f, 0.4f));
+            return e;
+        }
+
+        static FeedbackItem[] SavedFades()
+        {
+            var oscillate = new OscillateMotion();
+            oscillate.m_Params.m_Amplitude = new Vector4(2f, 2f, 2f, 0f);
+            oscillate.m_Params.m_Frequency = 3f;
+            oscillate.m_Params.m_FadeIn = 0.2f;
+            oscillate.m_Params.m_FadeOut = 0.3f;
+            oscillate.m_Params.m_FadeEase = SavedFadeEase();
+            var wiggle = new WiggleMotion();
+            wiggle.m_Params.m_Amplitude = new Vector4(0.5f, 0.5f, 0.5f, 0f);
+            wiggle.m_Params.m_Frequency = 4f;
+            wiggle.m_Params.m_Octaves = 3;
+            wiggle.m_Params.m_FadeIn = 0.25f;
+            wiggle.m_Params.m_FadeOut = 0.35f;
+            wiggle.m_Params.m_FadeEase = SavedFadeEase();
+            var shake = new ShakeMotion();
+            shake.m_Params.m_Amplitude = new Vector4(0.25f, 0.25f, 0.25f, 0f);
+            shake.m_Params.m_Frequency = 12f;
+            shake.m_Params.m_Falloff = Ease.Of(EaseType.QuadOut);
+            shake.m_Params.m_FadeIn = 0.4f;
+            shake.m_Params.m_FadeEase = SavedFadeEase();
+            return new FeedbackItem[] { new PositionItem { m_Motion = oscillate }, new RotationItem { m_Motion = wiggle }, new ScaleItem { m_Motion = shake } };
+        }
+
+        // Fade In · Fade Out, and each Fade Ease with every line indented under it
+        static int CutFades(string path)
+        {
+            string file = Path.GetFullPath(path);
+            string[] lines = File.ReadAllLines(file);
+            var kept = new List<string>();
+            int block = -1;
+            foreach (string line in lines)
+            {
+                int indent = line.Length - line.TrimStart().Length;
+                if (block >= 0 && indent > block)
+                    continue;
+                block = -1;
+                string key = line.TrimStart();
+                if (key.StartsWith("m_FadeEase:", System.StringComparison.Ordinal))
+                {
+                    block = indent;
+                    continue;
+                }
+                if (!key.StartsWith("m_FadeIn:", System.StringComparison.Ordinal) && !key.StartsWith("m_FadeOut:", System.StringComparison.Ordinal))
+                    kept.Add(line);
+            }
+            File.WriteAllLines(file, kept);
+            return lines.Length - kept.Count;
+        }
+
+        static void AssertLinearFade(Ease e, string at)
+        {
+            Assert.That((e.m_Type, e.m_P1, e.m_P2), Is.EqualTo((EaseType.Linear, 0f, 0f)), at + " Fade Ease");
+            Assert.That(e.m_Curve == null || e.m_Curve.length == 0, Is.True, at + " Fade Ease curve");
+        }
+
+        static void AssertOlderFades(IList<FeedbackItem> items)
+        {
+            var oscillate = (OscillateMotion)((PositionItem)items[0]).m_Motion;
+            var wiggle = (WiggleMotion)((RotationItem)items[1]).m_Motion;
+            var shake = (ShakeMotion)((ScaleItem)items[2]).m_Motion;
+            Assert.That((oscillate.m_Params.m_FadeIn, oscillate.m_Params.m_FadeOut, wiggle.m_Params.m_FadeIn, wiggle.m_Params.m_FadeOut, shake.m_Params.m_FadeIn), Is.EqualTo((0f, 0f, 0f, 0f, 0f)), "the cut fades at 0");
+            AssertLinearFade(oscillate.m_Params.m_FadeEase, "Oscillate");
+            AssertLinearFade(wiggle.m_Params.m_FadeEase, "Wiggle");
+            AssertLinearFade(shake.m_Params.m_FadeEase, "Shake");
+            Assert.That((oscillate.m_Params.m_Amplitude, oscillate.m_Params.m_Frequency), Is.EqualTo((new Vector4(2f, 2f, 2f, 0f), 3f)), "Oscillate as saved");
+            Assert.That((wiggle.m_Params.m_Amplitude, wiggle.m_Params.m_Frequency, wiggle.m_Params.m_Octaves), Is.EqualTo((new Vector4(0.5f, 0.5f, 0.5f, 0f), 4f, 3)), "Wiggle as saved");
+            Assert.That((shake.m_Params.m_Amplitude, shake.m_Params.m_Frequency, shake.m_Params.m_Falloff.m_Type), Is.EqualTo((new Vector4(0.25f, 0.25f, 0.25f, 0f), 12f, EaseType.QuadOut)), "Shake as saved — its Falloff kept");
+        }
+
+        [Test]
+        public void FadeMotionsSavedBeforeTheEnvelopeLoadTheirDefaults()
+        {
+            var holder = ScriptableObject.CreateInstance<DataModelFormatHolder>();
+            holder.m_Items.AddRange(SavedFades());
+            AssetDatabase.CreateAsset(holder, AssetPath);
+            AssetDatabase.SaveAssets();
+            // eight field lines, and the three Fade Eases' lines under them
+            Assert.That(CutFades(AssetPath), Is.GreaterThan(8), "the asset's lines cut");
+            var back = ReloadAsset(holder);
+            Assert.That(back, Is.Not.SameAs(holder), "the asset was read again");
+            AssertOlderFades(back.m_Items);
+
+            var before = OpenScenes();
+            var scene = OpenEmptyScene(ScenePath);
+            var root = CreateContainer(scene, RootName, null);
+            root.m_Items.AddRange(SavedFades());
+            Assert.That(EditorSceneManager.SaveScene(scene), Is.True);
+            EditorSceneManager.CloseScene(scene, true);
+            Assert.That(CutFades(ScenePath), Is.GreaterThan(8), "the scene's lines cut");
+            var reopened = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Additive);
+            var container = reopened.GetRootGameObjects().Single(g => g.name == RootName).GetComponent<DataModelTestContainer>();
+            Assert.That(container, Is.Not.SameAs(root), "the container was read again");
+            AssertOlderFades(container.m_Items);
+            EditorSceneManager.CloseScene(reopened, true);
+            Assert.That(OpenScenes(), Is.EqualTo(before), "the editor's scenes are as before");
+        }
+
+        // the package presets' fade motions — Shake in ten, Oscillate in Charge — all load without a fade
+        [Test]
+        public void ThePresetsFadeMotionsHaveNoFade()
+        {
+            string[] paths = AssetDatabase.FindAssets("t:FeedbackPreset", new[] { "Packages/com.xpturn.feedback/Presets" }).Select(AssetDatabase.GUIDToAssetPath).ToArray();
+            var files = new HashSet<string>();
+            int motions = 0;
+            foreach (string path in paths)
+            {
+                var preset = AssetDatabase.LoadAssetAtPath<FeedbackPreset>(path);
+                foreach (FeedbackMotion motion in preset.m_Items.OfType<TargetItem>().Select(i => i.m_Motion))
+                {
+                    string at = path + " " + motion?.GetType().Name;
+                    switch (motion)
+                    {
+                        case OscillateMotion o:
+                            Assert.That((o.m_Params.m_FadeIn, o.m_Params.m_FadeOut), Is.EqualTo((0f, 0f)), at);
+                            AssertLinearFade(o.m_Params.m_FadeEase, at);
+                            break;
+                        case WiggleMotion w:
+                            Assert.That((w.m_Params.m_FadeIn, w.m_Params.m_FadeOut), Is.EqualTo((0f, 0f)), at);
+                            AssertLinearFade(w.m_Params.m_FadeEase, at);
+                            break;
+                        case ShakeMotion s:
+                            Assert.That(s.m_Params.m_FadeIn, Is.EqualTo(0f), at);
+                            AssertLinearFade(s.m_Params.m_FadeEase, at);
+                            break;
+                        default:
+                            continue;
+                    }
+                    files.Add(path);
+                    motions++;
+                }
+            }
+            Assert.That((files.Count, motions), Is.EqualTo((11, 12)), "the presets' fade motions — files · motions");
         }
 
         // the format version hook on a component — the file keeps the lower version (a hook run before saving would hide the

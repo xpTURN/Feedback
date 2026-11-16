@@ -13,9 +13,12 @@
     { "id": "E4", "file": "preset-linked.png", "state": "PresetLinked" },
     { "id": "E5", "file": "debugger.png", "state": "Debugger" },
     { "id": "E6", "file": "validator.png", "state": "Validator" },
+    { "id": "E7", "file": "graphs.png", "state": "Graphs" },
     { "id": "C1", "file": "items.png", "state": "Items" },
     { "id": "C2", "file": "timeline-strip.png", "state": "Strip" },
     { "id": "C3", "file": "layers.png", "state": "Layers" },
-    { "id": "C4", "file": "timeline-track.png", "state": "Timeline" }
+    { "id": "C4", "file": "timeline-track.png", "state": "Timeline" },
+    { "id": "M1", "file": "motions.png", "state": "Motions" },
+    { "id": "M2", "file": "eases.png", "state": "Eases" }
   ]
 }

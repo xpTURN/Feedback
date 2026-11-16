@@ -39,10 +39,20 @@ namespace xpTURN.Feedback.Editor
         internal const string Strip = "xpturn-feedback-strip";
         internal const string StripCanvas = "xpturn-feedback-strip-canvas";
         internal const string StripBand = "xpturn-feedback-strip-band";
+        internal const string Graph = "xpturn-feedback-graph";
+        internal const string GraphHeader = "xpturn-feedback-graph-header";
+        internal const string GraphCanvas = "xpturn-feedback-graph-canvas";
+        internal const string GraphNotes = "xpturn-feedback-graph-notes";
+        internal const string GraphComponent = "xpturn-feedback-graph-component";
+        internal const string GraphChannel = "xpturn-feedback-graph-channel";
+        internal const string GraphScale = "xpturn-feedback-graph-scale";
         // the validation's slot, panels and rows
         internal const string ValidationWarning = "xpturn-feedback-validation-warning";
         internal const string ValidationResults = "xpturn-feedback-validation-results";
         internal const string ValidationSummary = "xpturn-feedback-validation-summary";
+        internal const string ValidationSummaryWarning = "xpturn-feedback-validation-summary-warning";
+        internal const string ValidationSummaryError = "xpturn-feedback-validation-summary-error";
+        internal const string Alias = "xpturn-feedback-alias";
         internal const string ValidationHost = "xpturn-feedback-validation-host";
         internal const string ValidationRow = "xpturn-feedback-validation-row";
         internal const string ValidationIcon = "xpturn-feedback-validation-icon";
@@ -84,6 +94,7 @@ namespace xpTURN.Feedback.Editor
                 case FeedbackCategory.Particles: return new Color32(102, 204, 102, 255);
                 case FeedbackCategory.UI: return new Color32(51, 204, 204, 255);
                 case FeedbackCategory.Haptics: return new Color32(204, 153, 102, 255);
+                case FeedbackCategory.Audio: return new Color32(230, 102, 102, 255);
                 default: return new Color32(128, 128, 128, 255);
             }
         }

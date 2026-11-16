@@ -132,6 +132,24 @@ namespace xpTURN.Feedback.Editor
 
         static bool PhysicsRange(FeedbackItem item) => item is RigidbodyForceItem || item is RigidbodyVelocityItem || item is Rigidbody2DForceItem || item is Rigidbody2DVelocityItem;
 
+        // a motion parameter the body shows — an Oscillate's Per Axis on a target of more than one component, its two numbers
+        // while Per Axis is on
+        internal static bool MotionParameterVisible(ValueKind kind, string field, bool perAxis)
+        {
+            switch (field)
+            {
+                case "m_PerAxis":
+                    return ValueField.Components(kind) > 1;
+                case "m_AxisPhase":
+                case "m_AxisFrequency":
+                    return perAxis && ValueField.Components(kind) > 1;
+            }
+            return true;
+        }
+
+        // a motion parameter of plain numbers, one per component — drawn as X · Y · Z · W, not as the target's value
+        internal static bool PerComponent(string field) => field == "m_AxisPhase" || field == "m_AxisFrequency";
+
         // the advanced half of the body (the gradual disclosure: random, repeat, conditions)
         internal static bool Advanced(string field)
             => field == RepeatCount || field == RepeatForever || field == RepeatGap || field == Background || field == "m_Timing.m_Clock"

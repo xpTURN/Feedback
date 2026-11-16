@@ -15,7 +15,7 @@ namespace xpTURN.Feedback.Tests.Editor
         static FeedbackMotion[] AllMotions() => new FeedbackMotion[]
         {
             new SetMotion(), new TweenMotion(), new PunchMotion(), new ShakeMotion(), new CurveMotion(), new FlashMotion(),
-            new GradientMotion(), new OscillateMotion(), new BlinkMotion(), new WiggleMotion(), new SpringMotion(),
+            new GradientMotion(), new OscillateMotion(), new BlinkMotion(), new WiggleMotion(), new SpringMotion(), new BounceMotion(),
         };
 
         static void AssertLinear(Ease e, string at)
@@ -37,6 +37,8 @@ namespace xpTURN.Feedback.Tests.Editor
             var shake = new ShakeMotion().m_Params;
             Assert.That((shake.m_Amplitude, shake.m_Frequency, shake.m_Noise), Is.EqualTo((Vector4.one, 10f, ShakeNoise.Smooth)), "Shake");
             AssertLinear(shake.m_Falloff, "Shake — Falloff Linear");
+            Assert.That(shake.m_FadeIn, Is.EqualTo(0f), "Shake — Fade In 0");
+            AssertLinear(shake.m_FadeEase, "Shake — Fade Ease Linear");
             var curve = new CurveMotion().m_Params;
             Assert.That(Keys(curve.m_Curve), Is.EqualTo("0:0 0.5:1 1:0"), "Curve keys");
             Assert.That((curve.m_RemapZero, curve.m_RemapOne), Is.EqualTo((Vector4.zero, Vector4.one)), "Curve remap");
@@ -50,13 +52,20 @@ namespace xpTURN.Feedback.Tests.Editor
             Assert.That(gradient.m_Mode, Is.EqualTo(GradientWrite.Override));
             var oscillate = new OscillateMotion().m_Params;
             Assert.That((oscillate.m_Amplitude, oscillate.m_Frequency, oscillate.m_Waveform, oscillate.m_Phase), Is.EqualTo((Vector4.one, 1f, Waveform.Sine, 0f)), "Oscillate");
+            Assert.That((oscillate.m_PerAxis, oscillate.m_AxisPhase, oscillate.m_AxisFrequency), Is.EqualTo((false, Vector4.zero, Vector4.one)), "Oscillate — Per Axis off · Axis Phase 0 · Axis Frequency 1");
+            Assert.That((oscillate.m_FadeIn, oscillate.m_FadeOut), Is.EqualTo((0f, 0f)), "Oscillate — Fade In · Fade Out 0");
+            AssertLinear(oscillate.m_FadeEase, "Oscillate — Fade Ease Linear");
             var blink = new BlinkMotion().m_Params;
             Assert.That((blink.m_Value, blink.m_Period, blink.m_Duty, blink.m_Jitter, blink.m_StartOn), Is.EqualTo((Vector4.one, 0.2f, 0.5f, 0f, true)), "Blink");
             var wiggle = new WiggleMotion().m_Params;
             Assert.That((wiggle.m_Amplitude, wiggle.m_Frequency, wiggle.m_Octaves), Is.EqualTo((Vector4.one, 1f, 2)), "Wiggle");
+            Assert.That((wiggle.m_FadeIn, wiggle.m_FadeOut), Is.EqualTo((0f, 0f)), "Wiggle — Fade In · Fade Out 0");
+            AssertLinear(wiggle.m_FadeEase, "Wiggle — Fade Ease Linear");
             var spring = new SpringMotion().m_Params;
             Assert.That((spring.m_Mode, spring.m_Value, spring.m_Relative), Is.EqualTo((SpringMode.Bump, Vector4.one, false)), "Spring");
             Assert.That((spring.m_Frequency, spring.m_Damping, spring.m_Settle), Is.EqualTo((6f, 0.4f, 0.001f)), "Spring — 6 · 0.4 · 0.001");
+            var bounce = new BounceMotion().m_Params;
+            Assert.That((bounce.m_Amplitude, bounce.m_Count, bounce.m_Restitution), Is.EqualTo((Vector4.one, 3, 0.5f)), "Bounce — Count 3 · Restitution 0.5");
 
             // Default twice is the same value
             Assert.That(EditorJsonUtility.ToJson(CurveParams.Default), Is.EqualTo(EditorJsonUtility.ToJson(CurveParams.Default)));
@@ -144,7 +153,7 @@ namespace xpTURN.Feedback.Tests.Editor
         {
             float[] ts = { -1f, 0f, 0.1f, 0.37f, 0.5f, 0.83f, 1f, 2f, float.NaN };
             float[] ps = { 0f, 1f, 1.70158f, 0.3f, -2f };
-            for (int k = 0; k < 31; k++)
+            foreach (int k in Enumerable.Range(0, 31).Append((int)EaseType.Steps))
                 foreach (float p1 in ps)
                     foreach (float p2 in ps)
                         foreach (float t in ts)
@@ -158,7 +167,7 @@ namespace xpTURN.Feedback.Tests.Editor
                 var e = Ease.Of(type);
                 bool back = type >= EaseType.BackIn && type <= EaseType.BackInOut;
                 bool elastic = type >= EaseType.ElasticIn && type <= EaseType.ElasticInOut;
-                Assert.That((e.m_Type, e.m_P1, e.m_P2, e.m_Curve), Is.EqualTo((type, back ? 1.70158f : elastic ? 1f : 0f, elastic ? 0.3f : 0f, (AnimationCurve)null)), type.ToString());
+                Assert.That((e.m_Type, e.m_P1, e.m_P2, e.m_Curve), Is.EqualTo((type, back ? 1.70158f : elastic ? 1f : type == EaseType.Steps ? 4f : 0f, elastic ? 0.3f : 0f, (AnimationCurve)null)), type.ToString());
             }
             Assert.That(default(Ease).m_Type, Is.EqualTo(EaseType.Linear));
 
@@ -218,14 +227,14 @@ namespace xpTURN.Feedback.Tests.Editor
         // Core's public types
         static readonly string[] PublicTypes =
         {
-            "ActionItem", "BlinkMotion", "CameraShakeItem", "CameraShakeReceiver", "CategoryOverride", "ChannelRef", "ChannelRefMode", "ChildLookup", "CurveMotion",
+            "ActionItem", "BlinkMotion", "BounceMotion", "CameraShakeItem", "CameraShakeReceiver", "CameraTraumaItem", "CategoryOverride", "ChannelRef", "ChannelRefMode", "ChildLookup", "CurveMotion",
             "DirectionCondition", "DistanceReference", "EffectItem", "FeedbackCategories", "FeedbackCategory", "FeedbackChannel", "FeedbackChannels", "FeedbackCommand", "FeedbackCommandKind",
-            "FeedbackItem", "FeedbackMotion", "FeedbackPlayer", "FeedbackPlayerLoop", "FeedbackPreset", "FeedbackRange", "FeedbackReceiver", "FeedbackSettings", "FeedbackTimeScale",
-            "FlashMotion", "FlowItem", "GradientMotion", "GradientWrite", "HitStopItem", "HoldItem", "IPlaybackListener", "IntensityResponse", "ItemClock",
+            "FeedbackItem", "FeedbackMotion", "FeedbackPlayer", "FeedbackPlayerLoop", "FeedbackPreset", "FeedbackRange", "FeedbackReceiver", "FeedbackSettings", "FeedbackTimeScale", "FeedbackTrauma",
+            "FlashMotion", "FlowItem", "GradientMotion", "GradientWrite", "HitStopItem", "HitStopOverlap", "HoldItem", "IPlaybackListener", "IntensityResponse", "ItemClock",
             "ItemConditions", "ItemPlayDirection", "ItemRandomness", "ItemTiming", "LightIntensityItem", "LoopEndItem", "LoopStartItem", "MaterialColorItem",
             "MaterialWriteMode", "MotionDriver", "MotionDriverMode", "OscillateMotion", "PlayArgs", "PlayPolicy", "PlaybackEnd", "PlaybackHandle", "PlayerAutoPlay", "PlayerDirection", "PlayerDisableBehavior", "PlayerEventKind", "PlayerInitialization", "PlayerTimeMode", "PositionItem", "PositionSpace", "PunchMotion", "RotationInterpolation",
             "RotationItem", "ScaleItem", "SetActiveItem", "SetMotion", "ShakeMotion", "ShakeNoise", "SpringColor", "SpringFloat", "SpringMode", "SpringMotion", "SpringVector2", "SpringVector3", "StopMode", "TargetItem",
-            "TargetRef", "TargetRefMode", "TransformSpace", "TweenMode", "TweenMotion", "UnityEventItem", "WaitForSignalItem", "WaitItem",
+            "TargetRef", "TargetRefMode", "TransformSpace", "TransformTraumaItem", "TraumaShaker", "TweenMode", "TweenMotion", "UnityEventItem", "WaitForSignalItem", "WaitItem",
             "WiggleMotion",
             "LightRangeItem", "LightColorItem", "LightSpotAngleItem", "LightShadowStrengthItem",
             "Light2DIntensityItem", "Light2DColorItem", "Light2DRadiusItem", "Light2DFalloffItem",
@@ -237,6 +246,7 @@ namespace xpTURN.Feedback.Tests.Editor
             "CinemachineImpulseItem", "CinemachineImpulseClearItem", "CinemachineLensFieldOfViewItem", "CinemachineLensOrthographicSizeItem", "CinemachineLensDutchItem", "CinemachineNoiseAmplitudeGainItem", "CinemachineNoiseFrequencyGainItem", "CinemachineActivateCameraItem",
             "CinemachineImpulseShape", "CinemachineImpulseSpread", "CinemachineImpulseMode", "CinemachineBlendStyle", "CinemachineBlendSpec",
             "GamepadRumbleItem", "GamepadRumbleDevice",
+            "AudioVolumeItem", "AudioPitchItem", "AudioStereoPanItem", "AudioLowPassCutoffItem", "AudioHighPassCutoffItem", "AudioEchoWetMixItem", "AudioDistortionLevelItem", "AudioReverbLevelItem", "AudioListenerVolumeItem", "AudioSourceControlItem", "AudioPlayClipItem", "AudioMixerParameterItem", "AudioMixerSnapshotItem", "AudioPlayAtPointItem", "AudioSourceAction",
             "CameraFieldOfViewItem", "CameraOrthographicSizeItem", "CameraZoomItem", "CameraClippingPlanesItem", "CameraBackgroundColorItem",
             "SquashAndStretchItem", "LookAtItem", "RotateAroundItem", "MatchTransformItem", "SetParentItem", "SquashAxis", "LookAtMode", "LookAtUp",
             // the material items' common fields' interface is internal

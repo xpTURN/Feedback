@@ -26,6 +26,8 @@ namespace xpTURN.Feedback
                 case EaseType.ElasticOut:
                 case EaseType.ElasticInOut:
                     return new Ease { m_Type = type, m_P1 = 1f, m_P2 = 0.3f };
+                case EaseType.Steps:
+                    return new Ease { m_Type = type, m_P1 = 4f };
                 default:
                     return new Ease { m_Type = type };
             }

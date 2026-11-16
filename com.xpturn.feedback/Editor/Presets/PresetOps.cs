@@ -13,6 +13,7 @@ namespace xpTURN.Feedback.Editor
         // the asset was deleted — the field keeps a fake object (a never linked field is a true null)
         internal static bool Missing(FeedbackPlayer player) => player != null && !ReferenceEquals(player.m_Preset, null) && player.m_Preset == null;
 
+        // the scene players that play the preset — linked to it, or holding it in a Variants slot that plays
         internal static List<FeedbackPlayer> Linked(FeedbackPreset preset)
         {
             var found = new List<FeedbackPlayer>();
@@ -20,7 +21,7 @@ namespace xpTURN.Feedback.Editor
                 return found;
             foreach (FeedbackPlayer p in Resources.FindObjectsOfTypeAll<FeedbackPlayer>())
             {
-                if (p.m_Preset == preset && !EditorUtility.IsPersistent(p) && p.gameObject.scene.IsValid())
+                if ((p.m_Preset == preset || VariantShow.Uses(p, preset)) && !EditorUtility.IsPersistent(p) && p.gameObject.scene.IsValid())
                     found.Add(p);
             }
             return found;

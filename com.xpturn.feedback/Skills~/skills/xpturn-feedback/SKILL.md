@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: Unity 6000.0 or later with com.xpturn.feedback installed.
 metadata:
   package: com.xpturn.feedback
-  version: "0.1.0"
+  version: "0.2.0"
 ---
 
 # xpTURN.Feedback
@@ -34,22 +34,24 @@ as a transform's scale, a renderer's material color or the camera, with one moti
 and the others). Actions act once when the play reaches them — a hit stop, a UnityEvent, a signal — and flow items shape
 the list with waits and loops. A preset is an item list in an asset; the package comes with
 <!-- gen:count:presets -->21<!-- /gen:count:presets --> of them. Read `Documentation~/Concepts.md#players-and-items` and
-`Documentation~/Concepts.md#targets-and-motions` before you choose items.
+`Documentation~/Concepts.md#targets-and-motions` before you choose items, and `Documentation~/Motions.md` for a motion's
+parameters.
 
 ## The tasks
 
 | Task | You do | The person does | Read |
 |---|---|---|---|
-| Choose an effect | Pick feedbacks or a preset and say why; check the packages they need | — | `Documentation~/Feedbacks.md` · [the presets](references/authoring-files.md#the-presets) |
+| Choose an effect | Pick feedbacks or a preset and say why; check the packages they need | — | `Documentation~/Feedbacks.md` · `Documentation~/Motions.md#choosing-a-motion` · [the presets](references/authoring-files.md#the-presets) |
 | A player from a preset | Add a player that links the preset to an object in a scene or prefab file | Saves the scene first, opens it after | [Writing files](references/authoring-files.md) |
-| A player with items of its own | Write the steps: each item's Add menu path and its values — not the items in a file | Adds and tunes the items, previews them | `Documentation~/GettingStarted.md#the-add-menu` · `Documentation~/Feedbacks.md` |
+| A player with items of its own | Write the steps: each item's Add menu path and its values — not the items in a file | Adds and tunes the items, previews them | `Documentation~/GettingStarted.md#the-add-menu` · `Documentation~/Feedbacks.md` · `Documentation~/Motions.md` |
 | Play from code | C#: a `FeedbackPlayer` field and `FeedbackPlayer.Play` with `PlayArgs`, or `FeedbackPlayer.PlayAsync` to wait for the end | Drags the player into the field | `Documentation~/ScriptingAPI.md#playing` |
 | Play from a UnityEvent — a Button, a Toggle, a Slider, a Timeline Signal | Pick `FeedbackPlayer.PlayFromEvent`: the version without a value for a Button or a Signal, the `bool` version for a Toggle (a play running the other way turns around where it is), the `float` version for a Slider's value as the intensity | Wires the event in the inspector | `Documentation~/ScriptingAPI.md#feedbackplayer` |
 | Play on a UI pointer, selection or submit event | Say which events and actions to give a Feedback UI Trigger on the UI object | Adds it and fills its entries | `Documentation~/ScriptingAPI.md#feedbackuitrigger` |
 | Many players at once | C#: channels, signals and receivers | — | `Documentation~/Concepts.md#channels-and-signals` · `Documentation~/ScriptingAPI.md#broadcasting` |
 | Unity Timeline | Explain the Feedback track and its clips | Makes the tracks and clips | `Documentation~/Concepts.md#unity-timeline` · `Documentation~/ScriptingAPI.md#unity-timeline` |
 | Allocation and cost | Say what allocates and what a play costs | Measures with the Stress & Zero-GC sample | `Documentation~/Performance.md` |
-| A sound, a middleware event, a vibration | C#: an action or an effect of your own | Adds it from the Add menu | `Documentation~/ScriptingAPI.md#your-own-feedbacks` |
+| A sound from Unity's audio | Pick Audio feedbacks — `Audio/Play Clip` or `Audio/Play At Point` for a sound, the others for a source, a filter or a mixer — and check the Audio module | Adds and tunes the items | `Documentation~/Feedbacks.md#audio` |
+| A middleware event, a vibration | C#: an action or an effect of your own | Adds it from the Add menu | `Documentation~/ScriptingAPI.md#your-own-feedbacks` |
 | Accessibility, strength, time | C#: categories, the time scale, the settings | Edits the settings asset | `Documentation~/ScriptingAPI.md#global` · `Documentation~/Concepts.md#categories-and-accessibility` |
 | An effect that does not show | Find the cause in the documentation; ask for the validator's findings | Runs the validator | [Checking the result](references/checking.md) |
 

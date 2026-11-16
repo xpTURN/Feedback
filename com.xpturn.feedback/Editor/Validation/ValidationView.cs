@@ -16,6 +16,7 @@ namespace xpTURN.Feedback.Editor
     {
         internal const double Delay = 0.3;
         internal const string OnItemsText = " on the items — see their headers";
+        internal const string OtherItemsText = " on the other lists' items — pick them in Show";
 
         internal readonly Button Summary;
         internal readonly VisualElement HostPanel = new VisualElement();
@@ -53,12 +54,16 @@ namespace xpTURN.Feedback.Editor
             Run();
         }
 
+        // the list the rows show — a Variant shown by the player, else null (the player's list)
+        FeedbackPreset Shown => m_List != null && m_Host is FeedbackPlayer player && PreviewMasks.IsVariant(player, m_List.ListOwner) ? (FeedbackPreset)m_List.ListOwner : null;
+
         List<RuleResult> ResultsFor(int item)
         {
             var mine = new List<RuleResult>();
+            FeedbackPreset shown = Shown;
             foreach (RuleResult r in Results)
             {
-                if (r.Item == item)
+                if (r.Item == item && ReferenceEquals(r.List, shown))
                     mine.Add(r);
             }
             return mine;
@@ -86,6 +91,11 @@ namespace xpTURN.Feedback.Editor
             m_List?.RefreshResults();
             Summary.text = FeedbackValidator.Summary(Results);
             Summary.style.display = Results.Count > 0 && m_List != null ? DisplayStyle.Flex : DisplayStyle.None;
+            // the summary in the colour and the icon of its highest severity — an error's red, a warning's yellow
+            RuleSeverity top = Results.Count > 0 ? Results.Max(x => x.Severity) : RuleSeverity.Info;
+            Summary.EnableInClassList(InspectorStyles.ValidationSummaryError, Results.Count > 0 && top == RuleSeverity.Error);
+            Summary.EnableInClassList(InspectorStyles.ValidationSummaryWarning, Results.Count > 0 && top == RuleSeverity.Warning);
+            Summary.iconImage = Results.Count > 0 ? Background.FromTexture2D(ResultRows.Icon(top)) : default;
             if (m_List == null)
                 ShowHostPanel(Results.Count > 0);
             else if (HostPanel.style.display == DisplayStyle.Flex)
@@ -104,9 +114,13 @@ namespace xpTURN.Feedback.Editor
                     FeedbackValidator.Apply(x, f);
                     Run();
                 }));
-            int onItems = m_List == null ? 0 : Results.Count(x => x.Item >= 0);
+            FeedbackPreset shown = Shown;
+            int onItems = m_List == null ? 0 : Results.Count(x => x.Item >= 0 && ReferenceEquals(x.List, shown));
+            int onOthers = m_List == null ? 0 : Results.Count(x => x.Item >= 0 && !ReferenceEquals(x.List, shown));
             if (onItems > 0)
                 HostPanel.Add(new Label(onItems + OnItemsText));
+            if (onOthers > 0)
+                HostPanel.Add(new Label(onOthers + OtherItemsText));
         }
     }
 
