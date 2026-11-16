@@ -36,6 +36,8 @@ public class Enemy : MonoBehaviour
 
 ![A Feedback Player's inspector: the preview bar, the player's settings, the timeline strip and a list of five items](com.xpturn.feedback/Documentation~/images/inspector.png)
 
+![The strip's Graph following an edit-mode preview: the position a Punch and a later Shake write together, the played frames drawn as dots behind the play head, above the two folded items](com.xpturn.feedback/Documentation~/images/graphs.gif)
+
 ## Requirements
 
 Unity 6000.0.85f2 or later. Tested with Unity 6000.3.28f1 and 6000.6.8f1 (players: IL2CPP on macOS arm64).

@@ -19,6 +19,7 @@
     { "id": "C3", "file": "layers.png", "state": "Layers" },
     { "id": "C4", "file": "timeline-track.png", "state": "Timeline" },
     { "id": "M1", "file": "motions.png", "state": "Motions" },
-    { "id": "M2", "file": "eases.png", "state": "Eases" }
+    { "id": "M2", "file": "eases.png", "state": "Eases" },
+    { "id": "R3", "file": "graphs.gif", "state": "GraphsPlay" }
   ]
 }

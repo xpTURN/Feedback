@@ -197,6 +197,7 @@ namespace xpTURN.Feedback.Tests.Editor.Docs
                 case "Eases": return EasesShot(shot);
                 case "Motions": return MotionsShot(shot);
                 case "Graphs": return GraphsShot(shot);
+                case "GraphsPlay": return GraphsPlay(shot);
             }
             throw new ShotFailed("no state " + shot.state);
         }
@@ -719,6 +720,80 @@ namespace xpTURN.Feedback.Tests.Editor.Docs
             Check(top >= 0f && bottom <= inspector.position.height, $"the strip to the item's Graph ({bottom - top:F0} pt) does not fit the inspector");
             foreach (int w in Capture(inspector, Rect.MinMaxRect(0f, top, Within(inspector, strip).xMax, bottom), shot.id))
                 yield return w;
+        }
+
+        // the README's graphs: a cube's player of a Punch on its position's Y and a Shake that starts later, the strip's Graph
+        // open and the items folded, Dots on, the preview played to its end on a stepped clock — a frame every two ticks, its
+        // last frame held — the part from the strip to the last item's header, the same in every frame. frames-<id>.txt lists
+        // the frames and their times
+        static IEnumerable<int> GraphsPlay(Shot shot)
+        {
+            NewScene();
+            GameObject crate = Cube("Crate");
+            var player = crate.AddComponent<FeedbackPlayer>();
+            var punch = (TargetItem)ItemFactory.Create(Leaf("Transform/Position/Punch"));
+            ((PunchMotion)punch.m_Motion).m_Params.m_Amplitude = new Vector4(0f, 0.5f, 0f, 0f);
+            punch.m_Timing.m_Duration = 0.8f;
+            var shake = (TargetItem)ItemFactory.Create(Leaf("Transform/Position/Shake"));
+            ((ShakeMotion)shake.m_Motion).m_Params.m_Amplitude = new Vector4(0.15f, 0.15f, 0.15f, 0f);
+            shake.m_Timing.m_Delay = 0.3f;
+            shake.m_Timing.m_Duration = 0.5f;
+            player.m_Items.Add(punch);
+            player.m_Items.Add(shake);
+            // the items' reference ids fixed before the player is first serialized: an item's random parts are keyed by its
+            // id, so the Shake's noise is the same at each run
+            Check(UnityEngine.Serialization.ManagedReferenceUtility.SetManagedReferenceIdForObject(player, punch, 1000)
+                && UnityEngine.Serialization.ManagedReferenceUtility.SetManagedReferenceIdForObject(player, shake, 1001), "the items' reference ids cannot be set");
+            EditorUtility.SetDirty(player);
+            EditorSceneManager.SaveScene(crate.scene);
+            long rid = new SerializedObject(player).FindProperty("m_Items").GetArrayElementAtIndex(0).managedReferenceId;
+            Check(rid == 1000, "the first item's reference id is " + rid);
+            SessionState.SetBool(SlotGraphField.FoldPrefix + player.GetEntityId(), true);
+            EditorPrefs.SetBool(MotionGraphView.DotsKey, true);
+            EditorWindow inspector = Inspect(crate);
+            yield return Settle;
+            double now = 1000.0;
+            PreviewClock.Source = () => now;
+            Check(PreviewSession.Start(player, Args) == PreviewRefusal.None, "the preview did not start");
+            // the clock's first reading is the start
+            yield return 1;
+            Check(PreviewSession.Current.ScrubState(out _, out double high, out _) == SeekRefusal.None, "the preview cannot seek");
+            var strip = inspector.rootVisualElement.Q<TimelineStrip>();
+            var slot = inspector.rootVisualElement.Q<SlotGraphField>();
+            List<ItemHeader> headers = PlayerRoot(inspector, player).Query<ItemHeader>().ToList();
+            Check(strip != null && slot != null && headers.Count == 2, $"no strip or strip's Graph, or {headers.Count} item headers");
+            Check(inspector.rootVisualElement.Q<ItemGraphField>() == null, "an item is open");
+            VisualElement last = headers[1];
+            ScrollTo(inspector, strip);
+            yield return Settle;
+            Check(slot.Notes.text.Contains("Play 1"), "the strip's Graph does not follow the preview's play");
+            Vector2 origin = inspector.rootVisualElement.worldBound.position;
+            float top = strip.worldBound.yMin - origin.y - 4f;
+            float bottom = last.worldBound.yMax - origin.y + 4f;
+            Check(top >= 0f && bottom <= inspector.position.height, $"the strip to the last item's header ({bottom - top:F0} pt) does not fit the inspector");
+            Rect crop = Rect.MinMaxRect(0f, top, Within(inspector, strip).xMax, bottom);
+            const int ticks = 2;
+            int steps = (int)Math.Ceiling(high / (ticks * PreviewClock.TickInterval) - 1e-6);
+            var frames = new List<string>();
+            for (int k = 0; k <= steps; k++)
+            {
+                if (k > 0)
+                {
+                    for (int i = 0; i < ticks; i++)
+                    {
+                        now += PreviewClock.TickInterval + 1e-7;
+                        yield return 1;
+                    }
+                }
+                string name = $"{shot.id}-f{frames.Count:000}";
+                foreach (int w in Capture(inspector, crop, name))
+                    yield return w;
+                origin = inspector.rootVisualElement.worldBound.position;
+                Check(Math.Abs(strip.worldBound.yMin - origin.y - 4f - top) < 0.5f && Math.Abs(last.worldBound.yMax - origin.y + 4f - bottom) < 0.5f, $"the strip or the last item's header moved at frame {k}");
+                frames.Add(name + " " + F(k == steps ? HeldFrame : FrameStep));
+            }
+            Check(slot.View.Dots != null && slot.View.Dots.Count > 0, "the strip's Graph recorded no frame");
+            File.WriteAllLines(Path.Combine(s_Out, $"frames-{shot.id}.txt"), frames);
         }
 
         // ---- the states

@@ -4,7 +4,7 @@
 
 > 本文档是英文 [README](README.md) 的翻译。如有出入，以英文版为准。
 
-<!-- english: 53bc81f9c930 -->
+<!-- english: 47289b436a8b -->
 
 ![在打砖块的 Boss 上播放的反馈 — 暴击、爆炸和屏幕闪光 — 在 Game 视图中预览](com.xpturn.feedback/Documentation~/images/hero.gif)
 
@@ -37,6 +37,8 @@ public class Enemy : MonoBehaviour
 - **示例** — <!-- gen:count:bundles -->5<!-- /gen:count:bundles --> 个示例包，从第一个反馈到一个小游戏。
 
 ![Feedback Player 的检查器：预览栏、播放器设置、时间线条和五个条目的列表](com.xpturn.feedback/Documentation~/images/inspector.png)
+
+![跟随编辑模式预览的时间线条 Graph：冲击和稍后开始的震动共同写入的位置 — 已播放的帧以点的形式画在播放头之后，下方是两个折叠的条目](com.xpturn.feedback/Documentation~/images/graphs.gif)
 
 ## 要求
 

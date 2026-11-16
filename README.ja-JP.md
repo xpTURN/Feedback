@@ -4,7 +4,7 @@
 
 > この文書は英語の [README](README.md) の翻訳です。内容が異なる場合は英語版を正とします。
 
-<!-- english: 53bc81f9c930 -->
+<!-- english: 47289b436a8b -->
 
 ![ブロック崩しのボスに再生したフィードバック — クリティカルヒット・爆発・画面フラッシュ — を Game ビューでプレビューした様子](com.xpturn.feedback/Documentation~/images/hero.gif)
 
@@ -40,6 +40,8 @@ public class Enemy : MonoBehaviour
 - **サンプル** — 最初のフィードバックから短いゲームまで、<!-- gen:count:bundles -->5<!-- /gen:count:bundles --> つのバンドル。
 
 ![Feedback Player のインスペクター：プレビューバー・プレイヤーの設定・タイムラインストリップ・5 つのアイテムのリスト](com.xpturn.feedback/Documentation~/images/inspector.png)
+
+![エディットモードのプレビューを追うタイムラインストリップの Graph：パンチと遅れて始まるシェイクが一緒に書き込む位置 — 再生したフレームが再生ヘッドの後ろに点で描かれ、その下に折りたたんだ 2 つのアイテム](com.xpturn.feedback/Documentation~/images/graphs.gif)
 
 ## 動作環境
 

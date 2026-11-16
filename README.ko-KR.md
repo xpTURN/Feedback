@@ -4,7 +4,7 @@
 
 > 이 문서는 영어 [README](README.md) 의 번역입니다. 내용이 다르면 영어판을 기준으로 합니다.
 
-<!-- english: 53bc81f9c930 -->
+<!-- english: 47289b436a8b -->
 
 ![브릭 브레이커 보스에 재생한 피드백 — 치명타 · 폭발 · 화면 번쩍임 — 을 Game 뷰에서 미리 본 모습](com.xpturn.feedback/Documentation~/images/hero.gif)
 
@@ -39,6 +39,8 @@ public class Enemy : MonoBehaviour
 - **샘플** — 첫 피드백부터 짧은 게임까지, 묶음 <!-- gen:count:bundles -->5<!-- /gen:count:bundles --> 개.
 
 ![Feedback Player 의 인스펙터: 미리보기 막대 · 플레이어 설정 · 타임라인 띠 · 항목 다섯의 목록](com.xpturn.feedback/Documentation~/images/inspector.png)
+
+![에디트 모드 미리보기를 따라가는 타임라인 띠의 Graph: 펀치와 늦게 시작하는 흔들기가 함께 쓰는 위치 — 재생된 프레임이 재생 헤드 뒤에 점으로 그려지고, 그 아래에 접힌 항목 둘](com.xpturn.feedback/Documentation~/images/graphs.gif)
 
 ## 요구 사항
 
