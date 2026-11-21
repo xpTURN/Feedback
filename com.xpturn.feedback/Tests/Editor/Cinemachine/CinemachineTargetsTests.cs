@@ -189,6 +189,20 @@ namespace xpTURN.Feedback.Tests.Editor
             }
         }
 
+        // the edit-mode player loop does not run while the editor app is hidden: the brain would not move the camera
+        static IEnumerator NeedPlayerLoop()
+        {
+            int frame = Time.frameCount;
+            double until = EditorApplication.timeSinceStartup + 2.0;
+            while (Time.frameCount == frame && EditorApplication.timeSinceStartup < until)
+            {
+                EditorApplication.QueuePlayerLoopUpdate();
+                yield return null;
+            }
+            if (Time.frameCount == frame)
+                Assert.Ignore("the editor is hidden: its edit-mode player loop does not run");
+        }
+
         static Vector3 Seeds(CinemachineBasicMultiChannelPerlin perlin)
             => (Vector3)typeof(CinemachineBasicMultiChannelPerlin).GetField("m_NoiseOffsets", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(perlin);
 
@@ -310,6 +324,7 @@ namespace xpTURN.Feedback.Tests.Editor
         [UnityTest]
         public IEnumerator CI17a_ThePreview()
         {
+            yield return NeedPlayerLoop();
             OpenScene();
             Camera cam = MainRig();
             CinemachineCamera vcam = Vcam("CI vcam");
@@ -353,6 +368,7 @@ namespace xpTURN.Feedback.Tests.Editor
         [UnityTest]
         public IEnumerator CI17b_TheShakePreviewThroughTheExtension()
         {
+            yield return NeedPlayerLoop();
             OpenScene();
             Camera cam = MainRig();
             CinemachineCamera vcam = Vcam("CI vcam");

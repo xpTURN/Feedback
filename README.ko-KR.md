@@ -4,7 +4,7 @@
 
 > 이 문서는 영어 [README](README.md) 의 번역입니다. 내용이 다르면 영어판을 기준으로 합니다.
 
-<!-- english: 47289b436a8b -->
+<!-- english: 0eea23811cb0 -->
 
 ![브릭 브레이커 보스에 재생한 피드백 — 치명타 · 폭발 · 화면 번쩍임 — 을 Game 뷰에서 미리 본 모습](com.xpturn.feedback/Documentation~/images/hero.gif)
 
@@ -74,7 +74,7 @@ Input System 1.20.1 · UniTask 2.5.11 · Timeline 1.8.13(Unity 6000.6 은 내장
 ## 설치
 
 - Package Manager 에서 **+ > Add package from git URL…** 을 고르고
-  `https://github.com/xpTURN/Feedback.git?path=/com.xpturn.feedback#v0.2.1` 을 넣습니다.
+  `https://github.com/xpTURN/Feedback.git?path=/com.xpturn.feedback#v0.2.2` 을 넣습니다.
 - 또는 **+ > Add package from disk…** 를 고르고 `com.xpturn.feedback` 폴더의 `package.json` 을 고릅니다.
 - 또는 **+ > Add package from tarball…** 을 고르고 패키지의 `.tgz` 를 고릅니다.
 - 또는 `Packages/manifest.json` 에 더합니다(상대 경로는 `Packages` 폴더에서 시작합니다):

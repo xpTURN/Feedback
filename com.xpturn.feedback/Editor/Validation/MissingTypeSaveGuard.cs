@@ -11,7 +11,8 @@ namespace xpTURN.Feedback.Editor
 {
     // a save of a scene, a prefab or a preset whose loaded feedback lists hold items of a missing type. A save in the session
     // the type went missing drops them (one loaded from a file with the type already gone keeps them — the two are not told
-    // apart): asked first, the answer kept for the path until the next domain reload. A batch run saves and says so
+    // apart): asked first, the answer kept for the path until the next domain reload. A batch run saves and says so. The save
+    // of a prefab whose clear left no missing entries is not asked
     internal sealed class MissingTypeSaveGuard : AssetModificationProcessor
     {
         internal const string Title = "Feedback items of a missing type";
@@ -21,6 +22,9 @@ namespace xpTURN.Feedback.Editor
 
         // the question for the paths not answered yet — true saves them
         internal static Func<IReadOnlyList<string>, bool> Ask = DefaultAsk;
+
+        // the path MissingTypes.Clear is saving a copy to with no missing entries left
+        internal static string Clearing;
 
         static readonly Dictionary<string, bool> s_Answers = new Dictionary<string, bool>();
 
@@ -40,7 +44,7 @@ namespace xpTURN.Feedback.Editor
 
         internal static string[] Filter(string[] paths)
         {
-            List<string> held = paths.Where(Holds).ToList();
+            List<string> held = paths.Where(p => p != Clearing && Holds(p)).ToList();
             if (held.Count == 0)
                 return paths;
             List<string> open = held.Where(p => !s_Answers.ContainsKey(p)).ToList();
@@ -76,7 +80,7 @@ namespace xpTURN.Feedback.Editor
             return AssetDatabase.GetMainAssetTypeAtPath(path) == typeof(FeedbackPreset) && MissingTypes.Has(AssetDatabase.LoadAssetAtPath<FeedbackPreset>(path));
         }
 
-        static IEnumerable<Object> Lists(GameObject root)
+        internal static IEnumerable<Object> Lists(GameObject root)
             => root.GetComponentsInChildren<FeedbackPlayer>(true).Cast<Object>().Concat(root.GetComponentsInChildren<MotionDriver>(true));
     }
 }

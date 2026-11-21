@@ -394,9 +394,16 @@ namespace xpTURN.Feedback
         internal void Launch(FloatingTextInstance fi, Vector3 world, Transform follow, Vector3 offset, in FloatingTextLook st, uint seed, float life, bool unscaled)
         {
             fi.RefreshRenderers();
-            if (m_LiveCount == m_Live.Length)
-                System.Array.Resize(ref m_Live, m_Live.Length * 2);
-            m_Live[m_LiveCount] = new Live
+            // a text Pools handed out again before Update saw it back keeps its entry for the new life
+            int slot = fi.LiveSlot;
+            if (slot >= m_LiveCount || !ReferenceEquals(m_Live[slot].Instance, fi))
+            {
+                if (m_LiveCount == m_Live.Length)
+                    System.Array.Resize(ref m_Live, m_Live.Length * 2);
+                slot = m_LiveCount++;
+                fi.LiveSlot = slot;
+            }
+            m_Live[slot] = new Live
             {
                 Instance = fi,
                 World = world,
@@ -412,8 +419,7 @@ namespace xpTURN.Feedback
                 Unscaled = unscaled,
                 Seed = seed,
             };
-            Place(m_LiveCount);
-            m_LiveCount++;
+            Place(slot);
         }
 
         // RunUpdate's services step: a text Pools took back (under its container) leaves · the ages on the spawn's clock
@@ -426,6 +432,8 @@ namespace xpTURN.Feedback
                 {
                     m_Live[i] = m_Live[--m_LiveCount];
                     m_Live[m_LiveCount] = default;
+                    if (i < m_LiveCount && m_Live[i].Instance != null)
+                        m_Live[i].Instance.LiveSlot = i;
                     continue;
                 }
                 m_Live[i].Age += m_Live[i].Unscaled ? time.UnscaledDelta : time.ScaledDelta;

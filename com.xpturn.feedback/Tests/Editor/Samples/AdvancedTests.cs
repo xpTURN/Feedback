@@ -335,7 +335,7 @@ namespace xpTURN.Feedback.Tests.Editor.Samples
         // a Skip ends it at once. A fixed 1/60 frame: the play's end comes before the sample's LateUpdate adds that frame to its clock
         // (the batch editor's frames are far shorter)
 
-        [UnityTest]
+        [UnityTest, Timeout(600000)]
         public IEnumerator VQ05_LandingAndPause()
         {
             yield return new EnterPlayMode();
@@ -540,10 +540,20 @@ namespace xpTURN.Feedback.Tests.Editor.Samples
             (int e0, int w0) = Counts();
             Component lab = Lab("ChannelsRangeLab");
             var lamps = Resources.FindObjectsOfTypeAll<FeedbackPlayer>().Where(p => p.gameObject.scene.isLoaded && p.name.StartsWith("Lamp ", StringComparison.Ordinal)).Select(p => p.transform).ToList();
-            Call(lab, "SetFilter", 0);
-            Call(lab, "Explode", Vector3.zero);
-            int got = (int)P(lab, "LastReceived");
-            yield return Frames(4);
+            int got;
+            // the burst is read four steps in: a fixed 1/120 s step keeps every lamp in the punch's first swing at any frame length
+            Time.captureDeltaTime = 1f / 120f;
+            try
+            {
+                Call(lab, "SetFilter", 0);
+                Call(lab, "Explode", Vector3.zero);
+                got = (int)P(lab, "LastReceived");
+                yield return Frames(4);
+            }
+            finally
+            {
+                Time.captureDeltaTime = 0f;
+            }
             int popped = 0, blue = 0, far = 0;
             var near = new List<(float d, float s)>();
             foreach (Transform t in lamps)

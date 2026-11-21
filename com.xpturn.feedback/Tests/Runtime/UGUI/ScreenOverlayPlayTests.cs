@@ -327,6 +327,64 @@ namespace xpTURN.Feedback.Tests
             Assert.That((pools.MadeOf(prefab), warmed.Length, warmed.All(i => i.GetComponent<CanvasGroup>() != null && i.Text != null)), Is.EqualTo((2, 2, true)), "a style's prefab is the template — warmed with its parts");
         }
 
+        // ---- a text the pool hands out again before the service's update saw it back has one entry: its last life's entry does
+        // not place it, and the list stays at what the preparations reserved
+
+        [UnityTest]
+        public IEnumerator OT14b_AReusedTextHasOneEntry()
+        {
+            NeedTMP();
+            LogAssert.ignoreFailingMessages = true;
+            Time.captureDeltaTime = 1f / 60f;
+            Camera cam = MainCamera(false);
+            FeedbackPlayer p = Player(Text(Style(0.3f), FloatingTextSource.Text, 8), Keeper(5f));
+            ScreenOverlayService svc = ScreenOverlayService.Of(FeedbackScheduler.Default.Context);
+            int capacity = svc.LiveCapacity;
+            var worlds = new List<Vector3>();
+            int frames = 0, doubled = 0, misplaced = 0;
+            void Check()
+            {
+                if (svc.LiveCount == 0)
+                    return;
+                frames++;
+                var seen = new HashSet<FloatingTextInstance>();
+                bool twice = false, off = false;
+                for (int i = 0; i < svc.LiveCount; i++)
+                {
+                    FloatingTextInstance fi = svc.LiveAt(i);
+                    twice |= !seen.Add(fi);
+                    if (!fi.gameObject.activeInHierarchy)
+                        continue;
+                    bool near = false;
+                    for (int w = Mathf.Max(0, worlds.Count - 4); w < worlds.Count; w++)
+                        near |= (fi.Rect.anchoredPosition - Projected(svc, cam, worlds[w])).magnitude < 0.5f;
+                    off |= !near;
+                }
+                doubled += twice ? 1 : 0;
+                misplaced += off ? 1 : 0;
+            }
+            Canvas.willRenderCanvases += Check;
+            try
+            {
+                for (int f = 0; f < 120; f++)
+                {
+                    if (f % 6 == 0)
+                    {
+                        var world = new Vector3(-2f + f * 0.03f, 0f, 0f);
+                        worlds.Add(world);
+                        p.Play(PlayArgs.Default.WithPosition(world));
+                    }
+                    yield return null;
+                }
+            }
+            finally
+            {
+                Canvas.willRenderCanvases -= Check;
+            }
+            Assert.That(frames, Is.GreaterThanOrEqualTo(100), "the frames seen");
+            Assert.That((doubled, misplaced, svc.LiveCapacity), Is.EqualTo((0, 0, capacity)), "frames with a text twice · frames with a text off its play's place · the list's capacity");
+        }
+
         // ---- the motion over the lifetime — the place · the scale · the group alpha · the tint follow one t of the style's
         // curves (read by the test) · t moves by the frame's step · the text's own color is not written
 
@@ -502,8 +560,9 @@ namespace xpTURN.Feedback.Tests
             Assert.That(rest, Is.True, "the window starts from rest — every graphic off but the anchors");
             Assert.That(moved, Is.EqualTo(7), "every part wrote in the window — the positive");
             Assert.That(positive, Is.GreaterThanOrEqualTo(4), "the positive control");
-            // the number's string is TMP's in the editor only (SetText(char[]) keeps no string in a player)
-            if (!numbers || !Application.isEditor)
+            // the number's string is TMP's in the editor only (SetText(char[]) keeps no string in a player); a non-batch editor's
+            // windows allocate in the frames the scene changes
+            if (!Application.isEditor || (Application.isBatchMode && !numbers))
             {
 #if UNITY_6000_3_OR_NEWER || !UNITY_EDITOR
                 Assert.That(allocating, Is.LessThanOrEqualTo(idleAllocating + 3), "from rest the screen plays allocate nothing");

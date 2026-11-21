@@ -135,8 +135,12 @@ namespace xpTURN.Feedback.Tests
             Time.captureDeltaTime = 0f;
             Assert.That((s_Done, frames), Is.EqualTo((done + 1, frames)), "the loop finished inside the window");
             Assert.That(frames, Is.InRange(55, 130), "a play a frame");
-            Assert.That(allocating, Is.LessThanOrEqualTo(3), "nothing once warm (a stray editor chunk or two)");
-            Assert.That(discardedFrames, Is.GreaterThanOrEqualTo(4), "the positive control — a discarded UniTask keeps its source");
+            // a non-batch editor's windows move the idle baseline — the allocation is judged in a batch run and a player
+            if (!Application.isEditor || Application.isBatchMode)
+            {
+                Assert.That(allocating, Is.LessThanOrEqualTo(3), "nothing once warm (a stray editor chunk or two)");
+                Assert.That(discardedFrames, Is.GreaterThanOrEqualTo(4), "the positive control — a discarded UniTask keeps its source");
+            }
             Object.Destroy(go);
             Object.Destroy(go2);
             PlayerTestBinding.Reset();

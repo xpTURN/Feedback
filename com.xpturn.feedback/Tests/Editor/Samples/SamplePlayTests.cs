@@ -65,7 +65,8 @@ namespace xpTURN.Feedback.Tests.Editor.Samples
             => SampleHud.Instance != null && SampleHud.Instance.GetComponentsInChildren<Text>(true).Any(t => t.text == card.Title + "\n" + card.Controls + "\n" + SampleHud.Keys);
 
         // the hub round trip with the state composed and put back, the Console list unchanged
-        [UnityTest]
+        // a fixed count of game frames for every card: 45 s at 60 fps, minutes on a slow editor
+        [UnityTest, Timeout(600000)]
         public IEnumerator KQ3_HubRoundTrip()
         {
             yield return new EnterPlayMode();

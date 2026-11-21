@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -51,17 +52,22 @@ namespace xpTURN.Feedback.Editor
             int cleared = 0;
             try
             {
-                foreach (FeedbackPlayer p in contents.GetComponentsInChildren<FeedbackPlayer>(true))
+                // the fix's own kind of list — what the other kind still holds keeps the save's question
+                Component[] lists = owner is MotionDriver ? (Component[])contents.GetComponentsInChildren<MotionDriver>(true) : contents.GetComponentsInChildren<FeedbackPlayer>(true);
+                foreach (Component list in lists)
                 {
-                    var entries = SerializationUtility.GetManagedReferencesWithMissingTypes(p);
+                    var entries = SerializationUtility.GetManagedReferencesWithMissingTypes(list);
                     foreach (var e in entries)
-                        SerializationUtility.ClearManagedReferenceWithMissingType(p, e.referenceId);
+                        SerializationUtility.ClearManagedReferenceWithMissingType(list, e.referenceId);
                     cleared += entries.Length;
                 }
+                if (!MissingTypeSaveGuard.Lists(contents).Any(SerializationUtility.HasManagedReferencesWithMissingTypes))
+                    MissingTypeSaveGuard.Clearing = path;
                 PrefabUtility.SaveAsPrefabAsset(contents, path);
             }
             finally
             {
+                MissingTypeSaveGuard.Clearing = null;
                 PrefabUtility.UnloadPrefabContents(contents);
             }
             return cleared;

@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.2.2] - 2026-11-21
+
+Fixes for clearing missing items on a prefab, replayed floating texts and the Showcase's boss defeat.
+
+### Fixed
+- **Clear missing entries** on a prefab asked before saving, and **Don't Save** left the entries in place. It now saves
+  without asking, unless a player or a Motion Driver it does not clear still holds a missing item.
+- **Clear missing entries** on a Motion Driver in a prefab cleared nothing; it now clears the driver's item.
+- A floating text played again in quick succession added to the list of live texts, which grew during play; a text
+  reused from its pool now keeps its one entry.
+- The Showcase's boss defeat cut its slow motion and color drain off after 0.4 seconds, when the boss is hidden; they
+  now play their full 1.2 seconds.
+
 ## [0.2.1] - 2026-11-16
 
 The Infinite field only where a motion keeps moving, and the validator on the rest. Requires Unity 6000.0.85f2 or later;

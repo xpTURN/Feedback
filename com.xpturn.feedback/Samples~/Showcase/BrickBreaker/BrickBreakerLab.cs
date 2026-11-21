@@ -195,6 +195,7 @@ namespace xpTURN.Feedback.Samples.Showcase
             m_Phase = Phase.Serve;
             if (m_BossBody != null)
                 m_BossBody.SetActive(false);
+            ShowBoss(true);
             if (m_BossBarRoot != null)
                 m_BossBarRoot.SetActive(false);
             if (m_BannerText != null)
@@ -438,6 +439,7 @@ namespace xpTURN.Feedback.Samples.Showcase
             m_IntroUntil = m_GameClock + IntroSeconds;
             if (m_BossBody != null)
                 m_BossBody.SetActive(true);
+            ShowBoss(true);
             if (m_BossBarRoot != null)
                 m_BossBarRoot.SetActive(true);
             if (m_BossBar != null)
@@ -472,6 +474,13 @@ namespace xpTURN.Feedback.Samples.Showcase
                 m_Banner.Skip();
         }
 
+        // the boss's look — a defeat hides it and leaves the object on, so its players (the slow motion, the drain) run their length
+        void ShowBoss(bool show)
+        {
+            if (m_BossBody != null && m_BossBody.TryGetComponent(out Renderer look))
+                look.enabled = show;
+        }
+
         // the unscaled timers of a defeat (a slow motion does not stretch them)
         void Timers(float unscaledDt)
         {
@@ -480,7 +489,7 @@ namespace xpTURN.Feedback.Samples.Showcase
                 m_BossHideAt -= unscaledDt;
                 if (m_BossHideAt < 0f && m_BossBody != null)
                 {
-                    m_BossBody.SetActive(false);
+                    ShowBoss(false);
                     if (m_BossBarRoot != null)
                         m_BossBarRoot.SetActive(false);
                 }

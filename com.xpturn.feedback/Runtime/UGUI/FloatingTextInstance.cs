@@ -13,6 +13,8 @@ namespace xpTURN.Feedback
         internal CanvasGroup Group;
         internal RectTransform Rect;
         internal readonly List<CanvasRenderer> Renderers = new List<CanvasRenderer>(4);
+        // its place in the service's live list — valid when that slot holds this text
+        internal int LiveSlot;
 
         internal void Bind()
         {

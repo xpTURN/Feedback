@@ -148,9 +148,13 @@ namespace xpTURN.Feedback.Tests
             Time.captureDeltaTime = 0f;
             Assert.That((s_Done, frames), Is.EqualTo((done + 1, frames)), "the loop finished inside the window");
             Assert.That(frames, Is.InRange(55, 130), "a play a frame");
-            Assert.That(allocating, Is.LessThanOrEqualTo(3), "PlayAsync allocates nothing once warm (a stray editor chunk or two)");
-            Assert.That(burstFrames, Is.LessThanOrEqualTo(1), "an instant burst of the warmed size");
-            Assert.That(discardedFrames, Is.GreaterThanOrEqualTo(4), "the positive control — a discarded Awaitable");
+            // a non-batch editor's windows move the idle baseline — the allocation is judged in a batch run and a player
+            if (!Application.isEditor || Application.isBatchMode)
+            {
+                Assert.That(allocating, Is.LessThanOrEqualTo(3), "PlayAsync allocates nothing once warm (a stray editor chunk or two)");
+                Assert.That(burstFrames, Is.LessThanOrEqualTo(1), "an instant burst of the warmed size");
+                Assert.That(discardedFrames, Is.GreaterThanOrEqualTo(4), "the positive control — a discarded Awaitable");
+            }
             PlayerTestBinding.Reset();
         }
 

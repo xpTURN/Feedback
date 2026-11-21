@@ -57,7 +57,8 @@ namespace xpTURN.Feedback.Tests.Editor
             StageUtility.GoToMainStage();
         }
 
-        // clearing a scene's entries dirties the scene; no reload offered with several scenes open
+        // clearing a scene's entries dirties the scene; no reload offered with several scenes open · a prefab's clear saves
+        // without the missing-type save question
         [Test]
         public void VT04b_ClearingAndReopening()
         {
@@ -71,12 +72,78 @@ namespace xpTURN.Feedback.Tests.Editor
             Assert.That(MissingTypes.Has(p), Is.False);
             Assert.That(p.gameObject.scene.isDirty, Is.True, "dirty — the save keeps the clear");
             Assert.That(F.Of(p, "FB-B02").Select(x => x.Item), Is.EqualTo(new[] { 0 }), "the slot is empty now");
-            // a prefab asset — in its copy, saved
-            GameObject asset = m_Fx.MissingPrefab("VT04b");
-            FeedbackPlayer instance = m_Fx.Instance(asset);
-            r = F.Of(instance, "FB-B01").Single();
-            FeedbackValidator.Apply(r, r.Fixes[0]);
-            Assert.That(MissingTypes.Has(AssetDatabase.LoadAssetAtPath<GameObject>(AssetDatabase.GetAssetPath(asset)).GetComponent<FeedbackPlayer>()), Is.False);
+            // a prefab asset — in its copy, saved, not asked (an answer would be Don't Save)
+            var asked = new List<string>();
+            Func<IReadOnlyList<string>, bool> ask = MissingTypeSaveGuard.Ask;
+            MissingTypeSaveGuard.Ask = paths =>
+            {
+                asked.AddRange(paths);
+                return false;
+            };
+            try
+            {
+                GameObject asset = m_Fx.MissingPrefab("VT04b");
+                FeedbackPlayer instance = m_Fx.Instance(asset);
+                r = F.Of(instance, "FB-B01").Single();
+                FeedbackValidator.Apply(r, r.Fixes[0]);
+                Assert.That((asked.Count, MissingTypes.Has(AssetDatabase.LoadAssetAtPath<GameObject>(AssetDatabase.GetAssetPath(asset)).GetComponent<FeedbackPlayer>())), Is.EqualTo((0, false)));
+            }
+            finally
+            {
+                MissingTypeSaveGuard.Ask = ask;
+                MissingTypeSaveGuard.Forget();
+            }
+        }
+
+        // a prefab whose driver (and player, when asked) holds an item of a missing type
+        static GameObject MissingDriverPrefab(string name, bool player)
+        {
+            var src = new GameObject(name);
+            if (player)
+                src.AddComponent<FeedbackPlayer>().m_Items.Add(new WaitItem());
+            src.AddComponent<MotionDriver>().m_Item = F.Position();
+            string path = F.Dir + "/" + name + ".prefab";
+            PrefabUtility.SaveAsPrefabAsset(src, path);
+            UnityEngine.Object.DestroyImmediate(src);
+            string full = System.IO.Path.GetFullPath(path);
+            System.IO.File.WriteAllText(full, System.IO.File.ReadAllText(full).Replace("class: WaitItem", "class: NoSuchItemType").Replace("class: PositionItem", "class: NoSuchItemType"));
+            AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceUpdate);
+            return AssetDatabase.LoadAssetAtPath<GameObject>(path);
+        }
+
+        // a prefab's clear takes the fix's own kind of list: what the other kind still holds keeps the save's question, and a
+        // driver's fix clears the driver
+        [Test]
+        public void VT04h_AClearLeavesTheOtherKindToTheQuestion()
+        {
+            var asked = new List<string>();
+            Func<IReadOnlyList<string>, bool> ask = MissingTypeSaveGuard.Ask;
+            MissingTypeSaveGuard.Ask = paths =>
+            {
+                asked.AddRange(paths);
+                return false;
+            };
+            try
+            {
+                GameObject both = MissingDriverPrefab("VT04hBoth", true);
+                string path = AssetDatabase.GetAssetPath(both);
+                string file = System.IO.File.ReadAllText(path);
+                MissingTypes.Clear(m_Fx.Instance(both));
+                Assert.That((asked.Count, System.IO.File.ReadAllText(path) == file), Is.EqualTo((1, true)), "the driver's entry still there: asked · Don't Save leaves the file");
+                MissingTypeSaveGuard.Forget();
+                asked.Clear();
+                GameObject alone = MissingDriverPrefab("VT04hAlone", false);
+                var instance = (GameObject)PrefabUtility.InstantiatePrefab(alone);
+                m_Fx.Made.Add(instance);
+                int cleared = MissingTypes.Clear(instance.GetComponent<MotionDriver>());
+                GameObject saved = AssetDatabase.LoadAssetAtPath<GameObject>(AssetDatabase.GetAssetPath(alone));
+                Assert.That((cleared, asked.Count, MissingTypes.Has(saved.GetComponent<MotionDriver>())), Is.EqualTo((1, 0, false)), "a driver's fix clears it, nothing left to ask");
+            }
+            finally
+            {
+                MissingTypeSaveGuard.Ask = ask;
+                MissingTypeSaveGuard.Forget();
+            }
         }
 
         [Test]

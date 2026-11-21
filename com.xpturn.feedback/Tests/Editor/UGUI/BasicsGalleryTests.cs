@@ -336,16 +336,27 @@ namespace xpTURN.Feedback.Tests.Editor
             float size = camera.orthographicSize;
             var problems = new List<string>();
 
-            press.Invoke(g, new[] { Entry(g, "Camera", "Background Color · Flash") });
+            // the flash is white for 60 ms of scaled time: a fixed 1/120 s step samples it at any frame length, and 48 steps cover
+            // its 0.3 s
+            Time.captureDeltaTime = 1f / 120f;
             bool solid = true;
             float white = 0f;
-            float until = Time.realtimeSinceStartup + 1.5f;
-            while (Time.realtimeSinceStartup < until)
+            float until;
+            try
             {
-                yield return null;
-                solid &= camera.clearFlags == CameraClearFlags.SolidColor;
-                Color c = camera.backgroundColor;
-                white = Mathf.Max(white, Mathf.Min(c.r, Mathf.Min(c.g, c.b)));
+                press.Invoke(g, new[] { Entry(g, "Camera", "Background Color · Flash") });
+                until = Time.realtimeSinceStartup + 1.5f;
+                for (int f = 0; f < 48 || Time.realtimeSinceStartup < until; f++)
+                {
+                    yield return null;
+                    solid &= camera.clearFlags == CameraClearFlags.SolidColor;
+                    Color c = camera.backgroundColor;
+                    white = Mathf.Max(white, Mathf.Min(c.r, Mathf.Min(c.g, c.b)));
+                }
+            }
+            finally
+            {
+                Time.captureDeltaTime = 0f;
             }
             TestContext.WriteLine($"Background Color — solid {solid} · whitest {white:F2}");
             if (!solid || white < 0.9f)
@@ -357,13 +368,22 @@ namespace xpTURN.Feedback.Tests.Editor
             // the size the stage set, before the punch writes (the scheduler has not run since the press)
             bool ortho = camera.orthographic;
             float start = camera.orthographicSize, low = float.MaxValue, high = float.MinValue;
-            until = Time.realtimeSinceStartup + 1.5f;
-            while (Time.realtimeSinceStartup < until)
+            // the punch's swings on the same fixed step, 48 steps past its 0.3 s
+            Time.captureDeltaTime = 1f / 120f;
+            try
             {
-                yield return null;
-                ortho &= camera.orthographic;
-                low = Mathf.Min(low, camera.orthographicSize);
-                high = Mathf.Max(high, camera.orthographicSize);
+                until = Time.realtimeSinceStartup + 1.5f;
+                for (int f = 0; f < 48 || Time.realtimeSinceStartup < until; f++)
+                {
+                    yield return null;
+                    ortho &= camera.orthographic;
+                    low = Mathf.Min(low, camera.orthographicSize);
+                    high = Mathf.Max(high, camera.orthographicSize);
+                }
+            }
+            finally
+            {
+                Time.captureDeltaTime = 0f;
             }
             float settled = camera.orthographicSize;
             TestContext.WriteLine($"Orthographic Size — orthographic {ortho} · size {start:F2} → {low:F2} ~ {high:F2} → {settled:F2}");
@@ -422,16 +442,29 @@ namespace xpTURN.Feedback.Tests.Editor
                 }
                 Transform t = player.transform;
                 bool drawn = t.TryGetComponent(out Renderer renderer);
-                press.Invoke(g, new[] { e });
-                // the stage as it shows, before the item writes (the scheduler has not run since the press)
-                float start = Drawn(k, t, renderer, block), low = start, high = start;
-                float until = Time.realtimeSinceStartup + 1.5f;
-                while (Time.realtimeSinceStartup < until)
+                float start = 0f, low = 0f, high = 0f;
+                // a flash is at its top for 60 ms of scaled time: a fixed 1/120 s step samples each item at any frame length, and
+                // 48 steps cover its 0.3 s
+                Time.captureDeltaTime = 1f / 120f;
+                try
                 {
-                    yield return null;
-                    float v = Drawn(k, t, renderer, block);
-                    low = Mathf.Min(low, v);
-                    high = Mathf.Max(high, v);
+                    press.Invoke(g, new[] { e });
+                    // the stage as it shows, before the item writes (the scheduler has not run since the press)
+                    start = Drawn(k, t, renderer, block);
+                    low = start;
+                    high = start;
+                    float until = Time.realtimeSinceStartup + 1.5f;
+                    for (int f = 0; f < 48 || Time.realtimeSinceStartup < until; f++)
+                    {
+                        yield return null;
+                        float v = Drawn(k, t, renderer, block);
+                        low = Mathf.Min(low, v);
+                        high = Mathf.Max(high, v);
+                    }
+                }
+                finally
+                {
+                    Time.captureDeltaTime = 0f;
                 }
                 float settled = Drawn(k, t, renderer, block);
                 TestContext.WriteLine($"{CustomLabels[k]} — drawn {drawn} · {start:F2} → {low:F2} ~ {high:F2} → {settled:F2}");

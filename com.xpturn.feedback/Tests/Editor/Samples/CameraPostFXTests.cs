@@ -187,6 +187,27 @@ namespace xpTURN.Feedback.Tests.Editor.Samples
             }
         }
 
+        // a shake's window on a fixed 1/120 s step: a brief shake is sampled at any frame length, and 30 steps outlast the presets' 0.2 s
+        static IEnumerator FixedWindow(Transform a, Vector3 ra, Transform b, Vector3 rb, float seconds, float[] max)
+        {
+            max[0] = max[1] = 0f;
+            Time.captureDeltaTime = 1f / 120f;
+            try
+            {
+                float until = Time.realtimeSinceStartup + seconds;
+                for (int f = 0; f < 30 || Time.realtimeSinceStartup < until; f++)
+                {
+                    yield return null;
+                    max[0] = Mathf.Max(max[0], (a.position - ra).magnitude);
+                    max[1] = Mathf.Max(max[1], (b.position - rb).magnitude);
+                }
+            }
+            finally
+            {
+                Time.captureDeltaTime = 0f;
+            }
+        }
+
         [UnityTest]
         public IEnumerator XQ02_SplitChannels()
         {
@@ -199,13 +220,13 @@ namespace xpTURN.Feedback.Tests.Editor.Samples
             Vector3 r1 = s1.position, r2 = s2.position;
             var m = new float[2];
             Call(lab, "Shake", 1);
-            yield return Window(s1, r1, s2, r2, 0.4f, m);
+            yield return FixedWindow(s1, r1, s2, r2, 0.4f, m);
             float[] shake2 = { m[0], m[1] };
             Call(lab, "Shake", 0);
-            yield return Window(s1, r1, s2, r2, 0.4f, m);
+            yield return FixedWindow(s1, r1, s2, r2, 0.4f, m);
             float[] shake1 = { m[0], m[1] };
             Call(lab, "Preset", 0);
-            yield return Window(s1, r1, s2, r2, 0.4f, m);
+            yield return FixedWindow(s1, r1, s2, r2, 0.4f, m);
             float[] light = { m[0], m[1] };
             string main = Camera.main != null ? Camera.main.name : "none";
             int listeners = Listeners();
@@ -313,14 +334,14 @@ namespace xpTURN.Feedback.Tests.Editor.Samples
             var m = new float[2];
             string main0 = Camera.main != null ? Camera.main.name : "none";
             Call(lab, "Preset", 1);
-            yield return Window(cm, near.position, plain, rest, 0.4f, m);
+            yield return FixedWindow(cm, near.position, plain, rest, 0.4f, m);
             float onCm = m[0];
             Call(lab, "Switch");
             string main1 = Camera.main != null ? Camera.main.name : "none";
             bool cmOff = !cm.gameObject.activeInHierarchy;
             int listeners = Listeners();
             Call(lab, "Preset", 1);
-            yield return Window(near, near.position, plain, rest, 0.4f, m);
+            yield return FixedWindow(near, near.position, plain, rest, 0.4f, m);
             float onPlain = m[1];
             Call(lab, "Toggle");
             yield return Real(0.2f);
@@ -426,6 +447,28 @@ namespace xpTURN.Feedback.Tests.Editor.Samples
             }
         }
 
+        // the hit's three volumes on a fixed 1/120 s step: each is seen lit at any frame length
+        static IEnumerator FixedUnion(float seconds, List<Behaviour> into, Behaviour[] except)
+        {
+            into.Clear();
+            Time.captureDeltaTime = 1f / 120f;
+            try
+            {
+                float until = Time.realtimeSinceStartup + seconds;
+                for (int f = 0; f < 30 || Time.realtimeSinceStartup < until; f++)
+                {
+                    yield return null;
+                    foreach (Behaviour v in Lit(Overlays()))
+                        if (!into.Contains(v) && Array.IndexOf(except, v) < 0)
+                            into.Add(v);
+                }
+            }
+            finally
+            {
+                Time.captureDeltaTime = 0f;
+            }
+        }
+
         static bool NoneUsable(Component lab)
         {
             for (int i = 0; i < 10; i++)
@@ -445,7 +488,7 @@ namespace xpTURN.Feedback.Tests.Editor.Samples
             float scale0 = Time.timeScale;
             var union = new List<Behaviour>();
             Call(lab, "Hit");
-            yield return Union(0.3f, union, new Behaviour[0]);
+            yield return FixedUnion(0.3f, union, new Behaviour[0]);
             Behaviour[] hit = union.ToArray();
             yield return Real(0.6f);
             float hitAfter = MaxWeight(hit);
@@ -466,7 +509,7 @@ namespace xpTURN.Feedback.Tests.Editor.Samples
                 on = now;
             }
             Call(lab, "Hit");
-            yield return Union(0.3f, union, pulse);
+            yield return FixedUnion(0.3f, union, pulse);
             Behaviour[] hit2 = union.ToArray();
             float hitTop = hit2.Length == 0 ? 0f : hit2.Max(Priority);
             float pulseTop = pulse.Length == 0 ? float.MaxValue : pulse.Max(Priority);
@@ -558,13 +601,22 @@ namespace xpTURN.Feedback.Tests.Editor.Samples
                 string name = effects[i].name;
                 if (Category(effects[i]).Contains("Flash"))
                     flash.Add(name);
-                Call(lab, "PlayEffect", i);
                 float seen = 0f;
-                float until = Time.realtimeSinceStartup + 0.3f;
-                while (Time.realtimeSinceStartup < until)
+                // a fixed 1/120 s step: the effect's rise is sampled at any frame length
+                Time.captureDeltaTime = 1f / 120f;
+                try
                 {
-                    yield return null;
-                    seen = Mathf.Max(seen, name == "Volume Weight" ? Weight(night) : MaxWeight(Overlays()));
+                    Call(lab, "PlayEffect", i);
+                    float until = Time.realtimeSinceStartup + 0.3f;
+                    for (int f = 0; f < 30 || Time.realtimeSinceStartup < until; f++)
+                    {
+                        yield return null;
+                        seen = Mathf.Max(seen, name == "Volume Weight" ? Weight(night) : MaxWeight(Overlays()));
+                    }
+                }
+                finally
+                {
+                    Time.captureDeltaTime = 0f;
                 }
                 if (seen <= 0.001f)
                     dark.Add(name);
@@ -621,9 +673,23 @@ namespace xpTURN.Feedback.Tests.Editor.Samples
             int picked = P<int>(lab, "Selected");
             yield return Tap(pad, GamepadButton.DpadLeft);
             int back = P<int>(lab, "Selected");
-            yield return Tap(pad, GamepadButton.DpadDown);
-            yield return Real(0.1f);
-            float played = MaxWeight(Overlays());
+            float played = 0f;
+            // a fixed 1/120 s step: the picked effect is seen at any frame length
+            Time.captureDeltaTime = 1f / 120f;
+            try
+            {
+                yield return Tap(pad, GamepadButton.DpadDown);
+                float seenUntil = Time.realtimeSinceStartup + 0.1f;
+                for (int f = 0; f < 12 || Time.realtimeSinceStartup < seenUntil; f++)
+                {
+                    yield return null;
+                    played = Mathf.Max(played, MaxWeight(Overlays()));
+                }
+            }
+            finally
+            {
+                Time.captureDeltaTime = 0f;
+            }
             bool pressed = PressButton("Bloom") != null;
             yield return Frames(2);
             bool clearAfterPress = EventSystem.current != null && EventSystem.current.currentSelectedGameObject == null;

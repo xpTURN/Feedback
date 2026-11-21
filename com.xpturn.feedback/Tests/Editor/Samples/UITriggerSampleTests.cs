@@ -345,27 +345,42 @@ namespace xpTURN.Feedback.Tests.Editor.Samples
             FeedbackPlayer tick = Player(go, "Tick Player");
             Count(tick);
             float quarter = 0f, full = 0f;
-            slider.value = 0.25f;
-            float until = Time.realtimeSinceStartup + 0.35f;
-            while (Time.realtimeSinceStartup < until)
+            float until;
+            // the punch swings four times in 0.25 s: a fixed 1/120 s step samples both plays at the same phases, and 36 steps
+            // cover the punch at any frame length
+            Time.captureDeltaTime = 1f / 120f;
+            try
             {
-                yield return null;
-                quarter = Mathf.Max(quarter, Mathf.Abs(handle.localScale.x - 1f));
+                slider.value = 0.25f;
+                until = Time.realtimeSinceStartup + 0.35f;
+                for (int f = 0; f < 36 || Time.realtimeSinceStartup < until; f++)
+                {
+                    yield return null;
+                    quarter = Mathf.Max(quarter, Mathf.Abs(handle.localScale.x - 1f));
+                }
+                slider.value = 1f;
+                until = Time.realtimeSinceStartup + 0.35f;
+                for (int f = 0; f < 36 || Time.realtimeSinceStartup < until; f++)
+                {
+                    yield return null;
+                    full = Mathf.Max(full, Mathf.Abs(handle.localScale.x - 1f));
+                }
             }
-            slider.value = 1f;
-            until = Time.realtimeSinceStartup + 0.35f;
-            while (Time.realtimeSinceStartup < until)
+            finally
             {
-                yield return null;
-                full = Mathf.Max(full, Mathf.Abs(handle.localScale.x - 1f));
+                Time.captureDeltaTime = 0f;
             }
             int plays0 = Plays(tick);
             int changes = 0;
             until = Time.realtimeSinceStartup + 0.3f;
-            while (Time.realtimeSinceStartup < until)
+            for (int f = 0; f < 6 || Time.realtimeSinceStartup < until; f++)
             {
-                slider.value = changes % 2 == 0 ? 0.4f : 0.6f;
-                changes++;
+                // three changes a frame over at least six frames: the cooldown thins them at any frame length
+                for (int k = 0; k < 3; k++)
+                {
+                    slider.value = changes % 2 == 0 ? 0.4f : 0.6f;
+                    changes++;
+                }
                 yield return null;
             }
             int drag = Plays(tick) - plays0;
