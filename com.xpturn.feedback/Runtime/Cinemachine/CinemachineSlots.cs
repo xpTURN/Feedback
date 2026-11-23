@@ -20,6 +20,8 @@ namespace xpTURN.Feedback
 
         internal override bool IsAlive => m_Target != null;
 
+        internal override bool RevertsAfterFixed => true;
+
         internal override void Attached() => CinemachineSaved.Add(this);
 
         internal override void Dropped() => CinemachineSaved.Remove(this);
@@ -52,6 +54,8 @@ namespace xpTURN.Feedback
 
         internal override bool IsAlive => m_Target != null;
 
+        internal override bool RevertsAfterFixed => true;
+
         internal override void Attached() => CinemachineSaved.Add(this);
 
         internal override void Dropped() => CinemachineSaved.Remove(this);
@@ -81,6 +85,8 @@ namespace xpTURN.Feedback
         }
 
         internal override bool IsAlive => m_Target != null;
+
+        internal override bool RevertsAfterFixed => true;
 
         internal override void Attached() => CinemachineSaved.Add(this);
 
@@ -112,6 +118,8 @@ namespace xpTURN.Feedback
 
         internal override bool IsAlive => m_Target != null;
 
+        internal override bool RevertsAfterFixed => true;
+
         internal override void Attached() => CinemachineSaved.Add(this);
 
         internal override void Dropped() => CinemachineSaved.Remove(this);
@@ -141,6 +149,8 @@ namespace xpTURN.Feedback
         }
 
         internal override bool IsAlive => m_Target != null;
+
+        internal override bool RevertsAfterFixed => true;
 
         internal override void Attached() => CinemachineSaved.Add(this);
 
@@ -172,6 +182,8 @@ namespace xpTURN.Feedback
 
         internal override bool IsAlive => m_Brain != null;
 
+        internal override bool RevertsAfterFixed => true;
+
         internal override void Dropped() => CinemachineShakeExtension.SetPosition(m_Brain, Vector3.zero);
 
         protected override Vector3 Read() => CinemachineShakeExtension.PositionOf(m_Brain);
@@ -195,6 +207,8 @@ namespace xpTURN.Feedback
         protected override Quaternion Offset(in Quaternion v, in Quaternion o, LayerSpace space) => v * o;
 
         internal override bool IsAlive => m_Brain != null;
+
+        internal override bool RevertsAfterFixed => true;
 
         internal override void Dropped() => CinemachineShakeExtension.SetRotation(m_Brain, Quaternion.identity);
 

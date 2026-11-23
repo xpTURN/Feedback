@@ -994,6 +994,10 @@ outside Cinemachine's blends. It has no fields.
 - The impulse manager's ignore-time-scale switch stays yours; a preview turns it off for its duration and puts it back.
 - `Cinemachine/Impulse Clear` clears every impulse on every channel, others' too.
 - The lens and noise values a Cinemachine feedback changes are not kept by Save During Play.
+- A Cinemachine feedback's value stays through the `FixedUpdate` phase, so a brain on Fixed Update or Smart Update takes
+  it; a camera updated in that phase shows it a frame or two late.
+- Your `Update` reads a lens or noise value without the feedback's offset. In `FixedUpdate` the value includes it, so
+  code there that reads the value and writes it back keeps the offset as the new value.
 
 ## Unity Timeline
 

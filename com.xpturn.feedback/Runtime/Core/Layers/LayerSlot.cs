@@ -51,6 +51,9 @@ namespace xpTURN.Feedback
 
         internal abstract bool IsAlive { get; }
 
+        // read by a clock that runs in the FixedUpdate phase — its Revert comes after that phase, before the game's Update
+        internal virtual bool RevertsAfterFixed => false;
+
         // it wrote — the next Revert judges its value
         internal abstract bool Pending { get; }
 

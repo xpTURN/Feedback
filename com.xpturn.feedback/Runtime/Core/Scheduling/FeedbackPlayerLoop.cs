@@ -9,14 +9,15 @@ using UnityEditor;
 
 namespace xpTURN.Feedback
 {
-    // runs FeedbackScheduler.Default's three stages at the front of EarlyUpdate · PreLateUpdate · PostLateUpdate, and its
-    // lifetime. SubsystemRegistration closes the last instance and makes a new one, AfterSceneLoad installs, quitting closes.
-    // In the editor EnteredEditMode closes again (a backup), beforeAssemblyReload closes, and a recompile during play makes a
-    // new instance and installs again
+    // runs FeedbackScheduler.Default's four stages at the front of EarlyUpdate · PreUpdate · PreLateUpdate · PostLateUpdate,
+    // and its lifetime. SubsystemRegistration closes the last instance and makes a new one, AfterSceneLoad installs,
+    // quitting closes. In the editor EnteredEditMode closes again (a backup), beforeAssemblyReload closes, and a recompile
+    // during play makes a new instance and installs again
     /// <summary>Runs the feedback stages in Unity's PlayerLoop.</summary>
     public static class FeedbackPlayerLoop
     {
         struct FeedbackRevert { }
+        struct FeedbackRevertAfterFixed { }
         struct FeedbackUpdate { }
         struct FeedbackLateApply { }
 
@@ -37,18 +38,19 @@ namespace xpTURN.Feedback
 #endif
         }
 
-        // removes ours from every list at every depth, then puts them at index 0 of the three phases (top level). A missing
-        // phase is skipped; true when all three were found
+        // removes ours from every list at every depth, then puts them at index 0 of the four phases (top level). A missing
+        // phase is skipped; true when all four were found
         internal static bool Install(ref PlayerLoopSystem loop)
         {
             Remove(ref loop);
             bool revert = Insert(ref loop, typeof(EarlyUpdate), typeof(FeedbackRevert), OnRevert);
+            bool revertAfterFixed = Insert(ref loop, typeof(PreUpdate), typeof(FeedbackRevertAfterFixed), OnRevertAfterFixed);
             bool update = Insert(ref loop, typeof(PreLateUpdate), typeof(FeedbackUpdate), OnUpdate);
             bool lateApply = Insert(ref loop, typeof(PostLateUpdate), typeof(FeedbackLateApply), OnLateApply);
-            return revert && update && lateApply;
+            return revert && revertAfterFixed && update && lateApply;
         }
 
-        static bool IsOurs(Type type) => type == typeof(FeedbackRevert) || type == typeof(FeedbackUpdate) || type == typeof(FeedbackLateApply);
+        static bool IsOurs(Type type) => type == typeof(FeedbackRevert) || type == typeof(FeedbackRevertAfterFixed) || type == typeof(FeedbackUpdate) || type == typeof(FeedbackLateApply);
 
         // a copy left in another phase would run that stage twice a frame
         static void Remove(ref PlayerLoopSystem system)
@@ -95,6 +97,15 @@ namespace xpTURN.Feedback
                 return;
 #endif
             FeedbackScheduler.Default.RunRevert();
+        }
+
+        static void OnRevertAfterFixed()
+        {
+#if UNITY_EDITOR
+            if (!Application.isPlaying)
+                return;
+#endif
+            FeedbackScheduler.Default.RunRevertAfterFixed();
         }
 
         static void OnUpdate()

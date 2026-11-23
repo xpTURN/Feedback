@@ -1,6 +1,13 @@
 {
     "name": "RecompileCheck.Samples",
-    "references": ["xpTURN.Feedback", "xpTURN.Feedback.Samples", "xpTURN.Feedback.Samples.UI", "Unity.InputSystem"],
-    "includePlatforms": ["Editor"],
+    "references": [
+        "xpTURN.Feedback",
+        "xpTURN.Feedback.Samples",
+        "xpTURN.Feedback.Samples.UI",
+        "Unity.InputSystem"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
     "autoReferenced": false
 }

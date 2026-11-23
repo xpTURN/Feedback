@@ -306,6 +306,7 @@ System, uGUI and Universal RP:
 | Cinemachine Shake Lab | Game Feel Labs | Cinemachine | The same shakes on a Cinemachine camera through its shake extension and on a plain camera, and the Cinemachine items. |
 | Spring Playground | Game Feel Labs | — | Springs stepped from code beside a Motion Driver following the same target, with live frequency and damping. |
 | PostFX Lab | Game Feel Labs | — | PostFX feedbacks on their own overlay volumes — a hit, slow motion and a low-health pulse that stack. |
+| Replay Monitor | Game Feel Labs | Video module | One video on an in-game monitor: a frozen frame on a hit, chapter jumps and an instant replay from Play, Pause and Seek items. |
 | UI Juice | UI | — | uGUI feedbacks on the unscaled clock — hovers, purchases, progress bars and a reward popup that keep moving while the game is paused. |
 | UI Trigger | UI | — | Feedback UI Trigger rows and UnityEvents with no script — hovers that turn back where they are, a toggle, a slider's intensity and a press whose second half waits for the release. |
 | Timeline & Flow | Advanced | — | Flow items in one list — start rules, a stage loop and a signal wait — with pause, seek and backward play. |

@@ -12487,7 +12487,8 @@ MonoBehaviour:
     NeedsTmp: 0
   - Tab: Not here
     Label: Video (1)
-    Note: "Video Player \u2014 needs a clip of your own"
+    Note: "Video Player \u2014 see Replay Monitor in Game Feel Labs (needs the Video
+      module)"
     Player: {fileID: 0}
     PlayerPath: 
     Target: {fileID: 0}

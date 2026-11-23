@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7265114aa1e7f41ada19d74a427f9e13, type: 3}
+  m_Name: ReplayMonitorCard
+  m_EditorClassIdentifier: xpTURN.Feedback.Samples::xpTURN.Feedback.Samples.SampleCard
+  Title: Replay Monitor
+  Try: Press 1 to freeze the picture on a hit, 2 to jump between chapters and 3 for
+    an instant replay. Z turns the monitor off and on.
+  See: One Video Player driven by Play, Pause and Seek items beside flashes and shakes.
+    X holds a frame at 4 s; C stops with Revert and the picture plays on from there,
+    because a Seek is not undone. V restores the first state. Video clips do not
+    play on Web.
+  Controls: "1 \u2014 hit freeze \xB7 2 \u2014 chapter \xB7 3 \u2014 instant replay
+    \xB7 Z \u2014 power \xB7 X \u2014 hold \xB7 C \u2014 stop with Revert \xB7 V
+    \u2014 restore"
+  SceneGuid: 9c5f335b5d5304c4ea32c48ac7f39e9f
+  SceneName: ReplayMonitor
+  RequiredType: xpTURN.Feedback.Samples.GameFeelLabs.ReplayMonitorLab, xpTURN.Feedback.Samples.GameFeelLabs.ReplayMonitor
+  RequiresText: Video module
+  OpenInEditor: 0

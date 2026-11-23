@@ -27,7 +27,7 @@ namespace xpTURN.Feedback.Tests.Editor.Samples
     {
         const BindingFlags All = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
         static readonly Dictionary<FeedbackPlayer, int> s_Plays = new Dictionary<FeedbackPlayer, int>();
-        static readonly string[] s_Titles = { "Before / After", "Combat Hit Lab", "Camera Shake Lab", "Cinemachine Shake Lab", "Spring Playground", "PostFX Lab" };
+        static readonly string[] s_Titles = { "Before / After", "Combat Hit Lab", "Camera Shake Lab", "Cinemachine Shake Lab", "Spring Playground", "PostFX Lab", "Replay Monitor" };
 
         static string Scene(string name)
         {
@@ -152,7 +152,8 @@ namespace xpTURN.Feedback.Tests.Editor.Samples
             string[] asmdefs = AssetDatabase.FindAssets("t:AssemblyDefinitionAsset xpTURN.Feedback.Samples.GameFeelLabs").Select(AssetDatabase.GUIDToAssetPath).ToArray();
             string cm = asmdefs.Where(p => Path.GetFileNameWithoutExtension(p) == "xpTURN.Feedback.Samples.GameFeelLabs.CinemachineShake").Select(File.ReadAllText).FirstOrDefault() ?? "";
             int cmOthers = asmdefs.Where(p => !p.EndsWith("CinemachineShake.asmdef", StringComparison.Ordinal)).Count(p => File.ReadAllText(p).Contains("cinemachine"));
-            bool cmRule = cm.Contains("\"name\": \"com.unity.cinemachine\", \"expression\": \"3.0.0\", \"define\": \"XPTURN_FEEDBACK_SAMPLES_CINEMACHINE\"") && cm.Contains("\"XPTURN_FEEDBACK_SAMPLES_CINEMACHINE\"]") && cm.Contains("\"Unity.Cinemachine\"");
+            string cmCompact = string.Concat(cm.Where(c => !char.IsWhiteSpace(c)));
+            bool cmRule = cmCompact.Contains("\"name\":\"com.unity.cinemachine\",\"expression\":\"3.0.0\",\"define\":\"XPTURN_FEEDBACK_SAMPLES_CINEMACHINE\"") && cmCompact.Contains("\"XPTURN_FEEDBACK_SAMPLES_CINEMACHINE\"]") && cmCompact.Contains("\"Unity.Cinemachine\"");
             Assert.That(titles, Is.EqualTo(s_Titles), "the catalog's cards in their order");
             Assert.That((entry.Contains("S5"), entry.Contains("S10")), Is.EqualTo((true, true)), "the samples entry names S5 and S10: " + entry);
             Assert.That((cmRule, cmOthers), Is.EqualTo((true, 0)), "only the Cinemachine lab's assembly asks for Cinemachine 3 or later (no upper bound)");

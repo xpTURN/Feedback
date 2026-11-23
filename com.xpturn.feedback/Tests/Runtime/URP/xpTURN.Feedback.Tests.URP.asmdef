@@ -3,6 +3,7 @@
     "rootNamespace": "xpTURN.Feedback.Tests",
     "references": [
         "xpTURN.Feedback",
+        "xpTURN.Feedback.Math",
         "xpTURN.Feedback.URP",
         "xpTURN.Feedback.Tests",
         "Unity.RenderPipelines.Core.Runtime",

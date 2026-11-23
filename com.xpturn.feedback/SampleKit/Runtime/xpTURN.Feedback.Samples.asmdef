@@ -1,7 +1,9 @@
 {
     "name": "xpTURN.Feedback.Samples",
     "rootNamespace": "xpTURN.Feedback.Samples",
-    "references": ["xpTURN.Feedback"],
+    "references": [
+        "xpTURN.Feedback"
+    ],
     "includePlatforms": [],
     "autoReferenced": true
 }

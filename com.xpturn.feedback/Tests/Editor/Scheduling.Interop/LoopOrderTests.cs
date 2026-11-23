@@ -27,8 +27,8 @@ namespace xpTURN.Feedback.Tests.Editor
         internal static int Count => SessionState.GetInt(Key, 0);
     }
 
-    // UniTask and VContainer in the loop with ours. After each entry our three systems are wrapped to record, a window opens
-    // each frame at the front of Initialization, and the last whole frame is cut by our three stages into four intervals
+    // UniTask and VContainer in the loop with ours. After each entry our four systems are wrapped to record, a window opens
+    // each frame at the front of Initialization, and the last whole frame is cut by our four stages into five intervals
     // whose sets must equal the table in every entry. A reload-on entry resets locals and statics after the yield: progress,
     // results and the loop count live in SessionState. The reload expectation is always the default (true) — false with a
     // reload ends the whole run without results
@@ -45,6 +45,7 @@ namespace xpTURN.Feedback.Tests.Editor
 
         const string WindowMark = "|";
         const string OurRevert = "FB.FeedbackRevert";
+        const string OurRevertAfterFixed = "FB.FeedbackRevertAfterFixed";
         const string OurUpdate = "FB.FeedbackUpdate";
         const string OurLateApply = "FB.FeedbackLateApply";
         const string OurFronts = "FeedbackRevert/FeedbackUpdate/FeedbackLateApply";
@@ -62,11 +63,12 @@ namespace xpTURN.Feedback.Tests.Editor
 
         static readonly EnterPlayModeOptions[] HookSettings = { EnterPlayModeOptions.None, AllOff };
 
-        // before our Revert · Revert to Update · Update to LateApply · after LateApply
+        // before our Revert · Revert to RevertAfterFixed · RevertAfterFixed to Update · Update to LateApply · after LateApply
         static readonly string[][] Table =
         {
             new string[0],
-            new[] { "UT.EarlyUpdate", "UT.LastEarlyUpdate", "UT.Update", "UT.LastUpdate", "VC.Tick", "VC.PostTick", "MB.Update" },
+            new[] { "UT.EarlyUpdate", "UT.LastEarlyUpdate" },
+            new[] { "UT.Update", "UT.LastUpdate", "VC.Tick", "VC.PostTick", "MB.Update" },
             new[] { "UT.PreLateUpdate", "UT.LastPreLateUpdate", "VC.LateTick", "VC.PostLateTick", "MB.LateUpdate" },
             new[] { "UT.PostLateUpdate", "UT.LastPostLateUpdate" },
         };
@@ -284,7 +286,7 @@ namespace xpTURN.Feedback.Tests.Editor
         // the sets, in order: FixedUpdate is left out — how many run differs by frame
         static string Intervals(List<string> frame)
         {
-            var sets = new SortedSet<string>[4];
+            var sets = new SortedSet<string>[5];
             for (int i = 0; i < sets.Length; i++)
                 sets[i] = new SortedSet<string>(StringComparer.Ordinal);
             int at = 0;
@@ -292,10 +294,12 @@ namespace xpTURN.Feedback.Tests.Editor
             {
                 if (entry == OurRevert)
                     at = 1;
-                else if (entry == OurUpdate)
+                else if (entry == OurRevertAfterFixed)
                     at = 2;
-                else if (entry == OurLateApply)
+                else if (entry == OurUpdate)
                     at = 3;
+                else if (entry == OurLateApply)
+                    at = 4;
                 else if (entry != "MB.FixedUpdate")
                     sets[at].Add(entry);
             }

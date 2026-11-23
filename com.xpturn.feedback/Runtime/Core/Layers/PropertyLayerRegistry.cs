@@ -59,11 +59,13 @@ namespace xpTURN.Feedback
         readonly List<LayerSlot> m_All = new List<LayerSlot>();
         readonly List<LayerSlot> m_Update = new List<LayerSlot>();
         readonly List<LayerSlot> m_LateApply = new List<LayerSlot>();
+        readonly List<LayerSlot> m_UpdateAfterFixed = new List<LayerSlot>();
         // a stage applies, reverts and closes its direct slots first — a direct snapshot never takes a shared slot's write
         readonly List<LayerSlot> m_UpdateDirect = new List<LayerSlot>();
         readonly List<LayerSlot> m_LateApplyDirect = new List<LayerSlot>();
         int m_UpdateSlots;
         int m_LateApplySlots;
+        int m_UpdateAfterFixedSlots;
         int m_UpdateDirectSlots;
         int m_LateApplyDirectSlots;
         // the cursors of the running pass — fields, so the isolation's restart goes on from them
@@ -97,14 +99,18 @@ namespace xpTURN.Feedback
         List<LayerSlot> ListOf(LayerSlot slot)
         {
             if (slot.Stage == ConsumptionStage.Update)
-                return slot.Direct ? m_UpdateDirect : m_Update;
+                return slot.Direct ? m_UpdateDirect : slot.RevertsAfterFixed ? m_UpdateAfterFixed : m_Update;
             return slot.Direct ? m_LateApplyDirect : m_LateApply;
         }
 
         ref int CountOf(LayerSlot slot)
         {
             if (slot.Stage == ConsumptionStage.Update)
+            {
+                if (!slot.Direct && slot.RevertsAfterFixed)
+                    return ref m_UpdateAfterFixedSlots;
                 return ref slot.Direct ? ref m_UpdateDirectSlots : ref m_UpdateSlots;
+            }
             return ref slot.Direct ? ref m_LateApplyDirectSlots : ref m_LateApplySlots;
         }
 
@@ -319,6 +325,13 @@ namespace xpTURN.Feedback
             RevertPass(m_LateApply);
         }
 
+        internal void RevertAfterFixed()
+        {
+            if (m_Closed)
+                return;
+            RevertPass(m_UpdateAfterFixed);
+        }
+
         // the loop is a method without try, the pass wraps it and goes on after a failed slot
         void RevertPass(List<LayerSlot> list)
         {
@@ -383,6 +396,8 @@ namespace xpTURN.Feedback
         {
             ApplyList(stage == ConsumptionStage.Update ? m_UpdateDirect : m_LateApplyDirect);
             ApplyList(stage == ConsumptionStage.Update ? m_Update : m_LateApply);
+            if (stage == ConsumptionStage.Update)
+                ApplyList(m_UpdateAfterFixed);
         }
 
         void ApplyList(List<LayerSlot> list)
@@ -438,6 +453,7 @@ namespace xpTURN.Feedback
             m_Closed = true;
             CloseList(m_UpdateDirect);
             CloseList(m_Update);
+            CloseList(m_UpdateAfterFixed);
             CloseList(m_LateApplyDirect);
             CloseList(m_LateApply);
             for (int i = 0; i < m_All.Count; i++)

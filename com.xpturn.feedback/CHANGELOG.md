@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.2.3] - 2026-11-23
+
+The Replay Monitor sample, Cinemachine feedbacks on a brain that updates in `FixedUpdate`, and test assemblies that
+compile with newer C# compilers.
+
+### Added
+- **Replay Monitor** sample in Game Feel Labs: one video on an in-game monitor, frozen on a hit, moved between chapters and
+  replayed by **Video/Player Control** items beside flashes and shakes. It needs the Video module.
+
+### Fixed
+- Camera shakes and Cinemachine lens and noise feedbacks did not reach a brain that updated its camera in `FixedUpdate`:
+  always on **Fixed Update**, and on **Smart Update** for a camera following a Rigidbody without interpolation or, at 60
+  fps or lower, a camera without a target that moves itself. They now reach it on every update method; a camera updated
+  in `FixedUpdate` shows them a frame or two late, and code in `FixedUpdate` reads these values with the offset.
+- The Physics, URP and Samples test assemblies failed with CS0012 on Roslyn 4.14 or later in a build that passes only
+  direct references. They now reference `xpTURN.Feedback.Math` directly.
+
 ## [0.2.2] - 2026-11-21
 
 Fixes for clearing missing items on a prefab, replayed floating texts and the Showcase's boss defeat.

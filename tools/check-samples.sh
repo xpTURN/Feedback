@@ -18,6 +18,8 @@
 #   --no-cm      Cinemachine out of the manifest — its card grey, its assembly absent, the round trip of the others
 #   --no-timeline  Timeline out of the manifest (on 6000.6 its built-in package too) — S14's card grey, its assembly absent,
 #                the round trip of the others, Console 0
+#   --no-video   the Video module out of the manifest — S16's card grey, its assembly and the package's Video assembly absent,
+#                the round trip of the others, Console 0
 #   --old-input  activeInputHandler 0 — the HUD's old-input notice and the round trip, Console 0
 #   --no-tmp     the clone's TMP Essential Resources removed — the round trip and the gallery's TMP parts off, Console 0
 #                (S4 without numbers · S7's popup without its TMP part)
@@ -56,11 +58,12 @@ EDITORS="${UNITY_EDITORS:-/Applications/Unity/Hub/Editor}"
 FILTER='xpTURN\.Feedback\.Tests\.Editor\.Samples\.|FE08'
 
 case "${1:-}" in -h|--help) sed -n '2,/^set /p' "${BASH_SOURCE[0]}"; exit 0 ;; esac
-NO_CM=0; NO_TIMELINE=0; OLD_INPUT=0; NO_TMP=0; PLAYER=0; STRESS=0; MINIMAL=0; VERSIONS=()
+NO_CM=0; NO_TIMELINE=0; NO_VIDEO=0; OLD_INPUT=0; NO_TMP=0; PLAYER=0; STRESS=0; MINIMAL=0; VERSIONS=()
 for a in "$@"; do
   case "${a}" in
     --no-cm) NO_CM=1 ;;
     --no-timeline) NO_TIMELINE=1 ;;
+    --no-video) NO_VIDEO=1 ;;
     --old-input) OLD_INPUT=1 ;;
     --no-tmp) NO_TMP=1 ;;
     --player) PLAYER=1 ;;
@@ -221,6 +224,20 @@ EOF
     tests_verdict "no Timeline" "${branch}" "${out}/notl.xml" 0 "${out}/notl.log" || failed=1
     [[ ! -e "${branch}/Library/ScriptAssemblies/xpTURN.Feedback.Samples.Advanced.TimelineCutscene.dll" && ! -e "${branch}/Library/ScriptAssemblies/Unity.Timeline.dll" ]] \
       && pass "no Timeline: Timeline and S14's assembly absent" || fail "no Timeline: Timeline or S14's assembly still compiled"
+  fi
+
+  if [[ ${NO_VIDEO} == 1 ]]; then
+    echo "-- no Video module"
+    branch="${WORK}/samples-novideo-${version}"
+    rm -rf "${branch}"; cp -c -R "${project}" "${branch}"; rm -rf "${branch}/Temp" "${branch}/Packages/packages-lock.json"
+    python3 - "${branch}/Packages/manifest.json" <<'EOF'
+import json, sys
+p = sys.argv[1]; m = json.load(open(p)); m["dependencies"].pop("com.unity.modules.video", None); json.dump(m, open(p, "w"), indent=2)
+EOF
+    editor "${out}/novideo.log" "${unity}" -batchmode -projectPath "${branch}" -runTests -testPlatform EditMode -testFilter "${FILTER}" -testResults "${out}/novideo.xml"
+    tests_verdict "no Video module" "${branch}" "${out}/novideo.xml" 0 "${out}/novideo.log" || failed=1
+    [[ -e "${project}/Library/ScriptAssemblies/xpTURN.Feedback.Samples.GameFeelLabs.ReplayMonitor.dll" && ! -e "${branch}/Library/ScriptAssemblies/xpTURN.Feedback.Samples.GameFeelLabs.ReplayMonitor.dll" && ! -e "${branch}/Library/ScriptAssemblies/xpTURN.Feedback.Video.dll" ]] \
+      && pass "no Video module: S16's and the package's Video assemblies absent" || fail "no Video module: a Video assembly still compiled"
   fi
 
   if [[ ${OLD_INPUT} == 1 ]]; then

@@ -1,7 +1,7 @@
 {
   "name": "com.xpturn.feedback",
   "displayName": "xpTURN.Feedback",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "unity": "6000.0",
   "unityRelease": "85f2",
   "hideInEditor": false,
@@ -30,7 +30,7 @@
     },
     {
       "displayName": "Game Feel Labs",
-      "description": "S3 Before / After, S4 Combat Hit Lab, S5 Camera Shake Lab (a Cinemachine card too), S6 Spring Playground and S10 PostFX Lab — layers of feedback, hits, camera shakes, springs and post effects.",
+      "description": "S3 Before / After, S4 Combat Hit Lab, S5 Camera Shake Lab (a Cinemachine card too), S6 Spring Playground, S10 PostFX Lab and S16 Replay Monitor — layers of feedback, hits, camera shakes, springs, post effects and a video.",
       "path": "Samples~/GameFeelLabs"
     },
     {

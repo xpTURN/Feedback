@@ -4,7 +4,7 @@
 
 > 本文档是英文 [README](README.md) 的翻译。如有出入，以英文版为准。
 
-<!-- english: 0eea23811cb0 -->
+<!-- english: 0f2f05999c06 -->
 
 ![在打砖块的 Boss 上播放的反馈 — 暴击、爆炸和屏幕闪光 — 在 Game 视图中预览](com.xpturn.feedback/Documentation~/images/hero.gif)
 
@@ -70,7 +70,7 @@ UniTask 2.5.11 和 Timeline 1.8.13（Unity 6000.6：其内置 Timeline 6.6.0）�
 ## 安装
 
 - 在 Package Manager 中选择 **+ > Add package from git URL…**，然后输入
-  `https://github.com/xpTURN/Feedback.git?path=/com.xpturn.feedback#v0.2.2`。
+  `https://github.com/xpTURN/Feedback.git?path=/com.xpturn.feedback#v0.2.3`。
 - 或选择 **+ > Add package from disk…**，然后选择 `com.xpturn.feedback` 文件夹中的 `package.json`。
 - 或选择 **+ > Add package from tarball…**，然后选择本包的 `.tgz`。
 - 或将其添加到 `Packages/manifest.json`（相对路径从 `Packages` 文件夹开始）：

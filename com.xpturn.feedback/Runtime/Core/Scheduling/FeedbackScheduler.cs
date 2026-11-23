@@ -3,7 +3,8 @@ using Unity.Profiling;
 
 namespace xpTURN.Feedback
 {
-    // runs playbacks on a slot map in three stages. RunRevert raises the frame number and records the slot count; RunUpdate
+    // runs playbacks on a slot map in four stages. RunRevert raises the frame number and records the slot count;
+    // RunRevertAfterFixed puts back the slots a FixedUpdate clock reads (RunUpdate runs it when the loop has not); RunUpdate
     // runs services → runners up to that count → layers → compaction; RunLateApply applies the late layers. Each stage runs
     // once per RunRevert. A runner's exception ends that playback alone and the pass goes on from the next slot. Shutdown
     // ends every playback and closes the services; nothing new is accepted after it. Main thread only
@@ -32,6 +33,7 @@ namespace xpTURN.Feedback
         int m_Cursor;
         bool m_InStage;
         bool m_IsShutdown;
+        bool m_RevertAfterFixedPending;
         bool m_UpdatePending;
         bool m_LateApplyPending;
 #if DEBUG
@@ -102,8 +104,35 @@ namespace xpTURN.Feedback
                     m_PassLimit = m_Slots.Count;
                     m_Layers.Revert();
                     // after the layers' Revert — if it throws, this frame applies nothing onto unreverted values
+                    m_RevertAfterFixedPending = true;
                     m_UpdatePending = true;
                     m_LateApplyPending = true;
+                }
+                finally
+                {
+                    m_InStage = false;
+                }
+            }
+        }
+
+        internal void RunRevertAfterFixed()
+        {
+            if (m_IsShutdown)
+                return;
+            if (m_InStage)
+            {
+                WarnReentry();
+                return;
+            }
+            if (!m_RevertAfterFixedPending)
+                return;
+            m_RevertAfterFixedPending = false;
+            using (s_RevertMarker.Auto())
+            {
+                m_InStage = true;
+                try
+                {
+                    Context.Layers.RevertAfterFixed();
                 }
                 finally
                 {
@@ -121,6 +150,7 @@ namespace xpTURN.Feedback
                 WarnReentry();
                 return;
             }
+            RunRevertAfterFixed();
             if (!m_UpdatePending)
                 return;
             m_UpdatePending = false;

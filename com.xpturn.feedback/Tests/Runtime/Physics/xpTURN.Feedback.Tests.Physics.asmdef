@@ -3,6 +3,7 @@
     "rootNamespace": "xpTURN.Feedback.Tests",
     "references": [
         "xpTURN.Feedback",
+        "xpTURN.Feedback.Math",
         "xpTURN.Feedback.Physics",
         "xpTURN.Feedback.Tests",
         "UnityEngine.TestRunner",

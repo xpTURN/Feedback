@@ -313,11 +313,12 @@ flashes change it.
 
 ## Under the hood
 
-The package runs in three stages it puts at the front of Unity's PlayerLoop: `FeedbackRevert` at the start of
-`EarlyUpdate` puts values back, `FeedbackUpdate` at the start of `PreLateUpdate` — after your scripts' `Update` —
-advances the plays and writes the Update-stage targets, and `FeedbackLateApply` at the start of `PostLateUpdate` — after
-`LateUpdate` — writes the rest. The Profiler shows them by those names. If your code replaces the PlayerLoop after the
-game starts, call [`FeedbackPlayerLoop.Reinstall`](ScriptingAPI.md#feedbackplayerloop).
+The package runs in four stages it puts at the front of Unity's PlayerLoop: `FeedbackRevert` at the start of
+`EarlyUpdate` puts values back, `FeedbackRevertAfterFixed` at the start of `PreUpdate` — after the `FixedUpdate` phase —
+puts back the Cinemachine lens, noise and shake values, `FeedbackUpdate` at the start of `PreLateUpdate` — after your
+scripts' `Update` — advances the plays and writes the Update-stage targets, and `FeedbackLateApply` at the start of
+`PostLateUpdate` — after `LateUpdate` — writes the rest. The Profiler shows them by those names. If your code replaces
+the PlayerLoop after the game starts, call [`FeedbackPlayerLoop.Reinstall`](ScriptingAPI.md#feedbackplayerloop).
 
 There is no manager object to add. The services live with the play session; they make what they need — a pool's
 container, the overlay canvases and volumes — when first used, and clean up when Play mode ends.

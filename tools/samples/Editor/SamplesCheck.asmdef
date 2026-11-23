@@ -1,6 +1,11 @@
 {
     "name": "SamplesCheck",
-    "references": ["xpTURN.Feedback.Samples", "xpTURN.Feedback.Samples.Editor"],
-    "includePlatforms": ["Editor"],
+    "references": [
+        "xpTURN.Feedback.Samples",
+        "xpTURN.Feedback.Samples.Editor"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
     "autoReferenced": false
 }

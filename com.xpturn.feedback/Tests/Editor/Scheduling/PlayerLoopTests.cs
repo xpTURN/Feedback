@@ -222,7 +222,7 @@ namespace xpTURN.Feedback.Tests.Editor
                 yield return new EnterPlayMode(false);
                 yield return null;
                 Assert.That(s_Token, Is.SameAs(token), "no domain reload");
-                Assert.That(CountOurs(), Is.EqualTo(3), "ours in the loop");
+                Assert.That(CountOurs(), Is.EqualTo(4), "ours in the loop");
                 Assert.That(Fronts(), Is.EqualTo(OurFronts), "at the fronts");
                 var current = FeedbackScheduler.Default;
                 Assert.That(current, Is.Not.Null.And.Not.SameAs(previous), "a new Default");
@@ -237,7 +237,7 @@ namespace xpTURN.Feedback.Tests.Editor
                     LogAssert.Expect(LogType.Exception, new Regex("test user quitting"));
                 yield return null;
                 yield return new ExitPlayMode();
-                Assert.That(CountOurs(), Is.EqualTo(3), "ours stay after the exit");
+                Assert.That(CountOurs(), Is.EqualTo(4), "ours stay after the exit");
                 Assert.That(previous.IsShutdown, Is.True, "closed after the exit");
                 Assert.That(ShutdownObserver.SawAtQuit, Is.EqualTo("open"), "OnApplicationQuit");
                 Assert.That(ShutdownObserver.SawAtDestroy, Is.EqualTo("closed"), "OnDestroy, session " + session);
@@ -297,13 +297,13 @@ namespace xpTURN.Feedback.Tests.Editor
             InsertFront(ref loop, typeof(PostLateUpdate), new PlayerLoopSystem { type = typeof(Foreign) });
             InsertFront(ref loop, typeof(Update), revert);
             PlayerLoop.SetPlayerLoop(loop);
-            Assert.That(CountOurs(), Is.EqualTo(4), "a copy in Update");
+            Assert.That(CountOurs(), Is.EqualTo(5), "a copy in Update");
             Assert.That(Fronts(), Is.EqualTo("Foreign/Foreign/Foreign"), "foreign fronts");
             FeedbackPlayerLoop.Reinstall();
-            Assert.That(CountOurs(), Is.EqualTo(3), "three after Reinstall");
+            Assert.That(CountOurs(), Is.EqualTo(4), "four after Reinstall");
             Assert.That(Fronts(), Is.EqualTo(OurFronts), "our fronts");
             FeedbackPlayerLoop.Reinstall();
-            Assert.That(CountOurs(), Is.EqualTo(3), "three after a second Reinstall");
+            Assert.That(CountOurs(), Is.EqualTo(4), "four after a second Reinstall");
             Assert.That(Fronts(), Is.EqualTo(OurFronts), "our fronts again");
         }
 
@@ -319,7 +319,7 @@ namespace xpTURN.Feedback.Tests.Editor
             var loop = PlayerLoop.GetCurrentPlayerLoop();
             InsertFront(ref loop, typeof(EarlyUpdate), new PlayerLoopSystem { type = typeof(Control), updateDelegate = () => s_Control++ });
             PlayerLoop.SetPlayerLoop(loop);
-            Assert.That(CountOurs(), Is.EqualTo(3), "ours in the loop");
+            Assert.That(CountOurs(), Is.EqualTo(4), "ours in the loop");
             SwapDefault(null);
             int control = s_Control;
             for (int i = 0; i < 10; i++)
