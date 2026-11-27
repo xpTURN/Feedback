@@ -113,7 +113,9 @@ namespace xpTURN.Feedback.Editor
 
     // the field: the default field, and the dropdown on its right. The value is read where the property is current — built,
     // and when the tracked value changes; the objects' players are polled while attached, without reading the property (an
-    // inspector rebuilt or a row removed leaves it behind until the element goes)
+    // inspector rebuilt or a row removed leaves it behind until the element goes). Built by a tool that calls the drawer
+    // itself, its default field builds one more inside: that one hides its dropdown once attached and gives way to the outer
+    // one, leaving it its default field
     internal sealed class PlayerField : VisualElement
     {
         internal const string PickName = "player-pick";
@@ -158,6 +160,32 @@ namespace xpTURN.Feedback.Editor
             Read(property);
             this.TrackPropertyValue(m_Property, Read);
             schedule.Execute(Refresh).Every(PollMs);
+            RegisterCallback<AttachToPanelEvent>(OnAttach);
+        }
+
+        void OnAttach(AttachToPanelEvent e)
+        {
+            if (Outer() == null)
+                return;
+            Pick.style.display = DisplayStyle.None;
+            schedule.Execute(GiveWay);
+        }
+
+        PlayerField Outer()
+        {
+            for (VisualElement p = parent; p != null; p = p.parent)
+            {
+                if (p is PlayerField outer && outer.Path == Path && outer.m_Host == m_Host)
+                    return outer;
+            }
+            return null;
+        }
+
+        void GiveWay()
+        {
+            VisualElement p = parent;
+            p.Insert(p.IndexOf(this), Field);
+            RemoveFromHierarchy();
         }
 
         void Read(SerializedProperty property)
@@ -186,8 +214,9 @@ namespace xpTURN.Feedback.Editor
     }
 
     // every FeedbackPlayer field drawn through a PropertyField — ours and a user's; the field itself is the default one (the
-    // drawer's own PropertyField and EditorGUI.PropertyField draw it without this drawer). An own-object field carries
-    // OwnObjectPlayer. UI Toolkit and IMGUI inspectors both
+    // drawer's own PropertyField and EditorGUI.PropertyField draw it without this drawer, or, when a tool calls the drawer
+    // itself, come back to it once for the default field alone). An own-object field carries OwnObjectPlayer. UI Toolkit and
+    // IMGUI inspectors both
     [CustomPropertyDrawer(typeof(FeedbackPlayer))]
     internal sealed class PlayerFieldDrawer : PropertyDrawer
     {
@@ -219,6 +248,11 @@ namespace xpTURN.Feedback.Editor
             s_Depth++;
             try
             {
+                if (s_Depth > 1)
+                {
+                    EditorGUI.PropertyField(position, property, label);
+                    return;
+                }
                 LastPosition = position;
                 SerializedObject so = property.serializedObject;
                 bool mixed = property.hasMultipleDifferentValues;

@@ -25,7 +25,8 @@ namespace xpTURN.Feedback.Tests.Editor
     }
 
     // the Feedback Player field: where the drawer stands, the dropdown's lines, a pick, an own-object field's Empty line, the
-    // poll, several targets, IMGUI, persistent hosts, the default field's behaviour, the item header, a field built twice
+    // poll, several targets, IMGUI, persistent hosts, the default field's behaviour, the item header, a field built twice, a
+    // drawer called directly
     internal sealed class PlayerFieldTests
     {
         const string ScenePath = "Assets/PlayerFieldTests.unity";
@@ -618,6 +619,90 @@ namespace xpTURN.Feedback.Tests.Editor
             Object.DestroyImmediate(editor);
             root.Remove(inspector);
             yield return Wait(Poll);
+            Assert.That(m_Errors, Is.Empty);
+        }
+
+        static string Layers(VisualElement root) => Fields(root).Count + " field, " + root.Query<DropdownField>(PlayerField.PickName).ToList().Count + " dropdown, " + root.Query<ObjectField>().ToList().Count + " object field";
+
+        // a drawer called directly, not through a PropertyField — as an inspector tool that wraps fields calls it, bound after
+        // it is attached or before — is one field and one dropdown: the field built again inside gives way to the outer one,
+        // its dropdown hidden from the moment it is attached. A pick writes the property, a second bind and a detach before
+        // giving way leave one field, and an own-object field whose caller gave the drawer its field and label keeps its Empty
+        // line
+        [UnityTest]
+        public IEnumerator PF15_ADrawerCalledDirectly()
+        {
+            const string One = "1 field, 1 dropdown, 1 object field";
+            FeedbackPlayer[] p = Players(new GameObject("Two"), "a", "b");
+            PlayerHolder holder = Holder();
+            holder.One = p[0];
+            var so = new SerializedObject(holder);
+            var drawn = (PlayerField)Show(new PlayerFieldDrawer().CreatePropertyGUI(so.FindProperty("One")));
+            drawn.Bind(so);
+            Assert.That((Fields(drawn).Count, Fields(drawn).Count(Shown)), Is.EqualTo((2, 1)), "bound: built again inside, its dropdown hidden");
+            yield return Wait(0.3);
+            Assert.That(Layers(drawn), Is.EqualTo(One), "attached, then bound");
+            yield return Pick(drawn, 1);
+            Assert.That((holder.One, drawn.Q<ObjectField>().value), Is.EqualTo((p[1], (Object)p[1])), "a pick");
+            drawn.Bind(so);
+            PlayerField inner = Fields(drawn).Single(f => f != drawn);
+            VisualElement parent = inner.parent;
+            int at = parent.IndexOf(inner);
+            parent.Remove(inner);
+            yield return Wait(0.3);
+            parent.Insert(at, inner);
+            yield return Wait(0.3);
+            Assert.That(Layers(drawn), Is.EqualTo(One), "bound again, detached before giving way");
+
+            VisualElement early = new PlayerFieldDrawer().CreatePropertyGUI(so.FindProperty("One"));
+            early.Bind(so);
+            Show(early);
+            yield return Wait(0.3);
+            Assert.That(Layers(early), Is.EqualTo(One), "bound, then attached");
+
+            var go = new GameObject("Own");
+            Players(go, "a", "b");
+            var receiver = go.AddComponent<FeedbackReceiver>();
+            var drawer = new PlayerFieldDrawer();
+            typeof(PropertyDrawer).GetField("m_FieldInfo", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(drawer, typeof(FeedbackReceiver).GetField("m_Player", BindingFlags.NonPublic | BindingFlags.Instance));
+            typeof(PropertyDrawer).GetField("m_PreferredLabel", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(drawer, "Player");
+            var own = new SerializedObject(receiver);
+            var field = (PlayerField)Show(drawer.CreatePropertyGUI(own.FindProperty("m_Player")));
+            field.Bind(own);
+            yield return Wait(0.3);
+            Assert.That(Layers(field), Is.EqualTo(One), "an own-object field");
+            Assert.That((Lines(field), field.Q<ObjectField>().label), Is.EqualTo(("Empty → 1 · a, 1 · a, 2 · b @0", "Player")));
+            Assert.That(m_Errors, Is.Empty);
+        }
+
+        // IMGUI, a drawer's OnGUI called directly: the field drawn again inside is the default field on the rect the outer
+        // draw gave it, so the last draw is the outer one — the whole rect, its field beside the one dropdown
+        [UnityTest]
+        public IEnumerator PF16_ADrawerCalledDirectlyImgui()
+        {
+            FeedbackPlayer[] p = Players(new GameObject("Two"), "a", "b");
+            PlayerHolder holder = Holder();
+            holder.One = p[0];
+            var so = new SerializedObject(holder);
+            var drawer = new PlayerFieldDrawer();
+            var whole = new Rect(0f, 0f, 480f, EditorGUIUtility.singleLineHeight);
+            var container = new IMGUIContainer(() =>
+            {
+                so.Update();
+                drawer.OnGUI(whole, so.FindProperty("One"), new GUIContent("One"));
+                so.ApplyModifiedProperties();
+            });
+            container.style.height = 40f;
+            PlayerFieldDrawer.Draws = 0;
+            PlayerFieldDrawer.Nested = 0;
+            Show(container);
+            yield return Wait(0.3);
+            m_Window.Repaint();
+            container.MarkDirtyRepaint();
+            yield return Wait(0.3);
+            Assert.That((PlayerFieldDrawer.Draws > 0, PlayerFieldDrawer.Nested > 0), Is.EqualTo((true, true)), "drawn again inside");
+            Assert.That((PlayerFieldDrawer.LastPosition, PlayerFieldDrawer.LastPopup), Is.EqualTo((whole, true)), "the last draw is the outer one");
+            Assert.That(PlayerFieldDrawer.LastField.width, Is.LessThan(whole.width - PlayerField.PickWidth), "its field beside the dropdown");
             Assert.That(m_Errors, Is.Empty);
         }
 

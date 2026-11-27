@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.3.1] - 2026-11-27
+
+One Feedback Player field and one menu in inspector tools that call property drawers themselves. Requires Unity
+6000.0.85f2 or later; no package dependencies.
+
+### Fixed
+- A `FeedbackPlayer` field drawn by an inspector tool that calls its property drawer itself shows one field and one menu,
+  not the field and its menu twice.
+
 ## [0.3.0] - 2026-11-27
 
 The Graph Preview in the player's, preset's and clip's inspectors, a menu that picks one of an object's Feedback

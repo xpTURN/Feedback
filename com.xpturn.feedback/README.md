@@ -71,7 +71,7 @@ reinstalled.
 ## Install
 
 - In the Package Manager, choose **+ > Add package from git URL…** and enter
-  `https://github.com/xpTURN/Feedback.git?path=/com.xpturn.feedback#v0.3.0`.
+  `https://github.com/xpTURN/Feedback.git?path=/com.xpturn.feedback#v0.3.1`.
 - Or choose **+ > Add package from disk…** and select `package.json` in the `com.xpturn.feedback` folder.
 - Or choose **+ > Add package from tarball…** and select the package's `.tgz`.
 - Or add it to `Packages/manifest.json` (a relative path starts from the `Packages` folder):

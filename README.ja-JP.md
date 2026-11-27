@@ -4,7 +4,7 @@
 
 > この文書は英語の [README](README.md) の翻訳です。内容が異なる場合は英語版を正とします。
 
-<!-- english: 91d38218da2c -->
+<!-- english: e7b0bb41a4da -->
 
 ![ブロック崩しのボスに再生したフィードバック — クリティカルヒット・爆発・画面フラッシュ — を Game ビューでプレビューした様子](com.xpturn.feedback/Documentation~/images/hero.gif)
 
@@ -76,7 +76,7 @@ Cinemachine 3.1.7、Input System 1.20.1、UniTask 2.5.11、Timeline 1.8.13（Uni
 ## インストール
 
 - Package Manager で **+ > Add package from git URL…** を選び、
-  `https://github.com/xpTURN/Feedback.git?path=/com.xpturn.feedback#v0.3.0` を入力します。
+  `https://github.com/xpTURN/Feedback.git?path=/com.xpturn.feedback#v0.3.1` を入力します。
 - または **+ > Add package from disk…** を選び、`com.xpturn.feedback` フォルダーの `package.json` を選びます。
 - または **+ > Add package from tarball…** を選び、パッケージの `.tgz` を選びます。
 - または `Packages/manifest.json` に追加します（相対パスは `Packages` フォルダーから始まります）：
