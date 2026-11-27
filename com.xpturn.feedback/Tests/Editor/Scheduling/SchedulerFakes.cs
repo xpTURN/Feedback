@@ -80,9 +80,13 @@ namespace xpTURN.Feedback.Tests.Editor
         readonly CallRecord m_Record;
 
         internal int Reverts;
+        internal int RevertsAfterFixed;
         internal int UpdateApplies;
         internal int LateApplies;
         internal bool ThrowOnRevert;
+        internal Action OnRevert;
+        internal Action OnRevertAfterFixed;
+        internal Action OnLateApply;
 
         internal RecordingLayers(CallRecord record = null)
         {
@@ -93,8 +97,16 @@ namespace xpTURN.Feedback.Tests.Editor
         {
             Reverts++;
             m_Record?.Add("Revert");
+            OnRevert?.Invoke();
             if (ThrowOnRevert)
                 throw new InvalidOperationException("test layer revert");
+        }
+
+        public void RevertAfterFixed()
+        {
+            RevertsAfterFixed++;
+            m_Record?.Add("RevertAfterFixed");
+            OnRevertAfterFixed?.Invoke();
         }
 
         public void Apply(ConsumptionStage stage)
@@ -108,6 +120,7 @@ namespace xpTURN.Feedback.Tests.Editor
             {
                 LateApplies++;
                 m_Record?.Add("Apply(LateApply)");
+                OnLateApply?.Invoke();
             }
         }
     }
@@ -122,6 +135,7 @@ namespace xpTURN.Feedback.Tests.Editor
         internal bool ThrowOnUpdate;
         internal bool ThrowOnShutdown;
         internal Action OnUpdate;
+        internal Action OnLateApply;
 
         internal TestService(FeedbackContext context, string name, CallRecord record = null)
             : base(context)
@@ -143,6 +157,8 @@ namespace xpTURN.Feedback.Tests.Editor
             if (ThrowOnUpdate)
                 throw new InvalidOperationException("test service update " + m_Name);
         }
+
+        internal override void LateApply() => OnLateApply?.Invoke();
 
         internal override void Shutdown()
         {

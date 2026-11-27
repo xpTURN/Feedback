@@ -216,9 +216,8 @@ namespace xpTURN.Feedback.Tests.Editor
 
         // before the exit: a test scheduler in play with the test service (made first) and the real TimeScale — a request at 20
         // with the option on (injected settings) — ticked once, then Shutdown: the three values are the entry ones (fixed within
-        // a step) in each order (alone · the test service first · the TimeScale first) — the reverse close and the
-        // TimeScale's restore order (fixed first: 0.4 × 20 is above the entry max 0.333, so a wrong order leaves the max). The
-        // control: closed forward by hand, the test service's values stay (the shape sees the order). After the exit:
+        // a step) in each order (alone · the test service first · the TimeScale first) — the reverse close. The control:
+        // closed forward by hand, the test service's fixedDeltaTime stays (the shape sees the order). After the exit:
         // a request left open, closed in edit mode, writes nothing — fixedDeltaTime is changed in play first, or the engine's
         // restore and the service's value are equal and hide a write
         [UnityTest]
@@ -265,7 +264,7 @@ namespace xpTURN.Feedback.Tests.Editor
                 s.Tick(0.01f);
                 probe.Shutdown();
                 t.Shutdown();
-                if (!(Time.timeScale == GlobalStateService.AppliedTimeScale && Time.maximumDeltaTime == GlobalStateService.AppliedMaximumDelta))
+                if (!(Time.timeScale == GlobalStateService.AppliedTimeScale && Math.Abs(Time.fixedDeltaTime - GlobalStateService.AppliedFixedDelta) < 1e-6f))
                     fails.Add("the forward-close control (positive) — " + Now());
                 PutBack();
                 s.Shutdown();

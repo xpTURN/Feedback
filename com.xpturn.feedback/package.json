@@ -1,7 +1,7 @@
 {
   "name": "com.xpturn.feedback",
   "displayName": "xpTURN.Feedback",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "unity": "6000.0",
   "unityRelease": "85f2",
   "hideInEditor": false,

@@ -551,6 +551,169 @@ namespace xpTURN.Feedback.Tests.Editor
             Assert.That(second.Shutdowns, Is.EqualTo(1));
         }
 
+        static FakeRunner[] AddThree(FeedbackScheduler scheduler)
+        {
+            scheduler.Reserve(4);
+            var runners = new[] { new FakeRunner("A"), new FakeRunner("B"), new FakeRunner("C") };
+            for (int i = 0; i < runners.Length; i++)
+                scheduler.Add(runners[i], i);
+            return runners;
+        }
+
+        static int Aborts(FakeRunner[] runners)
+        {
+            int count = 0;
+            foreach (FakeRunner runner in runners)
+                count += runner.Aborts;
+            return count;
+        }
+
+        // a Shutdown inside a stage other than Update — the layers' Revert, the fourth stage the loop runs, the late layers, a
+        // service's LateApply, and a registry slot's write: the Revert stage's put-back and the LateApply stage's apply. The
+        // stage compacts as it ends, and the registry's values are the base
+        [Test]
+        public void KT11_ShutdownInsideAStageCompactsAtItsEnd()
+        {
+            var fails = new List<string>();
+            foreach (string where in new[] { "Revert", "RevertAfterFixed", "the late layers", "a service's LateApply" })
+            {
+                var layers = new RecordingLayers();
+                var scheduler = Create(layers);
+                var service = new TestService(scheduler.Context, "S");
+                scheduler.Context.AddService(service);
+                FakeRunner[] runners = AddThree(scheduler);
+                scheduler.Tick(s_Frame);
+                Action close = () => scheduler.Shutdown();
+                switch (where)
+                {
+                    case "Revert":
+                        layers.OnRevert = close;
+                        scheduler.RunRevert();
+                        break;
+                    case "RevertAfterFixed":
+                        layers.OnRevertAfterFixed = close;
+                        scheduler.RunRevert();
+                        scheduler.RunRevertAfterFixed();
+                        break;
+                    case "the late layers":
+                        layers.OnLateApply = close;
+                        scheduler.Tick(s_Frame);
+                        break;
+                    default:
+                        service.OnLateApply = close;
+                        scheduler.Tick(s_Frame);
+                        break;
+                }
+                if (!(scheduler.IsShutdown && scheduler.SlotCount == 0 && Aborts(runners) == 3))
+                    fails.Add(where + " — closed " + scheduler.IsShutdown + " · slots " + scheduler.SlotCount + " · aborts " + Aborts(runners));
+            }
+            foreach (bool putBack in new[] { true, false })
+            {
+                var scheduler = Create();
+                var a = new GameObject("scheduler test a").AddComponent<LayerTestTarget>();
+                var c = new GameObject("scheduler test c").AddComponent<LayerTestTarget>();
+                try
+                {
+                    foreach (LayerTestTarget target in new[] { a, c })
+                    {
+                        target.Value = 2f;
+                        TestFloatSlot slot = scheduler.Context.Layers.GetOrCreate(target, 0, 0, () => new TestFloatSlot(target, ConsumptionStage.LateApply, Composition.Additive, false));
+                        slot.Reserve(1);
+                        slot.SetOffset(slot.Begin(ContributionKind.Offset), 5f);
+                    }
+                    FakeRunner[] runners = AddThree(scheduler);
+                    scheduler.Tick(s_Frame);
+                    if (putBack)
+                    {
+                        a.OnWrite = () => scheduler.Shutdown();
+                        scheduler.RunRevert();
+                    }
+                    else
+                    {
+                        scheduler.RunRevert();
+                        scheduler.RunUpdate(s_Frame);
+                        a.OnWrite = () => scheduler.Shutdown();
+                        scheduler.RunLateApply();
+                    }
+                    a.OnWrite = null;
+                    if (!(scheduler.IsShutdown && scheduler.SlotCount == 0 && Aborts(runners) == 3 && a.Value == 2f && c.Value == 2f))
+                        fails.Add((putBack ? "a registry put-back" : "a registry apply") + " — closed " + scheduler.IsShutdown + " · slots " + scheduler.SlotCount
+                                  + " · aborts " + Aborts(runners) + " · values " + a.Value + "/" + c.Value);
+                }
+                finally
+                {
+                    UnityEngine.Object.DestroyImmediate(a.gameObject);
+                    UnityEngine.Object.DestroyImmediate(c.gameObject);
+                }
+            }
+            Assert.That(fails, Is.Empty);
+        }
+
+        // a scheduler closed in its LateApply stage — by the late layers or a service — raises no LayersApplied; its frame
+        // before raised one (the subscription is live)
+        [Test]
+        public void KT11_ShutdownInsideLateApplyRaisesNothing()
+        {
+            var fails = new List<string>();
+            FeedbackScheduler current = null;
+            int applied = 0;
+            Action<FeedbackScheduler> onApplied = s =>
+            {
+                if (s == current)
+                    applied++;
+            };
+            FeedbackDiagnostics.LayersApplied += onApplied;
+            try
+            {
+                foreach (bool byLayers in new[] { true, false })
+                {
+                    var layers = new RecordingLayers();
+                    var scheduler = Create(layers);
+                    current = scheduler;
+                    var service = new TestService(scheduler.Context, "S");
+                    scheduler.Context.AddService(service);
+                    applied = 0;
+                    scheduler.Tick(s_Frame);
+                    int before = applied;
+                    applied = 0;
+                    if (byLayers)
+                        layers.OnLateApply = () => scheduler.Shutdown();
+                    else
+                        service.OnLateApply = () => scheduler.Shutdown();
+                    scheduler.Tick(s_Frame);
+                    if (!(before == 1 && applied == 0 && scheduler.IsShutdown))
+                        fails.Add((byLayers ? "the late layers" : "a service") + " — before " + before + " · after the close " + applied);
+                }
+            }
+            finally
+            {
+                FeedbackDiagnostics.LayersApplied -= onApplied;
+            }
+            Assert.That(fails, Is.Empty);
+        }
+
+        // the fourth stage RunUpdate runs (the loop has not) closes the scheduler: RunUpdate stops there — no service update,
+        // no pass, no assert — and the slots are compacted
+        [Test]
+        public void KT11_ShutdownInsideTheFourthStageOfUpdate()
+        {
+            var layers = new RecordingLayers();
+            var scheduler = Create(layers);
+            var service = new TestService(scheduler.Context, "S");
+            scheduler.Context.AddService(service);
+            FakeRunner[] runners = AddThree(scheduler);
+            scheduler.Tick(s_Frame);
+            layers.OnRevertAfterFixed = () => scheduler.Shutdown();
+            scheduler.RunRevert();
+            scheduler.RunUpdate(s_Frame);
+            scheduler.RunLateApply();
+            LogAssert.NoUnexpectedReceived();
+            Assert.That(scheduler.IsShutdown, "closed");
+            Assert.That(service.Updates, Is.EqualTo(1), "the first frame's update only");
+            Assert.That(scheduler.SlotCount, Is.EqualTo(0), "slots");
+            Assert.That(Aborts(runners), Is.EqualTo(3), "aborts");
+        }
+
         // ---- reentrancy · once per RunRevert
 
         [Test]
@@ -632,6 +795,26 @@ namespace xpTURN.Feedback.Tests.Editor
             Assert.That(layers.LateApplies, Is.EqualTo(1));
         }
 
+        // the fourth stage once per RunRevert: none before the first, the loop's and then none from RunUpdate, RunUpdate's when
+        // the loop has not
+        [Test]
+        public void KT12_TheFourthStageRunsOncePerRevert()
+        {
+            var layers = new RecordingLayers();
+            var scheduler = Create(layers);
+            scheduler.RunRevertAfterFixed();
+            Assert.That(layers.RevertsAfterFixed, Is.EqualTo(0), "before any Revert");
+            scheduler.RunRevert();
+            scheduler.RunRevertAfterFixed();
+            scheduler.RunUpdate(s_Frame);
+            scheduler.RunUpdate(s_Frame);
+            Assert.That(layers.RevertsAfterFixed, Is.EqualTo(1), "the loop's");
+            scheduler.RunLateApply();
+            scheduler.RunRevert();
+            scheduler.RunUpdate(s_Frame);
+            Assert.That(layers.RevertsAfterFixed, Is.EqualTo(2), "RunUpdate's");
+        }
+
         // ---- stage order
 
         [Test]
@@ -642,7 +825,7 @@ namespace xpTURN.Feedback.Tests.Editor
             scheduler.Context.AddService(new TestService(scheduler.Context, "S", record));
             scheduler.Add(new FakeRunner("A", record), 0);
             scheduler.Tick(s_Frame);
-            Assert.That(record.Joined, Is.EqualTo("Revert,S.Update,A.Advance,Apply(Update),Apply(LateApply)"));
+            Assert.That(record.Joined, Is.EqualTo("Revert,RevertAfterFixed,S.Update,A.Advance,Apply(Update),Apply(LateApply)"));
         }
 
         [Test]
@@ -675,7 +858,7 @@ namespace xpTURN.Feedback.Tests.Editor
             Assert.That(record.Joined, Is.EqualTo("Revert"));
             layers.ThrowOnRevert = false;
             scheduler.Tick(s_Frame);
-            Assert.That(record.Joined, Is.EqualTo("Revert,Revert,S.Update,A.Advance,Apply(Update),Apply(LateApply)"));
+            Assert.That(record.Joined, Is.EqualTo("Revert,Revert,RevertAfterFixed,S.Update,A.Advance,Apply(Update),Apply(LateApply)"));
         }
 
         // ---- query — before compaction, with a dead slot

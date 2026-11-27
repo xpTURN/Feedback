@@ -325,7 +325,7 @@ namespace xpTURN.Feedback
             RevertPass(m_LateApply);
         }
 
-        internal void RevertAfterFixed()
+        public void RevertAfterFixed()
         {
             if (m_Closed)
                 return;

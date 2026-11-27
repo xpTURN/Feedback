@@ -5,6 +5,8 @@ namespace xpTURN.Feedback
     {
         void Revert();
 
+        void RevertAfterFixed();
+
         void Apply(ConsumptionStage stage);
     }
 }

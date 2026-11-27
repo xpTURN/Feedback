@@ -5,7 +5,7 @@ license: Apache-2.0
 compatibility: Unity 6000.0 or later with com.xpturn.feedback installed.
 metadata:
   package: com.xpturn.feedback
-  version: "0.3.1"
+  version: "0.3.2"
 ---
 
 # xpTURN.Feedback

@@ -247,9 +247,9 @@ namespace xpTURN.Feedback.Tests.Editor
 
         // ---- the real loop's wiring
 
-        // a recording scheduler put in as Default: Revert → Apply(Update) → Apply(LateApply) each frame, a frame number per
-        // Revert; a runner added goes between them from the next frame and gets the engine's deltas of that frame — the
-        // unscaled one cut at maximumDeltaTime
+        // a recording scheduler put in as Default: Revert → RevertAfterFixed → Apply(Update) → Apply(LateApply) each frame, a
+        // frame number per Revert; a runner added goes between them from the next frame and gets the engine's deltas of that
+        // frame — the unscaled one cut at maximumDeltaTime
         [UnityTest]
         public IEnumerator PT02_RealLoopRunsTheStages()
         {
@@ -263,8 +263,8 @@ namespace xpTURN.Feedback.Tests.Editor
             for (int i = 0; i < 3; i++)
                 yield return null;
             string stages = record.Joined;
-            Assert.That(stages, Does.Match(@"^(Revert,Apply\(Update\),Apply\(LateApply\)(,|$))+$"), "the stages");
-            Assert.That(test.Context.Frame, Is.EqualTo(Regex.Matches(stages, "Revert").Count), "a frame number per Revert");
+            Assert.That(stages, Does.Match(@"^(Revert,RevertAfterFixed,Apply\(Update\),Apply\(LateApply\)(,|$))+$"), "the stages");
+            Assert.That(test.Context.Frame, Is.EqualTo(Regex.Matches(stages, @"\bRevert\b").Count), "a frame number per Revert");
             var runner = new FakeRunner("R", record);
             test.Reserve(1);
             test.Add(runner, 0);
@@ -272,7 +272,7 @@ namespace xpTURN.Feedback.Tests.Editor
             for (int i = 0; i < 3; i++)
                 yield return null;
             string tail = record.Joined.Substring(mark.Length).TrimStart(',');
-            Assert.That(tail, Does.StartWith("Revert,R.Advance,Apply(Update),Apply(LateApply)"), "the runner's place");
+            Assert.That(tail, Does.StartWith("Revert,RevertAfterFixed,R.Advance,Apply(Update),Apply(LateApply)"), "the runner's place");
             // equality with the values read in the same call — half of the unscaled delta is not exact
             Assert.That(runner.EngineScaled, Is.Not.EqualTo(runner.EngineUnscaled), "the time scale makes the two differ");
             Assert.That(runner.LastTime.ScaledDelta, Is.EqualTo(runner.EngineScaled), "scaled");
@@ -431,6 +431,80 @@ namespace xpTURN.Feedback.Tests.Editor
             Assert.That(s_UserQuit, Is.EqualTo(1), "the user's quitting handler ran");
             Assert.That(s_UserEntered, Is.EqualTo(1), "the user's EnteredEditMode handler ran");
             real.Shutdown();
+        }
+
+        // ---- the delta-time option on the real loop
+
+        // a Runtime scheduler with Adjust Fixed Delta Time as Default, ~33 ms frames (the runner sleeps) and one 500 ms hitch
+        // in a time item at 0.05 and at 20: on each frame that starts and ends at the item's scale (the runner saw it this
+        // frame and the last), maximumDeltaTime is the game's 1/3, the runner's unscaled dt is the engine's cut at 1/3 and
+        // deltaTime is that × the scale — the hitch at 20 is 1/3 × 20. The window comes from the time scale the service
+        // writes, so the frames judged and the hitch among them are counted
+        [UnityTest]
+        public IEnumerator PT11_TheDeltaTimeOptionLeavesTheCap()
+        {
+            DisableDomainReload();
+            yield return new EnterPlayMode(false);
+            yield return null;
+            const float cap = 1f / 3f;
+            Time.maximumDeltaTime = cap;
+            var fails = new List<string>();
+            foreach (float scale in new[] { 0.05f, 20f })
+            {
+                Time.timeScale = 1f;
+                var scheduler = new FeedbackScheduler(ContextKind.Runtime);
+                scheduler.Context.UseSettings(new SettingsValues { AdjustFixedDeltaTime = true });
+                SwapDefault(scheduler);
+                TimeScaleService service = scheduler.Context.TimeScale;
+                string row = "at " + scale + " ";
+                bool judging = false;
+                int judged = 0, hitches = 0, hitchAt = -1;
+                float last = -1f, hitchDelta = -1f;
+                var runner = new FakeRunner("R");
+                runner.OnAdvance = state =>
+                {
+                    float ts = Time.timeScale;
+                    if (judging && ts == scale && last == scale)
+                    {
+                        judged++;
+                        float cut = Mathf.Min(Time.unscaledDeltaTime, cap);
+                        if (Time.maximumDeltaTime != cap)
+                            fails.Add(row + "maximumDeltaTime " + Time.maximumDeltaTime);
+                        if (runner.LastTime.UnscaledDelta != cut)
+                            fails.Add(row + "unscaled " + runner.LastTime.UnscaledDelta + " for the engine's " + Time.unscaledDeltaTime);
+                        if (Math.Abs(Time.deltaTime - cut * scale) > cut * scale * 1e-4f)
+                            fails.Add(row + "deltaTime " + Time.deltaTime + " for " + cut * scale);
+                        if (Time.unscaledDeltaTime > 0.4f)
+                        {
+                            hitches++;
+                            hitchDelta = Time.deltaTime;
+                        }
+                    }
+                    last = ts;
+                    if (runner.Advances == hitchAt)
+                        System.Threading.Thread.Sleep(500);
+                    System.Threading.Thread.Sleep(33);
+                    return true;
+                };
+                scheduler.Reserve(1);
+                scheduler.Add(runner, 0);
+                for (int i = 0; i < 600 && runner.Advances < 3; i++)
+                    yield return null;
+                hitchAt = runner.Advances + 8;
+                judging = true;
+                service.Request(scale, scale < 1f ? 1.0 : 1.5);
+                for (int i = 0; i < 1200 && service.Count > 0; i++)
+                    yield return null;
+                judging = false;
+                if (judged < 10 || hitches != 1)
+                    fails.Add(row + "judged " + judged + " frames, " + hitches + " hitches");
+                if (scale > 1f && Math.Abs(hitchDelta - cap * scale) > 1e-3f)
+                    fails.Add(row + "the hitch's deltaTime " + hitchDelta);
+                scheduler.Shutdown();
+                RestoreDefault();
+            }
+            yield return new ExitPlayMode();
+            Assert.That(fails, Is.Empty);
         }
     }
 }

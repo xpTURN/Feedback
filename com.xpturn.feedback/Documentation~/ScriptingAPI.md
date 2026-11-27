@@ -691,9 +691,10 @@ reads that asset in each play session and never writes it; without one, the defa
 - Keep one `Resources/FeedbackSettings`: only one is read, and the validator's FB-D08 reports a second.
 - A value outside a field's range is read as the field's default; the inspector cuts most fields to their range as you
   edit.
-- **Adjust Fixed Delta Time** scales `Time.fixedDeltaTime` and `Time.maximumDeltaTime` with the time scale while a time
-  item runs, overwriting other code's writes to them meanwhile, and puts them back when it ends; at scale 0 it leaves
-  both as they are.
+- **Adjust Fixed Delta Time** scales `Time.fixedDeltaTime` with the time scale while a time item runs, up to
+  `Time.maximumDeltaTime`, overwriting other code's writes to it meanwhile, and puts it back when it ends; at scale 0 it
+  leaves it as it is. It leaves `Time.maximumDeltaTime` to the game, so long frames are cut as they are without the
+  option.
 - A layer warning about a binding's maximum overlap on a camera shake receiver is fixed by raising
   **Receiver Contributions**, not a player's **Max Overlap**.
 - Because of **Maximum Unscaled Delta**, the package reads the settings in each play session even in scenes without

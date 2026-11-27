@@ -111,6 +111,8 @@ namespace xpTURN.Feedback
                 finally
                 {
                     m_InStage = false;
+                    if (m_IsShutdown)
+                        m_Slots.Compact();
                 }
             }
         }
@@ -132,11 +134,13 @@ namespace xpTURN.Feedback
                 m_InStage = true;
                 try
                 {
-                    Context.Layers.RevertAfterFixed();
+                    m_Layers.RevertAfterFixed();
                 }
                 finally
                 {
                     m_InStage = false;
+                    if (m_IsShutdown)
+                        m_Slots.Compact();
                 }
             }
         }
@@ -151,6 +155,9 @@ namespace xpTURN.Feedback
                 return;
             }
             RunRevertAfterFixed();
+            // closed in the fourth stage it ran: the slots are compacted below the pass limit
+            if (m_IsShutdown)
+                return;
             if (!m_UpdatePending)
                 return;
             m_UpdatePending = false;
@@ -252,9 +259,11 @@ namespace xpTURN.Feedback
                 finally
                 {
                     m_InStage = false;
+                    if (m_IsShutdown)
+                        m_Slots.Compact();
                 }
             }
-            if (!Context.Layers.Dry)
+            if (!m_IsShutdown && !Context.Layers.Dry)
                 FeedbackDiagnostics.RaiseApplied(this);
         }
 
@@ -304,7 +313,7 @@ namespace xpTURN.Feedback
             m_Slots.Unreserve(count);
         }
 
-        // Closed first, so a listener's new Play is refused. Inside a stage the running pass compacts
+        // Closed first, so a listener's new Play is refused. Inside a stage, that stage compacts as it ends
         internal void Shutdown()
         {
             if (m_IsShutdown)

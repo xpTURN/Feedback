@@ -212,7 +212,7 @@ namespace xpTURN.Feedback.Tests
                 float fixedIn = Time.fixedDeltaTime, maxIn = Time.maximumDeltaTime, tsIn = Time.timeScale;
                 for (int k = 0; k < 5; k++)
                     hand.Tick(0.03f);
-                Check(tsIn == 20f && Math.Abs(fixedIn - 0.4f) < 1e-6f && Math.Abs(maxIn - 20f / 3f) < 1e-4f && Time.timeScale == 1f && Math.Abs(Time.fixedDeltaTime - fixed0) < 1e-8f && Time.maximumDeltaTime == max0,
+                Check(tsIn == 20f && Math.Abs(fixedIn - max0) < 1e-6f && maxIn == max0 && Time.timeScale == 1f && Math.Abs(Time.fixedDeltaTime - fixed0) < 1e-8f && Time.maximumDeltaTime == max0,
                     "the option at 20 — in " + F(tsIn) + "/" + R(fixedIn) + "/" + R(maxIn) + " · after " + F(Time.timeScale) + "/" + R(Time.fixedDeltaTime) + "/" + R(Time.maximumDeltaTime));
                 HandPlayer(hand, Hit(0.1f)).Play();
                 hand.Tick(0.03f);
@@ -220,6 +220,27 @@ namespace xpTURN.Feedback.Tests
                 for (int k = 0; k < 5; k++)
                     hand.Tick(0.03f);
                 Check(Math.Abs(fixedZero - fixed0) < 1e-8f && maxZero == max0, "the option at 0 keeps both — " + R(fixedZero) + "/" + R(maxZero));
+                // the game's maximumDeltaTime under the option is its own: raised to 1 at 20 the fixed step follows to 0.4, and 0.1
+                // written at 0.5 (above the step 0.01) stays — both after the item too
+                HandPlayer(hand, Hit(0.1f, 20f)).Play();
+                hand.Tick(0.03f);
+                Time.maximumDeltaTime = 1f;
+                hand.Tick(0.03f);
+                float fixedRaised = Time.fixedDeltaTime;
+                for (int k = 0; k < 4; k++)
+                    hand.Tick(0.03f);
+                Check(Math.Abs(fixedRaised - 0.4f) < 1e-6f && Math.Abs(Time.fixedDeltaTime - fixed0) < 1e-8f && Time.maximumDeltaTime == 1f,
+                    "the game's 1 at 20 — in " + R(fixedRaised) + " · after " + R(Time.fixedDeltaTime) + "/" + R(Time.maximumDeltaTime));
+                Time.maximumDeltaTime = max0;
+                HandPlayer(hand, Hit(0.1f, 0.5f)).Play();
+                hand.Tick(0.03f);
+                Time.maximumDeltaTime = 0.1f;
+                hand.Tick(0.03f);
+                float fixedSlow = Time.fixedDeltaTime, maxSlow = Time.maximumDeltaTime;
+                for (int k = 0; k < 4; k++)
+                    hand.Tick(0.03f);
+                Check(Math.Abs(fixedSlow - fixed0 * 0.5f) < 1e-6f && maxSlow == 0.1f && Math.Abs(Time.fixedDeltaTime - fixed0) < 1e-8f && Time.maximumDeltaTime == 0.1f,
+                    "the game's 0.1 at 0.5 — in " + R(fixedSlow) + "/" + R(maxSlow) + " · after " + R(Time.fixedDeltaTime) + "/" + R(Time.maximumDeltaTime));
                 hand.Shutdown();
                 Time.timeScale = 1f;
                 Time.fixedDeltaTime = 0.02f;

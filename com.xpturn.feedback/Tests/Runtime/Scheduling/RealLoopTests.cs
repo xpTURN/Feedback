@@ -14,13 +14,15 @@ namespace xpTURN.Feedback.Tests
     // puts Default, the capture delta and the real Default's runners back after a red test too. No UnityEditor here
     public class RealLoopTests
     {
-        static readonly string[] Positions = { "FB.Revert", "MB.FixedUpdate", "MB.Update", "FB.Update", "MB.LateUpdate", "FB.LateApply" };
+        static readonly string[] Positions = { "FB.Revert", "MB.FixedUpdate", "FB.RevertAfterFixed", "MB.Update", "FB.Update", "MB.LateUpdate", "FB.LateApply" };
 
         const string ThrowMessage = "RealLoopTests thrower";
 
         sealed class RecordingLayers : ILayerStages
         {
             public void Revert() => FrameRecorder.Add("FB.Revert");
+
+            public void RevertAfterFixed() => FrameRecorder.Add("FB.RevertAfterFixed");
 
             public void Apply(ConsumptionStage stage) => FrameRecorder.Add(stage == ConsumptionStage.Update ? "FB.Update" : "FB.LateApply");
         }
@@ -106,7 +108,8 @@ namespace xpTURN.Feedback.Tests
         static string Describe((int Frame, List<string> Entries) frame) => frame.Frame + ": " + string.Join(" > ", frame.Entries);
 
         // Default is a test scheduler with a recording layer; the capture delta makes one FixedUpdate a frame. Each whole
-        // frame (the first and the last are cut) is Revert → FixedUpdate → Update → our Update → LateUpdate → our LateApply.
+        // frame (the first and the last are cut) is Revert → FixedUpdate → our RevertAfterFixed → Update → our Update →
+        // LateUpdate → our LateApply.
         // A runner added in MonoBehaviour.Update does not advance in that frame, and from the next frame advances once between
         // MonoBehaviour.Update and our Update — the pass limit is Revert's
         [UnityTest]

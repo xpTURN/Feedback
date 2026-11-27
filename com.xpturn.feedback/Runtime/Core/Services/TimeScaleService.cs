@@ -18,8 +18,8 @@ namespace xpTURN.Feedback
     // the requests' stack (fixed capacity, the slowest wins) × the base scale. Every request runs out on its own unscaled
     // lifetime, and a new one is not shortened by the first Update it meets (a request made after our Update gets its whole
     // length too). Time.timeScale is written here, after the others'-write check, and only while playing (the editor's
-    // settings stay clean) — an idle service's base scale is the one write outside Update. The two delta-time values follow
-    // the effective scale when the option is on
+    // settings stay clean) — an idle service's base scale is the one write outside Update. The fixed delta time follows the
+    // effective scale when the option is on, no higher than the game's maximumDeltaTime
     internal sealed class TimeScaleService : FeedbackService
     {
         internal const string FullWarning = "The Feedback time-scale stack was full: the oldest request was dropped.";
@@ -50,9 +50,8 @@ namespace xpTURN.Feedback
         // what the last write left (read back) — a different value at Update is the game's write
         bool m_Owning;
         float m_Written;
-        // the delta-time values before the stack filled — the empty stack and Shutdown put them back
+        // the fixed delta time before the stack filled — the empty stack and Shutdown put it back
         float m_FixedBefore;
-        float m_MaximumBefore;
 #if DEBUG
         bool m_WarnedFull;
         bool m_WarnedRange;
@@ -277,18 +276,17 @@ namespace xpTURN.Feedback
             m_OpenChanged = false;
             if (m_Count > 0 || m_OpenId != 0)
             {
-                // ④ the delta-time values before the first write
+                // ④ the fixed delta time before the first write
                 if (!m_Owning)
                 {
                     m_Owning = true;
                     m_FixedBefore = Time.fixedDeltaTime;
-                    m_MaximumBefore = Time.maximumDeltaTime;
                 }
                 Write(Effective);
             }
             else if (m_Owning)
             {
-                // ⑤ the last request ended: the base, the delta-time values as before — then hands off (the next request reads
+                // ⑤ the last request ended: the base, the fixed delta time as before — then hands off (the next request reads
                 // the base again)
                 Write(m_Base);
                 PutBackDeltas();
@@ -316,7 +314,6 @@ namespace xpTURN.Feedback
                 {
                     m_Owning = true;
                     m_FixedBefore = Time.fixedDeltaTime;
-                    m_MaximumBefore = Time.maximumDeltaTime;
                 }
                 Write(Effective);
             }
@@ -335,27 +332,22 @@ namespace xpTURN.Feedback
             if (Time.timeScale != scale)
                 Time.timeScale = scale;
             m_Written = Time.timeScale;
-            // at 0 both stay — a frozen frame's dt is 0 already
+            // at 0 it stays — a frozen frame's dt is 0 already. No higher than maximumDeltaTime: a step above it raises the
+            // game's cap
             if (m_Adjust && scale > 0f)
             {
-                float fixedDelta = m_FixedBefore * scale;
+                float fixedDelta = Mathf.Min(m_FixedBefore * scale, Time.maximumDeltaTime);
                 if (Time.fixedDeltaTime != fixedDelta)
                     Time.fixedDeltaTime = fixedDelta;
-                float maximum = m_MaximumBefore * scale;
-                if (Time.maximumDeltaTime != maximum)
-                    Time.maximumDeltaTime = maximum;
             }
         }
 
-        // fixedDeltaTime first — maximumDeltaTime written under a still-large fixedDeltaTime rises to it
         void PutBackDeltas()
         {
             if (!m_Adjust)
                 return;
             if (Time.fixedDeltaTime != m_FixedBefore)
                 Time.fixedDeltaTime = m_FixedBefore;
-            if (Time.maximumDeltaTime != m_MaximumBefore)
-                Time.maximumDeltaTime = m_MaximumBefore;
         }
 
         // a close outside play (the exit's EnteredEditMode) writes nothing: the engine put the values back

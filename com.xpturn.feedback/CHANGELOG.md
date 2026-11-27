@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.3.2] - 2026-11-27
+
+Time items that scale only the physics step with **Adjust Fixed Delta Time** on, leaving the frame-time cap to the
+game. Requires Unity 6000.0.85f2 or later; no package dependencies.
+
+### Fixed
+- With **Adjust Fixed Delta Time** on, a time item no longer changes `Time.maximumDeltaTime`; it scales
+  `Time.fixedDeltaTime` only, up to `Time.maximumDeltaTime`. A slow motion no longer slows the game, Unscaled plays and
+  its own length on frames longer than its scale × `Time.maximumDeltaTime` (1/60 s at 0.05 with the default 1/3 s), a
+  speed-up no longer lets a long frame through, and the game's writes to `Time.maximumDeltaTime` during a time item stay.
+
 ## [0.3.1] - 2026-11-27
 
 One Feedback Player field and one menu in inspector tools that call property drawers themselves. Requires Unity
