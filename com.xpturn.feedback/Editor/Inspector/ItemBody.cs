@@ -23,7 +23,10 @@ namespace xpTURN.Feedback.Editor
             AddToClassList(InspectorStyles.Body);
         }
 
-        internal void Build(SerializedProperty item, string foldKey, UnityEngine.Component host)
+        internal void Build(SerializedProperty item, string foldKey, UnityEngine.Component host) => Build(item, foldKey, host, host);
+
+        // host: the fields' (targets · components · Animator names) · graphHost: the Graph's
+        internal void Build(SerializedProperty item, string foldKey, UnityEngine.Component host, UnityEngine.Component graphHost)
         {
             Clear();
             Fields.Clear();
@@ -41,7 +44,7 @@ namespace xpTURN.Feedback.Editor
             {
                 if (field == "m_Motion")
                 {
-                    AddMotion(item, value, () => Build(item, foldKey, host), foldKey, host);
+                    AddMotion(item, value, () => Build(item, foldKey, host, graphHost), foldKey, graphHost);
                     continue;
                 }
                 SerializedProperty p = item.FindPropertyRelative(field);
@@ -102,10 +105,10 @@ namespace xpTURN.Feedback.Editor
                 f.BindProperty(p);
                 // a Parameter's kind and pick choose its other fields · a 2D force's kind
                 if ((value is AnimatorParameterItem && (field == "m_Kind" || field == "m_Pick")) || (value is Rigidbody2DForceItem && field == "m_Kind"))
-                    f.TrackPropertyValue(p, _ => Build(item, foldKey, host));
+                    f.TrackPropertyValue(p, _ => Build(item, foldKey, host, graphHost));
                 // an Infinite shown only while it is on — turned off, the body is built without it
                 if (field == ItemRules.Infinite && ItemRules.InfiniteUnused(value))
-                    f.TrackPropertyValue(p, _ => Build(item, foldKey, host));
+                    f.TrackPropertyValue(p, _ => Build(item, foldKey, host, graphHost));
                 (ItemRules.Advanced(field) ? Advanced.contentContainer : this).Add(f);
                 Fields.Add(field);
             }
@@ -125,7 +128,7 @@ namespace xpTURN.Feedback.Editor
         }
 
         // the motion and its parameters, one level under m_Params — after the target, before the timing
-        void AddMotion(SerializedProperty item, FeedbackItem value, System.Action changed, string foldKey, UnityEngine.Component host)
+        void AddMotion(SerializedProperty item, FeedbackItem value, System.Action changed, string foldKey, UnityEngine.Component graphHost)
         {
             var target = value as TargetItem;
             if (target == null)
@@ -169,8 +172,8 @@ namespace xpTURN.Feedback.Editor
                     told = true;
                 }
             }
-            if (ItemGraphField.Draws(value, host))
-                Add(Graph = new ItemGraphField(item, foldKey, host));
+            if (ItemGraphField.Draws(value, graphHost))
+                Add(Graph = new ItemGraphField(item, foldKey, graphHost));
         }
 
         // the item's fields — timing · conditions · random · a flow item's play one level in — in order: label, target, motion,

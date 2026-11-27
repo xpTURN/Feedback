@@ -472,7 +472,7 @@ namespace xpTURN.Feedback
         // the runtime a Play's arguments pick: the list whose alias is the play's key, else the preset's (the list's for the
         // linked preset, null for a preset that is neither), else the list's when the play asks for it, else the list whose
         // alias is the player's key, else the list's
-        PlayerRuntime Select(in PlayArgs args)
+        internal PlayerRuntime Select(in PlayArgs args)
         {
             PlayerRuntime keyed = Keyed(args.VariantKey);
             if (keyed != null)

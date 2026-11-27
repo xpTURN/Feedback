@@ -263,7 +263,7 @@ namespace xpTURN.Feedback
                     SweepReverse(to, from);
                 else
                     SweepForward(from - 1, to - 1);
-                if (_head == Head.Running || _head == Head.Delay)
+                if (_head == Head.Running || _head == Head.Delay || (_head == Head.Done && to > _r.RootDelay))
                     MoveHead(to);
             }
             return to;
@@ -354,14 +354,29 @@ namespace xpTURN.Feedback
         {
             _mode = Mode.None;
             _finishPending = false;
+            if (_head == Head.Delay && position > _r.Total)
+                return;
             if (position <= _r.RootDelay)
             {
                 _head = Head.Done;
-                _headPosition = _r.RootDelay;
+                _headPosition = position;
                 _finishPending = true;
                 return;
             }
             MoveHead(position);
+        }
+
+        public void ClearSweep()
+        {
+            _mode = Mode.None;
+            _finishPending = false;
+        }
+
+        // a head with no wait: a play that reached its end and turns keeps no start delay of its own
+        public void ResetHead()
+        {
+            ClearSweep();
+            _head = Head.Idle;
         }
 
         void MoveHead(long position)

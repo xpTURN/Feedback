@@ -63,7 +63,7 @@ namespace xpTURN.Feedback.Editor
         internal static string Id(Object o) => o == null ? "" : GlobalObjectId.GetGlobalObjectIdSlow(o).ToString();
 
         // identifier type 0: no object of a saved scene or asset (an unsaved scene's · DontDestroyOnLoad's) — one string for all
-        static bool NoId(string id) => id.Length == 0 || id.StartsWith("GlobalObjectId_V1-0-", StringComparison.Ordinal);
+        internal static bool NoId(string id) => id.Length == 0 || id.StartsWith("GlobalObjectId_V1-0-", StringComparison.Ordinal);
 
         internal static List<string> Marks() => SessionState.GetString(MarksKey, "").Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries).ToList();
 

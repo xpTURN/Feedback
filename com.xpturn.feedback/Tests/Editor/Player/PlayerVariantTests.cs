@@ -708,5 +708,33 @@ namespace xpTURN.Feedback.Tests.Editor
             p.m_PreviewMasks = null;
             End();
         }
+
+        // ---- a throw in the list's play leaves the Variant's play to the call
+
+        [Test]
+        public void VS29_AThrowLeavesTheVariantsPlay()
+        {
+            FeedbackScheduler s = Scheduler();
+            FeedbackPreset variant = Preset("variant", Act("c", 1f));
+            PlayerTestAction late = Act("b", 0.1f);
+            late.m_Timing.m_Delay = 0.5f;
+            FeedbackPlayer p = Player(s, Act("a", 1f), late);
+            p.m_Policy = PlayPolicy.Overlap;
+            p.m_Variants.Add(variant);
+            Watch(p);
+            p.Play();
+            p.Play(Of(variant));
+            s.Tick(0.1f);
+            PlayerTestBinding.ThrowsIn.Add("b.Begin");
+            UnityEngine.TestTools.LogAssert.Expect(LogType.Exception, "InvalidOperationException: test b.Begin");
+            bool moved = p.Seek(0.7f);
+            Check(moved && Mathf.Abs(B("c").LastTime.T - 0.7f) < 1e-4f, "the Seek moves the Variant's play: " + moved + " · " + B("c").LastTime.T);
+            p.Play();
+            UnityEngine.TestTools.LogAssert.Expect(LogType.Exception, "InvalidOperationException: test b.Begin");
+            bool ended = p.Skip();
+            PlayerTestBinding.ThrowsIn.Clear();
+            Check(ended && !p.IsPlaying && Events() == "|Played1 |Played2 |Played3 |Completed2", "the Skip ends the Variant's play: " + ended + " · " + Events());
+            End();
+        }
     }
 }

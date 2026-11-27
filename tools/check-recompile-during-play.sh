@@ -11,7 +11,7 @@
 #   - "Script Changes While Playing" is Recompile And Continue Playing (else the tool stops — it never changes it)
 #   - at the reload EditorApplication.isPlaying is true
 #   - the observer's OnDisable before the reload sees a closed Default (beforeAssemblyReload)
-#   - its OnEnable after the reload sees an open Default, and our three systems are in the loop
+#   - its OnEnable after the reload sees an open Default, and our four systems are in the loop
 #   - in the 60 frames after the reload the new Default's frame number rises once a frame and the three fronts are ours
 #   - at the exit OnApplicationQuit sees it open and OnDestroy closed (quitting before the cleanup)
 # The players: nine, made at the first frame of play — all Awake-initialized but lz (Lazy); vr holds two Variants (its list
@@ -97,7 +97,7 @@ for version in "${VERSIONS[@]}"; do
   rm -rf "${project}"
   mkdir -p "${WORK}"
   cp -c -R "${DEV_PROJECT}" "${project}" 2>/dev/null || cp -R "${DEV_PROJECT}" "${project}"
-  rm -rf "${project}/Temp" "${project}/Logs"
+  rm -rf "${project}/Temp" "${project}/Logs" "${project}/Library/LastSceneManagerSetup.txt"
   mkdir -p "${project}/Assets/RecompileCheck"
   cp -R "${DRIVER}/." "${project}/Assets/RecompileCheck/"
 
@@ -168,7 +168,7 @@ check(index("done") is not None, "the driver did not finish")
 
 edit = index("before-edit")
 reload = index("reload", edit if edit is not None else -1)
-check(edit is not None and events[edit][1].get("default") == "open" and events[edit][1].get("ours") == "3",
+check(edit is not None and events[edit][1].get("default") == "open" and events[edit][1].get("ours") == "4",
       "before the edit the stages are not running: " + (events[edit][2] if edit is not None else "no line"))
 check(reload is not None and events[reload][1].get("isPlaying") == "True",
       "at the reload EditorApplication.isPlaying is not true: " + (events[reload][2] if reload is not None else "no reload"))
@@ -180,7 +180,7 @@ if reload is not None:
     check(enable is not None and events[enable][1].get("default") == "open",
           "OnEnable after the reload: " + (events[enable][2] if enable is not None else "none"))
     after = index("after-reload", reload)
-    check(after is not None and events[after][1].get("ours") == "3",
+    check(after is not None and events[after][1].get("ours") == "4",
           "our systems after the reload: " + (events[after][2] if after is not None else "none"))
     frames = index("after-frames", reload)
     if frames is None:
@@ -189,7 +189,7 @@ if reload is not None:
         f = events[frames][1]
         check(int(f.get("frames", 0)) >= 60 and f.get("stages") == f.get("frames"),
               f"the stages after the reload: {f.get('stages')} in {f.get('frames')} frames")
-        check(f.get("ours") == "3" and f.get("fronts") == OURS, "the fronts 60 frames after the reload: " + events[frames][2])
+        check(f.get("ours") == "4" and f.get("fronts") == OURS, "the fronts 60 frames after the reload: " + events[frames][2])
         quit_ = index("observer-quit", frames)
         destroy = index("observer-destroy", frames)
         check(quit_ is not None and events[quit_][1].get("default") == "open",

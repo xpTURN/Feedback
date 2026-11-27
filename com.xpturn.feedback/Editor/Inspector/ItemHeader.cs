@@ -75,12 +75,19 @@ namespace xpTURN.Feedback.Editor
             string name = string.IsNullOrEmpty(item.m_Label) ? Name(item.GetType()) : item.m_Label;
             // the player a Play Player plays · a note's first line
             if (item is PlayPlayerItem play)
-                return name + " · " + (play.m_Player != null ? play.m_Player.name : "(none)");
+                return name + " · " + (play.m_Player != null ? PlayerName(play.m_Player) : "(none)");
             if (item is DebugItem note && note.m_Action == DebugAction.Note && !string.IsNullOrEmpty(note.m_Message))
                 return name + " · " + FirstLine(note.m_Message);
             if (!(item is TargetItem t))
                 return name;
             return name + " · " + (TargetChecks.Global(item.GetType()) ? "Global" : Target(t.m_Target));
+        }
+
+        // a player's object, and its line while the object has two or more players
+        static string PlayerName(FeedbackPlayer player)
+        {
+            string line = PlayerChoices.LineOf(player);
+            return line == null ? player.name : player.name + " · " + line;
         }
 
         static string FirstLine(string text)

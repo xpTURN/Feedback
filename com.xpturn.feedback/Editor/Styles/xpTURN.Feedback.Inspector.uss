@@ -223,6 +223,38 @@
     margin-bottom: 6px;
 }
 
+.xpturn-feedback-graph-box {
+    margin-top: 8px;
+    padding: 2px 4px;
+    border-width: 1px;
+    border-color: var(--unity-colors-default-border);
+    border-radius: 3px;
+}
+
+.xpturn-feedback-graph-box .xpturn-feedback-graph-notes {
+    margin-bottom: 2px;
+}
+
+.xpturn-feedback-graph-title-row {
+    flex-direction: row;
+    align-items: center;
+    min-height: 20px;
+}
+
+.xpturn-feedback-graph-title {
+    flex-grow: 1;
+    flex-shrink: 1;
+    margin: 0;
+    padding-left: 2px;
+    -unity-font-style: bold;
+}
+
+.xpturn-feedback-graph-switch {
+    flex-grow: 0;
+    flex-shrink: 0;
+    margin: 0;
+}
+
 .xpturn-feedback-hint {
     white-space: normal;
     font-size: 10px;

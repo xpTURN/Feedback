@@ -93,7 +93,10 @@ under it say what to know before you use the group.
   one-shots too. `Audio/Play Clip` plays at its volume × the play's intensity × the Audio category's scale, so a
   stronger play is louder.
 - The player's Pause pauses the sound its `Audio/Source Control` started, and the one-shots on that source with it. A
-  one-shot can't be stopped alone: one on another source plays on.
+  one-shot can't be stopped alone: one on another source plays on. Under the game's `AudioListener.pause` the player's
+  Pause holds that sound too: it stays paused when the listener's pause ends, until the player's Resume. The engine
+  can't tell the listener's pause from the source's own `Pause()`, so if the game paused the source itself, that Resume
+  plays it too.
 - At a play's end a Revert puts the source back as it was; the other ends leave the sound playing, but a sound paused with
   the player stops, and so does one whose player is destroyed. A Seek or Skip that passes these items, and a play going
   backward, starts no sound.
@@ -112,8 +115,9 @@ under it say what to know before you use the group.
   the Audio category's scale stops at full volume, and its pitch is **Pitch** ± **Pitch Random**, 0.1 to 3.
 - A Play At Point sound plays to its end, or for **Stop After** seconds of sound and then fades out over **Fade Out**;
   a pause does not count. A Revert, an aborted play and a play going backward stop it; it rings on when its player is
-  destroyed. The player's Pause pauses it while its play runs; the game's `AudioListener.pause` holds it unless
-  **Ignore Listener Pause**. An endless Audio Random Container ends only by Stop After, a Revert or `Restore()`.
+  destroyed. The player's Pause pauses it while its play runs, and it stops if the play ends paused; the game's
+  `AudioListener.pause` holds it unless **Ignore Listener Pause**. An endless Audio Random Container ends only by Stop
+  After, a Revert or `Restore()`.
 - In Edit mode the preview plays Play At Point from hidden voices; it does not read the project's Default Audio Output.
 - `Audio/Source Control`, `Audio/Play Clip`, `Audio/Mixer Snapshot` and `Audio/Play At Point` are instant: the sound or
   the transition goes on after them, so an item after one starts at once, even with **After Previous**. Give it a

@@ -32,6 +32,7 @@ namespace xpTURN.Feedback
         Mode _mode;
         bool _drained;
         bool _aborted;
+        bool _finishPending;
 
         public TimelineCursor(TimelineProgram program, ResolvedTimeline resolved, TimelineSampler sampler)
         {
@@ -65,6 +66,7 @@ namespace xpTURN.Feedback
                 _tickNew[c] = 0;
             }
             _aborted = false;
+            _finishPending = false;
             StartTick(Mode.Tick);
         }
 
@@ -95,6 +97,13 @@ namespace xpTURN.Feedback
             {
                 e = default;
                 return false;
+            }
+            if (_finishPending)
+            {
+                _finishPending = false;
+                long total = _r.Total;
+                e = new TimelineEvent(TimelineEventKind.Finished, false, false, false, -1, -1, 0, total, total);
+                return true;
             }
             while (true)
             {
@@ -172,6 +181,7 @@ namespace xpTURN.Feedback
             }
             _mode = Mode.Idle;
             _aborted = false;
+            _finishPending &= position >= _r.Total;
         }
 
         // a turned backward play's cursor: the clocks resolved as Begin does, every clock at the position — Rebuild's state
@@ -180,6 +190,7 @@ namespace xpTURN.Feedback
             _queue.ResolveClocks(baseClock);
             _queue.Reset();
             Rebuild(position);
+            _finishPending = position >= _r.Total;
         }
 
         // the most recently reached occurrence; items without a node (flow markers) are pending

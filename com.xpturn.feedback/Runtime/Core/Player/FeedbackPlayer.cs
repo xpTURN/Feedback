@@ -156,11 +156,11 @@ namespace xpTURN.Feedback
         // changed. Prepares a player that is not prepared yet. Allocates. The plays that run stop (Hold). false = not
         // prepared (edit mode without a preview, a closed scheduler, a destroyed player or one that never woke, inside its
         // own prepare or its own Play)
-        /// <summary>Rebuilds the player from its list and settings as they are now and stops the plays that run (Hold); false when it cannot be prepared, or when called inside its own Play, where nothing stops.</summary>
+        /// <summary>Rebuilds the player from its list and settings as they are now and stops the plays that run (Hold); false when it cannot be prepared, or when called inside its own Play or prepare, where nothing stops.</summary>
         public bool Rebuild()
         {
-            // inside its own Play the pipeline's runtime would be released under it
-            if (m_InPlay)
+            // inside its own Play or prepare the runtime that plays or is being made would be released under it
+            if (m_InPlay || m_Preparing)
                 return false;
             StopRuntimes(StopMode.Hold);
             // the new runtimes take the old ones' snapshots and the Toggle cell stays, then the old ones go
@@ -316,6 +316,18 @@ namespace xpTURN.Feedback
             finally
             {
                 m_Preparing = false;
+            }
+            // an item's prepare destroyed the player (DestroyImmediate) — in play mode its OnDestroy came before this prepare
+            // kept what it made, in edit mode none comes: what it made goes, and the player is refused
+            if (this == null)
+            {
+                PlayerRuntime made = m_Runtime;
+                PlayerRuntime[] madeVariants = m_VariantRuntimes;
+                m_Runtime = null;
+                m_VariantRuntimes = null;
+                made?.Release(PlaybackEnd.Destroyed);
+                Release(madeVariants, PlaybackEnd.Destroyed);
+                return Refusal.Destroyed;
             }
             if (initial)
             {

@@ -53,7 +53,7 @@ Plays a list of feedback items: play, stop, pause, seek and wait for the end of 
 | `void PlayFromEvent(FeedbackPreset preset)` | Plays `preset` — the linked preset or one of the Variants — as Play does with `PlayArgs.WithPreset`, and returns nothing — a preset picked in a UnityEvent; another preset plays nothing. |
 | `void PlayFromEvent(bool forward)` | Plays the list forward when `forward` is true and backward when it is false, and returns nothing — a Toggle's value picked in a UnityEvent; a play running the other way turns around where it is instead, the same play going on. |
 | `void PlayFromEvent(float intensity)` | Plays the list with `intensity` as its intensity, as Play does with `PlayArgs.WithIntensity`, and returns nothing — a Slider's or a signal's value picked in a UnityEvent; a negative or NaN intensity plays nothing. |
-| `bool Rebuild()` | Rebuilds the player from its list and settings as they are now and stops the plays that run (Hold); false when it cannot be prepared, or when called inside its own Play, where nothing stops. |
+| `bool Rebuild()` | Rebuilds the player from its list and settings as they are now and stops the plays that run (Hold); false when it cannot be prepared, or when called inside its own Play or prepare, where nothing stops. |
 | `void Restore()` | Stops the plays that run now (Hold) and puts each value target back to its value before the first play since the player first prepared or last restored — a Rebuild keeps it, and with Apply Initial State it is the value before the first frame; it does not prepare. |
 | `void Resume()` | Resumes the paused plays. |
 | `bool Seek(float time)` | Moves the plays that run now, paused ones too, to `time` on the nominal axis, running the instants crossed forward once and taking back those crossed backward; false when no play moved. |
@@ -150,8 +150,9 @@ public class LevelExit : MonoBehaviour
   that run (Hold).
   The next `Play` takes the other player settings (the **Policy** among them), `Intensity` and `VariantKey` and an
   item's **Intensity**, **Play Direction**, conditions and randomness without it.
-- Events follow the play: a list that ends at its start raises `Played` then `Completed` inside `Play`, and a play that
-  its own first instant stops raises `Stopped` before `Played`.
+- Events follow the play: a list that ends at its start raises `Played` then `Completed` inside `Play` — `Completed` comes
+  on the next update when one of its instants turns it — and a play that its own first instant stops raises `Stopped`
+  before `Played`.
 - A `Play` called while the same player is inside `Play` — from a `Played` handler, say — is refused with a warning.
   Called from `Completed` or a listener when the play ends in the player's tick, it plays.
 - Unsubscribe in your `OnDisable` or `OnDestroy`: a live player keeps calling a destroyed subscriber. An exception in a
@@ -172,6 +173,9 @@ public class LevelExit : MonoBehaviour
   starts during that stop runs to its end while the object is off.
 - A play whose item throws at its start returns `default`, yet its listener hears `PlaybackEnd.Faulted`, and the play
   still turns a **Toggle** direction and starts the **Cooldown**.
+- An item that throws inside `Seek`, `Skip()` or a turn ends that play the same way: its listener hears
+  `PlaybackEnd.Faulted` and no event is raised. The call does not throw and the player's other plays still move;
+  `Seek` does not count that play as moved.
 - `Seek` takes a time on the list's own axis, whatever the direction: in a backward play `Seek(0)` is its end and a time
   past the list's length is its start. `Skip()` ends a play in either direction.
 - Called from inside an event, a `Seek` during a seek runs at the next tick, and a `Skip()` of a paused play waits for
@@ -196,6 +200,11 @@ public class LevelExit : MonoBehaviour
   end.
 - Outside Play mode and outside the inspector's preview, `Play` and `PlayAsync` are refused.
 - A `PlayAsync` whose result is not awaited still allocates on each call; call `Play` when you do not wait.
+- A `FeedbackPlayer` field in the inspector — your scripts' too — shows a menu beside it while the player's object has
+  more than one Feedback Player: each is its number in the object's component order and its list's **Alias**, or
+  `(no alias)`, and picking one refers to that player. Give the players an **Alias** to tell them apart there; the alias
+  changes nothing in how a player without Variants plays. The package draws every `FeedbackPlayer` field, so a property
+  drawer of your own for that type is not used.
 
 ### PlayArgs
 
@@ -561,8 +570,9 @@ Set it to what the game is experienced from — the camera, or the character —
 ### FeedbackReceiver
 
 Add it with `Component > xpTURN > Feedback > Feedback Receiver`. It takes the commands sent to its **Channel** (**Int**
-with an **Id**, or **Asset**) and gives them to its **Player** — the player on its own object when the field is empty.
-With a **Range** above 0 it takes a command sent from a position only within that distance; 0 takes every command. In
+with an **Id**, or **Asset**) and gives them to its **Player** — the first Feedback Player on its own object when the
+field is empty; while that object has more than one, the menu beside the field names it and picks another. With a
+**Range** above 0 it takes a command sent from a position only within that distance; 0 takes every command. In
 Play mode its inspector shows whether it is registered.
 
 ### FeedbackSignalReceiver
@@ -893,8 +903,9 @@ times **Text Multiplier** with **Format**. The bars move in the Update stage.
 Add it with `Component > xpTURN > Feedback > Feedback UI Trigger` to a UI object — a Button, a Toggle, an image — and
 fill its **Entries**: each names an **Event** — **Pointer Enter**, **Pointer Exit**, **Pointer Down**, **Pointer Up**,
 **Pointer Click**, **Select**, **Deselect**, **Submit** or **Cancel** — an **Action** — **Play**, **Play Forward**,
-**Play Backward**, **Stop** with its **Stop Mode**, or **Signal** — and a **Player**, the Feedback Player on the
-trigger's object when it is empty. An event runs its entries in list order. A hover is two entries: **Pointer Enter**
+**Play Backward**, **Stop** with its **Stop Mode**, or **Signal** — and a **Player**, the first Feedback Player on the
+trigger's object when it is empty; while that object has more than one, the menu beside the field names it and picks
+another. An event runs its entries in list order. A hover is two entries: **Pointer Enter**
 with **Play Forward** and **Pointer Exit** with **Play Backward**. A **Play Forward** or **Play Backward** entry that
 comes while the player's latest play runs the other way turns that play around where it is, so the motion retraces
 without a jump however quickly the pointer comes and goes.

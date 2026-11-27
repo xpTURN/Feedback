@@ -51,7 +51,7 @@ namespace xpTURN.Feedback
         // Select's and Deselect's filter
         [SerializeField] internal UISelectSource m_Source;
         // null: the player on the trigger's object
-        [SerializeField] internal FeedbackPlayer m_Player;
+        [SerializeField, OwnObjectPlayer] internal FeedbackPlayer m_Player;
     }
 
     // uGUI's handlers for nine events and no drag or scroll handler, so a parent ScrollRect keeps its drags. The press, click

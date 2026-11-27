@@ -366,7 +366,7 @@ namespace xpTURN.Feedback.Editor
         // ---- the overlaps
 
         // the policy that cuts a clip — another clip of the same player overlaps it; Overlap when none does
-        static PlayPolicy OverlapOf(TimelineAsset timeline, PlayableDirector director, FeedbackClip asset)
+        internal static PlayPolicy OverlapOf(TimelineAsset timeline, PlayableDirector director, FeedbackClip asset)
         {
             Sign(timeline, director, s_Next);
             if (!ReferenceEquals(timeline, s_OverlapTimeline) || !ReferenceEquals(director, s_OverlapDirector) || !Same(s_Signature, s_Next))
@@ -444,6 +444,11 @@ namespace xpTURN.Feedback.Editor
 
         // ---- the clip's background
 
+        // the clip plays as Triggered: so set, a list that cannot be scrubbed, or in the Timeline window's preview a simulated
+        // target
+        internal static bool PlaysTriggered(FeedbackClip asset, TimelinePlayerInfo info)
+            => asset.m_Timing == FeedbackClipTiming.Triggered || !info.Model.Seekable || (info.Simulated && !Application.isPlaying);
+
         // the bars of the clip's player on its background region
         internal static bool Strip(TimelineClip clip, Rect area, double start, double end, List<StripRect> into)
         {
@@ -458,8 +463,7 @@ namespace xpTURN.Feedback.Editor
             if (player == null)
                 return false;
             TimelinePlayerInfo info = Of(player, asset.m_Preset);
-            bool triggered = asset.m_Timing == FeedbackClipTiming.Triggered || !info.Model.Seekable || (info.Simulated && !Application.isPlaying);
-            Place(info.Model, area, start, end, asset.m_Loop, triggered, into);
+            Place(info.Model, area, start, end, asset.m_Loop, PlaysTriggered(asset, info), into);
             return into.Count > 0;
         }
 

@@ -24,6 +24,7 @@ namespace xpTURN.Feedback.Editor
         readonly SerializedObject m_So;
         readonly string m_Path;
         readonly FeedbackPlayer m_Host;
+        FeedbackPlayer m_GraphHost;
         readonly Action<int> m_PlayItem;
         string m_Signature;
         internal int Refreshes;
@@ -39,6 +40,7 @@ namespace xpTURN.Feedback.Editor
             m_So = so;
             m_Path = path;
             m_Host = host;
+            m_GraphHost = host;
             m_PlayItem = playItem;
             AddToClassList(InspectorStyles.List);
             List = new ListView
@@ -73,6 +75,20 @@ namespace xpTURN.Feedback.Editor
         internal IReadOnlyList<CatalogLeaf> Leaves => FeedbackCatalog.All;
 
         internal bool Locked { get; private set; }
+
+        // the player the items' Graphs draw on — the host, or the player a preset's inspector picks (the fields keep the host).
+        // A change binds the rows again: the open bodies are built with it, their folds and the selection kept
+        internal FeedbackPlayer GraphHost
+        {
+            get => m_GraphHost;
+            set
+            {
+                if (ReferenceEquals(value, m_GraphHost))
+                    return;
+                m_GraphHost = value;
+                List.RefreshItems();
+            }
+        }
 
         // a linked player's list — Copy only, no drag, the bodies and the switches off
         internal bool ReadOnly { get; }

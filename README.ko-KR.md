@@ -4,7 +4,7 @@
 
 > 이 문서는 영어 [README](README.md) 의 번역입니다. 내용이 다르면 영어판을 기준으로 합니다.
 
-<!-- english: 0f2f05999c06 -->
+<!-- english: 91d38218da2c -->
 
 ![브릭 브레이커 보스에 재생한 피드백 — 치명타 · 폭발 · 화면 번쩍임 — 을 Game 뷰에서 미리 본 모습](com.xpturn.feedback/Documentation~/images/hero.gif)
 
@@ -40,7 +40,7 @@ public class Enemy : MonoBehaviour
 
 ![Feedback Player 의 인스펙터: 미리보기 막대 · 플레이어 설정 · 타임라인 띠 · 항목 다섯의 목록](com.xpturn.feedback/Documentation~/images/inspector.png)
 
-![에디트 모드 미리보기를 따라가는 타임라인 띠의 Graph: 펀치와 늦게 시작하는 흔들기가 함께 쓰는 위치 — 재생된 프레임이 재생 헤드 뒤에 점으로 그려지고, 그 아래에 접힌 항목 둘](com.xpturn.feedback/Documentation~/images/graphs.gif)
+![에디트 모드 미리보기를 따라가는 Graph Preview: 펀치와 늦게 시작하는 흔들기가 함께 쓰는 위치 — 재생된 프레임이 재생 헤드 뒤에 점으로 그려지고, 접힌 항목 둘과 Add Feedback 아래에 놓인다](com.xpturn.feedback/Documentation~/images/graphs.gif)
 
 ## 요구 사항
 
@@ -74,7 +74,7 @@ Input System 1.20.1 · UniTask 2.5.11 · Timeline 1.8.13(Unity 6000.6 은 내장
 ## 설치
 
 - Package Manager 에서 **+ > Add package from git URL…** 을 고르고
-  `https://github.com/xpTURN/Feedback.git?path=/com.xpturn.feedback#v0.2.3` 을 넣습니다.
+  `https://github.com/xpTURN/Feedback.git?path=/com.xpturn.feedback#v0.3.0` 을 넣습니다.
 - 또는 **+ > Add package from disk…** 를 고르고 `com.xpturn.feedback` 폴더의 `package.json` 을 고릅니다.
 - 또는 **+ > Add package from tarball…** 을 고르고 패키지의 `.tgz` 를 고릅니다.
 - 또는 `Packages/manifest.json` 에 더합니다(상대 경로는 `Packages` 폴더에서 시작합니다):

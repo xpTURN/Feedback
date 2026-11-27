@@ -136,7 +136,7 @@ namespace xpTURN.Feedback.Editor
         void ShowBody(bool open)
         {
             if (open && m_Item != null)
-                Body.Build(m_Item, m_FoldKey, m_Host);
+                Body.Build(m_Item, m_FoldKey, m_Host, m_Owner.GraphHost);
             else
                 Body.Clear();
             Body.style.display = open ? DisplayStyle.Flex : DisplayStyle.None;

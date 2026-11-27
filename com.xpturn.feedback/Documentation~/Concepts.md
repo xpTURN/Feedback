@@ -237,8 +237,9 @@ room grows, which allocates once, and the Editor and development builds warn.
 **Apply Initial State** writes the first frame of the player's **Direction** when it prepares, so a From tween or a
 Spring's Move To starts in place before any play. Only lasting timed items write it — To, From, From To, By, a Spring's
 Move To and a Persist Gradient — with the player's own settings, so a play's arguments, a Toggle's second play or random
-output can differ. `Rebuild()` writes it again only before the first play. Of two such items on one property, the
-earlier wins in a forward play and the later in a backward one.
+output can differ. An item that a play with those settings would leave out when the player prepares — by its direction
+condition, its intensity range or a category turned off — writes nothing. `Rebuild()` writes it again only before the
+first play. Of two such items on one property, the earlier wins in a forward play and the later in a backward one.
 
 ## Intensity, randomness and seeds
 
@@ -307,8 +308,9 @@ flashes change it.
 - Turning Time off skips new hit stops and time scale items. A hit stop already running ends as it was, and a running
   `Time/Time Scale` Flash drops to nothing.
 - The flash limit lets a flash start while fewer than a set number started in the last second of real time — 3 by
-  default, 0 lets none start. A started Blink counts each of its periods, a Seek back into a Flash counts it again, and
-  an endless Blink uses the whole limit when it starts; **Speed** does not change the count.
+  default, 0 lets none start. A started Blink counts each of its periods, a Seek back into a Flash counts it again, an
+  instant's undo in a Seek back or a backward play is not counted, and an endless Blink uses the whole limit when it
+  starts; **Speed** does not change the count.
 - The switches start fresh in each play session, from the settings asset — apply your options when the game starts.
 
 ## Under the hood
@@ -362,7 +364,8 @@ In Edit mode the Timeline window previews the track with the same runtime code: 
 Triggered clips play while the window plays, and turning the preview off puts the scene back. The window's preview and
 a player's Inspector **Preview** do not run together. In the window a clip's length is the list it plays — a new clip
 takes it and **Match Content** fits the clip to it. A clip whose **Preset** the bound player does not list shows an
-error and plays nothing; the clip's Inspector offers **Add to Variants**.
+error and plays nothing; the clip's Inspector offers **Add to Variants**. The clip's Inspector also has a
+[Graph Preview](GettingStarted.md#the-graphs) of the values the clip's play writes, on the clip's time.
 
 A clip is one play with one **Intensity**: a Feedback track has no markers and a clip no intensity curve. To play a
 player at a moment of the timeline, put a Signal on a Signal track and let a Signal Receiver call its

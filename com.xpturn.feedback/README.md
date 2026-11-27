@@ -35,7 +35,7 @@ public class Enemy : MonoBehaviour
 
 ![A Feedback Player's inspector: the preview bar, the player's settings, the timeline strip and a list of five items](Documentation~/images/inspector.png)
 
-![The strip's Graph following an edit-mode preview: the position a Punch and a later Shake write together, the played frames drawn as dots behind the play head, above the two folded items](Documentation~/images/graphs.gif)
+![The Graph Preview following an edit-mode preview: the position a Punch and a later Shake write together, the played frames drawn as dots behind the play head, below the two folded items and Add Feedback](Documentation~/images/graphs.gif)
 
 ## Requirements
 
@@ -71,7 +71,7 @@ reinstalled.
 ## Install
 
 - In the Package Manager, choose **+ > Add package from git URL…** and enter
-  `https://github.com/xpTURN/Feedback.git?path=/com.xpturn.feedback#v0.2.3`.
+  `https://github.com/xpTURN/Feedback.git?path=/com.xpturn.feedback#v0.3.0`.
 - Or choose **+ > Add package from disk…** and select `package.json` in the `com.xpturn.feedback` folder.
 - Or choose **+ > Add package from tarball…** and select the package's `.tgz`.
 - Or add it to `Packages/manifest.json` (a relative path starts from the `Packages` folder):

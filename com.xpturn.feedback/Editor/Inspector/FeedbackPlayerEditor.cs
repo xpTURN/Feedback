@@ -8,7 +8,7 @@ using UnityEngine.UIElements;
 namespace xpTURN.Feedback.Editor
 {
     // ① the status line ② the preview bar ③ the settings and the intensity ④ the link, the Variants and Show ⑤ the shown list's alias, the total and
-    // the strip ⑥ the item list ⑦ the bottom bar — Add · Paste. ⑤ ~ ⑦ are the shown list's: a Variant's read-only. Several
+    // the strip ⑥ the item list ⑦ the bottom bar — Add · Paste ⑧ the Graph Preview. ⑤ ~ ⑧ are the shown list's: a Variant's read-only. Several
     // players: the settings and a note — a managed-reference list differs per player. The keep row after the status line (first
     // for several players)
     [CustomEditor(typeof(FeedbackPlayer))]
@@ -154,7 +154,6 @@ namespace xpTURN.Feedback.Editor
                 var list = new ItemListView(listSo, ItemListEdits.ItemsPath, player, bar.PlayItem, !own);
                 List = list;
                 SlotGraph = new SlotGraphField(strip, listSo, player, list);
-                section.Add(SlotGraph);
                 section.Add(list);
                 var bottom = new VisualElement();
                 bottom.AddToClassList(InspectorStyles.Bottom);
@@ -180,6 +179,7 @@ namespace xpTURN.Feedback.Editor
                 Validation = new ValidationView(player, serializedObject, list, bottom);
                 section.Add(Validation);
                 section.Add(bottom);
+                section.Add(SlotGraph);
                 Builds++;
             }
             // the head's texts — the slots' count, the slots that play nothing and the lists of one alias, Show's choices and pick —

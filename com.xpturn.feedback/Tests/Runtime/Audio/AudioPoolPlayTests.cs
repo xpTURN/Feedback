@@ -182,6 +182,39 @@ namespace xpTURN.Feedback.Tests
 
         static AudioSource Source(GameObject voice) => voice.GetComponent<AudioSource>();
 
+        static UnityEventItem Call(UnityEngine.Events.UnityAction action, float delay = 0f)
+        {
+            var item = new UnityEventItem();
+            item.m_Event.AddListener(action);
+            item.m_Timing.m_Delay = delay;
+            return item;
+        }
+
+        // live · paused with the player · sounding
+        static (int, int, int) Counts(AudioVoiceService v)
+        {
+            int paused = 0, sounding = 0;
+            for (int i = 0; i < v.LiveCount; i++)
+            {
+                if (v.PausedAt(i))
+                    paused++;
+                if (Source(v.LiveAt(i)).isPlaying)
+                    sounding++;
+            }
+            return (v.LiveCount, paused, sounding);
+        }
+
+        // true only when five runs in a row allocate
+        static bool Allocates(TestDelegate run)
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                if (!UIs.AllocatingGCMemory().ApplyTo(run).IsSuccess)
+                    return false;
+            }
+            return true;
+        }
+
         // ---- the take: reserved at the prepare · the target's place with the offset in its space (the play's place without
         // the offset) · the eight fields written · playing · in the active scene, no flags · one template, the pool at the
         // largest size asked · a stronger play is louder up to the full volume
@@ -696,6 +729,228 @@ namespace xpTURN.Feedback.Tests
             Assert.That(Source(voices.LiveAt(0)).isPlaying, Is.True, "plays");
             Assert.That(pools.GrownOf(template), Is.EqualTo(grown + 1), "its voice made again — counted as growing");
             Assert.That(m_Warnings.FindAll(w => w.Contains("grew to")).Count, Is.EqualTo(UnityEngine.Debug.isDebugBuild ? 1 : 0), "with a warning once");
+        }
+
+        // ---- a play that ends while paused gives its paused voice back — by Skip, by a Seek to its end
+        [UnityTest]
+        public IEnumerator APP13_APlayEndingPaused()
+        {
+            yield return null;
+            PositiveControl();
+            FeedbackScheduler s = Sched();
+            Transform at = Anchor(Vector3.zero);
+            AudioVoiceService voices = Voices(s);
+            AudioClip clip = Clip(4f);
+            foreach (bool skip in new[] { true, false })
+            {
+                FeedbackPlayer p = Player(s, Point(clip, at), Keeper(at));
+                p.Play();
+                s.Tick(Step);
+                p.Pause();
+                if (skip)
+                    p.Skip();
+                else
+                    p.Seek(2f);
+                yield return null;
+                Tick(s, 2);
+                Assert.That((Counts(voices), p.IsPlaying), Is.EqualTo(((0, 0, 0), false)), skip ? "Skip" : "a Seek to the end");
+                p.Resume();
+                Tick(s, 1);
+                Assert.That(voices.LiveCount, Is.Zero, "the Resume has nothing to go on");
+            }
+        }
+
+        // ---- a voice started after a Pause in the same pass pauses with the play and goes on with its Resume — a tick, a
+        // backward pass
+        [UnityTest]
+        public IEnumerator APP14_APauseInsideThePlaysEvents()
+        {
+            yield return null;
+            PositiveControl();
+            FeedbackScheduler s = Sched();
+            Transform at = Anchor(Vector3.zero);
+            AudioVoiceService voices = Voices(s);
+            AudioClip clip = Clip(4f);
+            FeedbackPlayer p = null;
+            p = Player(s, Call(() => p.Pause(), 0.1f), Point(clip, at), Keeper(at));
+            p.Play();
+            s.Tick(0f);
+            s.Tick(0.2f);
+            yield return null;
+            Assert.That((Counts(voices), p.HasPaused), Is.EqualTo(((1, 1, 0), true)), "a tick");
+            p.Resume();
+            yield return null;
+            Assert.That(Counts(voices), Is.EqualTo((1, 0, 1)), "a tick — goes on");
+            p.Stop(StopMode.Revert);
+            s.Tick(0f);
+            FeedbackPlayer q = null;
+            AudioPlayAtPointItem only = Point(clip, at, i =>
+            {
+                i.m_Timing.m_Delay = 0.1f;
+                i.m_Conditions.m_Direction = DirectionCondition.ReverseOnly;
+            });
+            UnityEventItem pause = Call(() => q.Pause(), 0.1f);
+            pause.m_Conditions.m_Direction = DirectionCondition.ReverseOnly;
+            q = Player(s, only, pause, Keeper(at, 0.5f));
+            q.Play(Back);
+            s.Tick(0.65f);
+            yield return null;
+            Assert.That((Counts(voices), q.HasPaused), Is.EqualTo(((1, 1, 0), true)), "a backward pass");
+            q.Resume();
+            yield return null;
+            Assert.That(Counts(voices), Is.EqualTo((1, 0, 1)), "a backward pass — goes on");
+        }
+
+        // ---- a play that ends in the pass of its Pause gives the voice back whichever came first
+        [UnityTest]
+        public IEnumerator APP15_APauseInThePassThatEnds()
+        {
+            yield return null;
+            PositiveControl();
+            FeedbackScheduler s = Sched();
+            Transform at = Anchor(Vector3.zero);
+            AudioVoiceService voices = Voices(s);
+            AudioClip clip = Clip(4f);
+            FeedbackPlayer before = null;
+            before = Player(s, Point(clip, at), Call(() => before.Pause(), 0.1f));
+            before.Play();
+            s.Tick(0f);
+            s.Tick(0.2f);
+            yield return null;
+            Tick(s, 2);
+            Assert.That((Counts(voices), before.IsPlaying), Is.EqualTo(((0, 0, 0), false)), "the voice before the Pause");
+            FeedbackPlayer after = null;
+            after = Player(s, Call(() => after.Pause(), 0.1f), Point(clip, at));
+            after.Play();
+            s.Tick(0f);
+            s.Tick(0.2f);
+            yield return null;
+            Tick(s, 2);
+            Assert.That((Counts(voices), after.IsPlaying), Is.EqualTo(((0, 0, 0), false)), "the voice after the Pause");
+        }
+
+        // ---- an ended play's voice is not reached by a later backward play on its record — its Pause and its Skip
+        [UnityTest]
+        public IEnumerator APP16_AnEndedPlaysVoice()
+        {
+            yield return null;
+            PositiveControl();
+            FeedbackScheduler s = Sched();
+            Transform at = Anchor(Vector3.zero);
+            AudioVoiceService voices = Voices(s);
+            AudioClip clip = Clip(4f);
+            FeedbackPlayer p = Player(s, Keeper(at, 1f), Point(clip, at, i => i.m_Timing.m_Delay = 0.5f));
+            p.m_Policy = PlayPolicy.Overlap;
+            p.Rebuild();
+            p.Play();
+            Tick(s, 2);
+            p.Play();
+            Tick(s, 32);
+            yield return null;
+            Assert.That((Counts(voices), p.IsPlaying), Is.EqualTo(((2, 0, 2), false)), "two ended plays ring");
+            p.Play(Back);
+            Tick(s, 14);
+            yield return null;
+            Assert.That(Counts(voices), Is.EqualTo((1, 0, 1)), "the origin play's voice stopped");
+            p.Pause();
+            yield return null;
+            Assert.That(Counts(voices), Is.EqualTo((1, 0, 1)), "the Pause does not reach the ended play's voice");
+            p.Skip();
+            yield return null;
+            Tick(s, 2);
+            Assert.That((Counts(voices), p.IsPlaying), Is.EqualTo(((1, 0, 1), false)), "nor does the Skip");
+        }
+
+        // ---- a turned play keeps its voices: one a backward play made after turning forward hears Pause and the next backward
+        // play stops it · an Overlap play turned while a later play is the origin still hears Pause on its own voice
+        [UnityTest]
+        public IEnumerator APP17_TurnedPlaysKeepTheirVoices()
+        {
+            yield return null;
+            PositiveControl();
+            Transform at = Anchor(Vector3.zero);
+            AudioClip clip = Clip(4f);
+            FeedbackScheduler s = Sched();
+            AudioVoiceService voices = Voices(s);
+            FeedbackPlayer t = Player(s, Keeper(at, 1f), Point(clip, at, i => i.m_Timing.m_Delay = 0.5f));
+            t.Play(Back);
+            Tick(s, 12);
+            Assert.That(Counts(voices), Is.EqualTo((0, 0, 0)), "backward past it — no voice");
+            t.PlayTurning(PlayerDirection.Forward);
+            Tick(s, 4);
+            yield return null;
+            Assert.That(Counts(voices), Is.EqualTo((1, 0, 1)), "turned forward — its voice");
+            t.Pause();
+            yield return null;
+            Assert.That(Counts(voices), Is.EqualTo((1, 1, 0)), "the Pause reaches it");
+            t.Resume();
+            Tick(s, 12);
+            yield return null;
+            Assert.That((Counts(voices), t.IsPlaying), Is.EqualTo(((1, 0, 1), false)), "it rings past the end");
+            t.Play(Back);
+            Tick(s, 14);
+            yield return null;
+            Assert.That(Counts(voices), Is.EqualTo((0, 0, 0)), "the next backward play stops it");
+            FeedbackScheduler o = Sched();
+            AudioVoiceService own = Voices(o);
+            FeedbackPlayer p = Player(o, Keeper(at, 1f), Point(clip, at, i => i.m_Timing.m_Delay = 0.5f));
+            p.m_Policy = PlayPolicy.Overlap;
+            p.Rebuild();
+            p.Play();
+            Tick(o, 2);
+            PlaybackHandle later = p.Play();
+            Tick(o, 12);
+            yield return null;
+            Assert.That(Counts(own), Is.EqualTo((2, 0, 2)), "two plays ring");
+            p.Stop(later, StopMode.Hold);
+            p.PlayTurning(PlayerDirection.Backward);
+            Tick(o, 6);
+            yield return null;
+            Assert.That((Counts(own), p.IsPlaying), Is.EqualTo(((1, 0, 1), true)), "turned past it — the later play's voice stopped");
+            p.Pause();
+            yield return null;
+            Assert.That(Counts(own), Is.EqualTo((1, 1, 0)), "the Pause reaches its own voice");
+            p.Resume();
+            yield return null;
+            Assert.That(Counts(own), Is.EqualTo((1, 0, 1)), "and it goes on");
+        }
+
+        // ---- a paused play's end and a Pause inside a pass allocate nothing once warm
+        [UnityTest]
+        public IEnumerator APP18_ThePausedPathsAllocateNothing()
+        {
+            yield return null;
+            PositiveControl();
+            FeedbackScheduler s = Sched();
+            Transform at = Anchor(Vector3.zero);
+            AudioVoiceService voices = Voices(s);
+            AudioClip clip = Clip(4f);
+            FeedbackPlayer p = Player(s, Point(clip, at, i => i.m_PoolSize = 2), Keeper(at));
+            TestDelegate skip = () =>
+            {
+                p.Play();
+                s.Tick(Step);
+                p.Pause();
+                p.Skip();
+                s.Tick(0f);
+            };
+            FeedbackPlayer q = null;
+            q = Player(s, Call(() => q.Pause(), 0.05f), Point(clip, at, i => i.m_PoolSize = 2), Keeper(at));
+            TestDelegate inside = () =>
+            {
+                q.Play();
+                s.Tick(0.1f);
+                q.Skip();
+                s.Tick(0f);
+            };
+            for (int i = 0; i < 3; i++)
+            {
+                skip();
+                inside();
+            }
+            Assert.That(Allocates(skip), Is.False, "a paused play's Skip");
+            Assert.That(Allocates(inside), Is.False, "a Pause inside a pass");
+            Assert.That(voices.LiveCount, Is.Zero, "the voices given back");
         }
     }
 }

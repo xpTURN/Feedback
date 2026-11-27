@@ -4,7 +4,7 @@
 
 > 本文档是英文 [README](README.md) 的翻译。如有出入，以英文版为准。
 
-<!-- english: 0f2f05999c06 -->
+<!-- english: 91d38218da2c -->
 
 ![在打砖块的 Boss 上播放的反馈 — 暴击、爆炸和屏幕闪光 — 在 Game 视图中预览](com.xpturn.feedback/Documentation~/images/hero.gif)
 
@@ -38,7 +38,7 @@ public class Enemy : MonoBehaviour
 
 ![Feedback Player 的检查器：预览栏、播放器设置、时间线条和五个条目的列表](com.xpturn.feedback/Documentation~/images/inspector.png)
 
-![跟随编辑模式预览的时间线条 Graph：冲击和稍后开始的震动共同写入的位置 — 已播放的帧以点的形式画在播放头之后，下方是两个折叠的条目](com.xpturn.feedback/Documentation~/images/graphs.gif)
+![跟随编辑模式预览的 Graph Preview：冲击和稍后开始的震动共同写入的位置 — 已播放的帧以点的形式画在播放头之后，位于两个折叠的条目和 Add Feedback 下方](com.xpturn.feedback/Documentation~/images/graphs.gif)
 
 ## 要求
 
@@ -70,7 +70,7 @@ UniTask 2.5.11 和 Timeline 1.8.13（Unity 6000.6：其内置 Timeline 6.6.0）�
 ## 安装
 
 - 在 Package Manager 中选择 **+ > Add package from git URL…**，然后输入
-  `https://github.com/xpTURN/Feedback.git?path=/com.xpturn.feedback#v0.2.3`。
+  `https://github.com/xpTURN/Feedback.git?path=/com.xpturn.feedback#v0.3.0`。
 - 或选择 **+ > Add package from disk…**，然后选择 `com.xpturn.feedback` 文件夹中的 `package.json`。
 - 或选择 **+ > Add package from tarball…**，然后选择本包的 `.tgz`。
 - 或将其添加到 `Packages/manifest.json`（相对路径从 `Packages` 文件夹开始）：

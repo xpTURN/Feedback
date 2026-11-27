@@ -1116,6 +1116,52 @@ namespace xpTURN.Feedback.Tests.Editor
             Assert.That(v.Ring.Differs, Is.False, "no warning: " + Trace(v));
         }
 
+        // ---- a turned delay
+
+        (FeedbackPlayer, FeedbackScheduler, View) DelayedLine(float delay)
+        {
+            GameObject c = Go("Delayed");
+            FeedbackPlayer p = Player(c, Timed(Pos(Tween(TweenMode.To, new Vector4(1f, 2f, 3f, 0f))), 0.5f));
+            p.m_StartDelay = delay;
+            FeedbackScheduler s = Live();
+            Bind(p, s);
+            View v = Watch(p);
+            p.Play(PlayArgs.Default.WithSeed(1u).WithDirection(PlayerDirection.Forward));
+            v.Slot = Line(p, v.Follow);
+            return (p, s, v);
+        }
+
+        // two turns in the start delay ask the shadow for nothing; a turn while paused leaves the line and the scene the same
+        [Test]
+        public void RG19_ATurnedDelay()
+        {
+            const float step = 1f / 64f;
+            {
+                (FeedbackPlayer p, FeedbackScheduler s, View v) = DelayedLine(0.25f);
+                for (int i = 0; i < 8; i++)
+                    Frame(s, step);
+                p.PlayTurning(PlayerDirection.Backward);
+                p.PlayTurning(PlayerDirection.Forward);
+                for (int n = 0; p.IsPlaying && n < 200; n++)
+                    Frame(s, step);
+                Assert.That((v.Follow.Reseeks, v.Follow.Lost, v.Ring.Differs, v.Ring.Count), Is.EqualTo((0, false, false, 48)), "two turns: " + Trace(v));
+            }
+            {
+                (FeedbackPlayer p, FeedbackScheduler s, View v) = DelayedLine(0.25f);
+                for (int i = 0; i < 8; i++)
+                    Frame(s, step);
+                p.Pause();
+                p.PlayTurning(PlayerDirection.Backward);
+                for (int i = 0; i < 3; i++)
+                    Frame(s, step);
+                long place = p.Runtime.Position(0);
+                p.Resume();
+                for (int n = 0; p.IsPlaying && n < 200; n++)
+                    Frame(s, step);
+                Assert.That((place, v.Ring.Differs), Is.EqualTo((125001L, false)), "a paused turn: " + Trace(v));
+            }
+        }
+
         static string Trace(View v)
         {
             var sb = new System.Text.StringBuilder();
@@ -1131,7 +1177,7 @@ namespace xpTURN.Feedback.Tests.Editor
 
         // ---- T10 · T16 the fields
 
-        // folded: not watched; open: watched — the dots, the play's words, no warning; folded again: let go. An edit of the list
+        // off: not watched; on: watched — the dots, the play's words, no warning; off again: let go. An edit of the list
         // drops the followed play; a Rebuild wait follows none
         [UnityTest]
         public IEnumerator RG10_TheFields()
@@ -1141,19 +1187,19 @@ namespace xpTURN.Feedback.Tests.Editor
             m_Window.Show();
             GameObject go = Go("Fields");
             FeedbackPlayer p = Player(go, Timed(Pos(Punch(new Vector4(0.4f, 0f, 0f, 0f), 3f)), 0.6f), Timed(Pos(Shake(0.1f, 8f)), 0.6f, 0.1f));
-            SessionState.EraseBool(SlotGraphField.FoldPrefix + p.GetEntityId());
+            SessionState.EraseBool(SlotGraphField.SwitchPrefix + p.GetEntityId());
             FeedbackScheduler s = Live();
             Bind(p, s);
             InspectorElement inspector = InspectorTesting.Inspector(m_Window, p);
             yield return InspectorTesting.Wait(0.4);
             SlotGraphField field = inspector.Q<SlotGraphField>();
             int views = RecordWatch.ViewCount;
-            Assert.That(field.Fold.value, Is.False);
+            Assert.That(field.Switch.value, Is.False);
             p.Play(PlayArgs.Default.WithSeed(7u));
-            Assert.That(RecordWatch.FollowOf(p, p), Is.Null, "folded: nothing followed");
-            field.Fold.value = true;
+            Assert.That(RecordWatch.FollowOf(p, p), Is.Null, "off: nothing followed");
+            field.Switch.value = true;
             yield return InspectorTesting.Wait(0.4);
-            Assert.That(RecordWatch.ViewCount, Is.EqualTo(views + 1), "open: watched");
+            Assert.That(RecordWatch.ViewCount, Is.EqualTo(views + 1), "on: watched");
             p.Play(PlayArgs.Default.WithSeed(8u));
             RecordFollow follow = RecordWatch.FollowOf(p, p);
             Assert.That(follow, Is.Not.Null);
@@ -1186,15 +1232,15 @@ namespace xpTURN.Feedback.Tests.Editor
             p.Play(PlayArgs.Default.WithSeed(10u));
             Assert.That(RecordWatch.FollowOf(p, p), Is.Not.Null, "after it, the next play");
 
-            field.Fold.value = false;
+            field.Switch.value = false;
             yield return InspectorTesting.Wait(0.2);
-            Assert.That(RecordWatch.ViewCount, Is.EqualTo(views), "folded: let go");
+            Assert.That(RecordWatch.ViewCount, Is.EqualTo(views), "off: let go");
             Assert.That(RecordWatch.FollowOf(p, p), Is.Null);
             Assert.That(field.View.Dots.Count, Is.Zero);
         }
 
-        // an inspector's rebuild destroys the editors — their serialized objects — before it clears their elements: two open
-        // fields of a followed list let go with no read of a gone serialized object, and the follow with them
+        // an inspector's rebuild destroys the editors — their serialized objects — before it clears their elements: two
+        // switched-on fields of a followed list let go with no read of a gone serialized object, and the follow with them
         [UnityTest]
         public IEnumerator RG10b_TheEditorsGoBeforeTheirFields()
         {
@@ -1203,7 +1249,7 @@ namespace xpTURN.Feedback.Tests.Editor
             m_Window.Show();
             GameObject go = Go("Rebuilt");
             FeedbackPlayer p = Player(go, Timed(Pos(Punch(new Vector4(0.4f, 0f, 0f, 0f), 3f)), 0.6f));
-            SessionState.SetBool(SlotGraphField.FoldPrefix + p.GetEntityId(), true);
+            SessionState.SetBool(SlotGraphField.SwitchPrefix + p.GetEntityId(), true);
             FeedbackScheduler s = Live();
             Bind(p, s);
             int views = RecordWatch.ViewCount;
@@ -1214,7 +1260,7 @@ namespace xpTURN.Feedback.Tests.Editor
             m_Window.rootVisualElement.Add(a);
             m_Window.rootVisualElement.Add(b);
             yield return InspectorTesting.Wait(0.4);
-            Assert.That(RecordWatch.ViewCount, Is.EqualTo(views + 2), "both open: watched");
+            Assert.That(RecordWatch.ViewCount, Is.EqualTo(views + 2), "both on: watched");
             p.Play(PlayArgs.Default.WithSeed(7u));
             Assert.That(RecordWatch.FollowOf(p, p), Is.Not.Null);
 
@@ -1225,7 +1271,7 @@ namespace xpTURN.Feedback.Tests.Editor
             Assert.That(a.Q<SlotGraphField>().panel, Is.Null);
             Assert.That(RecordWatch.ViewCount, Is.EqualTo(views), "both let go");
             Assert.That(RecordWatch.FollowOf(p, p), Is.Null, "the follow with them");
-            SessionState.EraseBool(SlotGraphField.FoldPrefix + p.GetEntityId());
+            SessionState.EraseBool(SlotGraphField.SwitchPrefix + p.GetEntityId());
         }
 
         // the header's Dots is the editor's one choice: the record and its comparison go on while hidden, a shown dot bounds
@@ -1238,7 +1284,7 @@ namespace xpTURN.Feedback.Tests.Editor
             m_Window.Show();
             GameObject go = Go("Dots");
             FeedbackPlayer p = Player(go, Timed(Pos(Punch(new Vector4(0.4f, 0f, 0f, 0f), 3f)), 0.6f));
-            SessionState.SetBool(SlotGraphField.FoldPrefix + p.GetEntityId(), true);
+            SessionState.SetBool(SlotGraphField.SwitchPrefix + p.GetEntityId(), true);
             FeedbackScheduler s = Live();
             Bind(p, s);
             m_Window.rootVisualElement.Add(new InspectorElement(p));
@@ -1279,7 +1325,7 @@ namespace xpTURN.Feedback.Tests.Editor
             loop.Build(new SerializedObject(d).FindProperty("m_Item"), "xpTURN.Feedback.Tests.Dots." + Guid.NewGuid().ToString("N"), d);
             loop.Graph.Build();
             Assert.That(loop.Graph.DotsChoice, Is.Null, "a Motion Driver has no record");
-            SessionState.EraseBool(SlotGraphField.FoldPrefix + p.GetEntityId());
+            SessionState.EraseBool(SlotGraphField.SwitchPrefix + p.GetEntityId());
         }
     }
 }

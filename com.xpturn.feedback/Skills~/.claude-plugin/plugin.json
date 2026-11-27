@@ -1,6 +1,6 @@
 {
   "name": "xpturn-feedback",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "description": "Game feel feedback with the xpTURN.Feedback Unity package: FeedbackPlayer, presets, playing feedback from C# or UI events, and Unity Timeline.",
   "author": {
     "name": "xpTURN",

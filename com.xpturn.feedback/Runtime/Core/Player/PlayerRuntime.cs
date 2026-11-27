@@ -193,8 +193,8 @@ namespace xpTURN.Feedback
         // the newest play's number — a stop of the plays that run now leaves the ones started after it
         internal long LastSerial => m_Serial;
 
-        // a record's place on the nominal axis — the cursor's forward, the head's backward
-        internal long Position(int record) => m_Records[record].Reverse ? m_Records[record].Sampler.ReversePosition : m_Records[record].Cursor.Position;
+        // a record's place on the nominal axis — the cursor's forward, not below 0, the head's backward
+        internal long Position(int record) => m_Records[record].Reverse ? m_Records[record].Sampler.ReversePosition : TimelineTime.Max(0, m_Records[record].Cursor.Position);
 
         // the tests' way to a known random
         internal void Reseed(uint seed) => m_Random = new XorShiftRandom(seed);
@@ -318,8 +318,9 @@ namespace xpTURN.Feedback
 
         // the first frame of the set direction, no play — Backward writes each item's end (an endless one none) in list
         // order: the later item wins, the one a backward play reaches first. Forward and Toggle (its first play) write t = 0
-        // in reverse list order: the earlier item wins. An item the direction leaves out writes nothing. The intensity is a
-        // Play without an argument's — the remap of 1 × the base intensity; no falloff, no random output
+        // in reverse list order: the earlier item wins. An item such a play leaves out — its direction, a category turned off,
+        // its intensity range — writes nothing; the chance is each play's own. The intensity is a Play without an argument's —
+        // the remap of 1 × the base intensity; no falloff, no random output
         void ApplyInitial()
         {
             FeedbackPlayer player = m_Player;
@@ -333,8 +334,7 @@ namespace xpTURN.Feedback
                 EffectItem effect = m_Effects[i];
                 if (binding == null || effect == null)
                     continue;
-                DirectionCondition condition = effect.m_Conditions.m_Direction;
-                if (backward ? condition == DirectionCondition.ForwardOnly : condition == DirectionCondition.ReverseOnly)
+                if (!m_Gate.IsEnabled(m_Category[i]) || PlayMath.ConditionSkips(in effect.m_Conditions, backward, intensity))
                     continue;
                 MotionTime time = default;
                 // a turned item's first frame is its other end

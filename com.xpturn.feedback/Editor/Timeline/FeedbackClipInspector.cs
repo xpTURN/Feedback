@@ -5,8 +5,9 @@ using UnityEngine.UIElements;
 
 namespace xpTURN.Feedback.Editor
 {
-    // a Feedback clip's Inspector in the Timeline window — the default fields, and a warning when the clip's Preset is not one
-    // of the bound player's lists, with the fix: the preset added to the player's Variants (an Undo step on the player)
+    // a Feedback clip's Inspector in the Timeline window — the default fields, a warning when the clip's Preset is not one
+    // of the bound player's lists, with the fix: the preset added to the player's Variants (an Undo step on the player), and
+    // for one clip its Graph
     [CustomEditor(typeof(FeedbackClip))]
     [CanEditMultipleObjects]
     internal sealed class FeedbackClipInspector : UnityEditor.Editor
@@ -14,6 +15,7 @@ namespace xpTURN.Feedback.Editor
         internal const string AddText = "Add to Variants";
 
         internal HelpBox Notice;
+        internal ClipGraphField Graph;
 
         public override VisualElement CreateInspectorGUI()
         {
@@ -22,6 +24,8 @@ namespace xpTURN.Feedback.Editor
             Notice = new HelpBox(TimelinePlayerInfo.NotVariantText, HelpBoxMessageType.Warning);
             Notice.Add(new Button(Add) { text = AddText });
             root.Add(Notice);
+            if (targets.Length == 1 && target is FeedbackClip clip)
+                root.Add(Graph = new ClipGraphField(clip, serializedObject));
             Show();
             root.TrackSerializedObjectValue(serializedObject, _ => Show());
             return root;

@@ -7,6 +7,8 @@ namespace xpTURN.Feedback
         internal readonly ResolvedTimeline Resolved;
         internal readonly TimelineSampler Sampler;
         internal readonly TimelineCursor Cursor;
+        // a backward play's sample at its head — its own: a binding's call can play or move another play of this runtime
+        internal readonly TimelineSample Sample;
 
         internal bool Active;
         internal bool Paused;
@@ -20,8 +22,8 @@ namespace xpTURN.Feedback
         internal double StartedAt;          // the context's time when the play was accepted
         internal PlaybackHandle Handle;
         internal readonly bool[] Running;   // by program item — a timed item between its Begin and its End
-        internal readonly bool[] Touched;
-        internal readonly bool[] Turned;    // by program item — fixed when the play is accepted   // by program item — begun or executed in this play (Stop(Revert))
+        internal readonly bool[] Touched;   // by program item — begun or executed in this play (Stop(Revert))
+        internal readonly bool[] Turned;    // by program item — fixed when the play is accepted
         internal readonly float[] Output;   // by program item — this play's random output multiplier
         internal readonly int[] Ended;      // the items the pass or the end ended, each once
         internal readonly bool[] InEnded;
@@ -55,6 +57,7 @@ namespace xpTURN.Feedback
             Resolved = new ResolvedTimeline(program);
             Sampler = new TimelineSampler(program, Resolved);
             Cursor = new TimelineCursor(program, Resolved, Sampler);
+            Sample = new TimelineSample(program);
             int count = program.ItemCount;
             Running = new bool[count];
             Touched = new bool[count];

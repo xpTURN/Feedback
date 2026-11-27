@@ -46,6 +46,10 @@ namespace xpTURN.Feedback.Editor
         internal const string GraphComponent = "xpturn-feedback-graph-component";
         internal const string GraphChannel = "xpturn-feedback-graph-channel";
         internal const string GraphScale = "xpturn-feedback-graph-scale";
+        internal const string GraphBox = "xpturn-feedback-graph-box";
+        internal const string GraphTitleRow = "xpturn-feedback-graph-title-row";
+        internal const string GraphTitle = "xpturn-feedback-graph-title";
+        internal const string GraphSwitch = "xpturn-feedback-graph-switch";
         // the validation's slot, panels and rows
         internal const string ValidationWarning = "xpturn-feedback-validation-warning";
         internal const string ValidationResults = "xpturn-feedback-validation-results";

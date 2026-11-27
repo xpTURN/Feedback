@@ -14,7 +14,7 @@ namespace xpTURN.Feedback
         internal const string NoPlayerWarning = "A FeedbackReceiver has no FeedbackPlayer to take its channel's commands (none set and none on its object); it is not registered.";
 
         [SerializeField] internal ChannelRef m_Channel;
-        [SerializeField] internal FeedbackPlayer m_Player;
+        [SerializeField, OwnObjectPlayer] internal FeedbackPlayer m_Player;
         // 0 takes every send; above, a send with a position takes it within this distance
         [SerializeField] internal float m_Range;
 

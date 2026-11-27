@@ -76,11 +76,12 @@ namespace xpTURN.Feedback.Editor
             return values;
         }
 
-        // the live slots a dry one starts from: the host's preview session's, else in play mode the default scheduler's
+        // the live slots a dry one starts from: the host's preview session's — its inspector's, or the Timeline window's that
+        // holds it — else in play mode the default scheduler's
         internal static PropertyLayerRegistry LiveLayers(Component host, bool playing)
         {
             PreviewSession session = PreviewSession.Current;
-            if (session != null && session.Subject == host && session.Scheduler != null)
+            if (session != null && session.Scheduler != null && (session.Subject == host || (host is FeedbackPlayer player && session.HoldsTrackPlayer(player))))
                 return session.Scheduler.Context.Layers;
             return playing ? FeedbackScheduler.Default?.Context.Layers : null;
         }
@@ -277,60 +278,99 @@ namespace xpTURN.Feedback.Editor
             }
             using (DryPlay play = model.NewPlay(player, items, owner, -1))
             {
-                PlayerRuntime rt = play.Runtime;
-                for (int k = 0; k < rt.ItemCount; k++)
-                {
-                    int listIndex = rt.ListIndex(k);
-                    FeedbackItem item = items[listIndex];
-                    List<LayerSlot> slots = play.SlotsOf(k);
-                    if (slots.Count == 0)
-                    {
-                        if (item != null && item.m_Active && Draws(item))
-                            model.NotDrawn.Add(ItemName(item));
-                        continue;
-                    }
-                    foreach (LayerSlot s in slots)
-                    {
-                        SlotGroup group = null;
-                        foreach (SlotGroup g in model.Groups)
-                        {
-                            if (g.Key.Equals(s.Key))
-                                group = g;
-                        }
-                        if (group == null)
-                        {
-                            group = new SlotGroup { Key = s.Key, Name = NameOf(s) };
-                            model.Groups.Add(group);
-                        }
-                        if (!group.Items.Contains(listIndex))
-                            group.Items.Add(listIndex);
-                    }
-                }
-                if (model.Groups.Count == 0)
+                LayerSlot slot = model.Prepare(play, player, items, owner, in inputs, preferred, live);
+                if (slot == null)
                     return model;
-                model.Group = model.Groups.FindIndex(g => g.Name == preferred);
-                if (model.Group < 0)
-                {
-                    model.Group = 0;
-                    for (int g = 1; g < model.Groups.Count; g++)
-                    {
-                        if (model.Groups[g].Items.Count > model.Groups[model.Group].Items.Count)
-                            model.Group = g;
-                    }
-                }
-                model.Seeded = model.Follow != null ? play.SeedFrom(model.Follow.Holder) : play.Seed(live);
-                foreach (int listIndex in model.Shown.Items)
-                    model.PersistGroup |= Persists(items[listIndex]);
-                LayerSlot slot = play.Find(model.Shown.Key);
-                model.Toggle = slot is ToggleSlot;
-                model.Composition = slot.GraphComposition;
-                model.Dimension = model.Toggle ? 1 : DimensionOf(slot);
-                model.RandomLengths = !inputs.Free && HasRandomLengths(player, items, owner, inputs.Seed);
                 model.Ticks = model.Run(play, slot, player, inputs);
             }
             int dimension = model.Dimension + (model.Capped ? 1 : 0);
             model.Sum = model.Fill(model.Ticks, dimension);
             return model;
+        }
+
+        // a clip's play of the list on the clip's axis, 0 ~ duration (the timeline's seconds). args: the clip's (a driven
+        // play's seed, forward and driven mark in). seek: a driven play's target at a clip time (µs on the play's range
+        // [low, high]) — null for a triggered play, ticked on the player's clock from the clip's start; loop: a triggered
+        // play's next play at the tick after its end
+        internal static SlotGraphModel BuildClip(FeedbackPlayer player, List<FeedbackItem> items, Object owner, in GraphInputs inputs, in PlayArgs args, double duration,
+            ClipSeek seek, bool loop, int columns, string preferred, PropertyLayerRegistry live, SettingsValues settings = null)
+        {
+            var model = new SlotGraphModel { Inputs = inputs, Span = duration, Columns = Math.Max(1, Math.Min(columns, ItemGraphModel.MaxColumns)) };
+            model.m_Settings = settings ?? GameSettings(inputs.Live);
+            if (player == null || items == null)
+            {
+                model.Refused = "no player";
+                return model;
+            }
+            using (DryPlay play = model.NewPlay(player, items, owner, -1))
+            {
+                LayerSlot slot = model.Prepare(play, player, items, owner, in inputs, preferred, live);
+                if (slot == null)
+                    return model;
+                model.Ticks = model.RunClip(play, slot, player, in args, seek, loop);
+            }
+            int dimension = model.Dimension + (model.Capped ? 1 : 0);
+            model.Sum = model.Fill(model.Ticks, dimension);
+            return model;
+        }
+
+        // a driven clip's seek target at a clip time — the clip behaviour's
+        internal delegate long ClipSeek(double seconds, long low, long high);
+
+        // the groups of the list's slots and the shown one's slot, its form, its start — null when no item writes a slot
+        LayerSlot Prepare(DryPlay play, FeedbackPlayer player, List<FeedbackItem> items, Object owner, in GraphInputs inputs, string preferred, PropertyLayerRegistry live)
+        {
+            SlotGraphModel model = this;
+            PlayerRuntime rt = play.Runtime;
+            for (int k = 0; k < rt.ItemCount; k++)
+            {
+                int listIndex = rt.ListIndex(k);
+                FeedbackItem item = items[listIndex];
+                List<LayerSlot> slots = play.SlotsOf(k);
+                if (slots.Count == 0)
+                {
+                    if (item != null && item.m_Active && Draws(item))
+                        model.NotDrawn.Add(ItemName(item));
+                    continue;
+                }
+                foreach (LayerSlot s in slots)
+                {
+                    SlotGroup group = null;
+                    foreach (SlotGroup g in model.Groups)
+                    {
+                        if (g.Key.Equals(s.Key))
+                            group = g;
+                    }
+                    if (group == null)
+                    {
+                        group = new SlotGroup { Key = s.Key, Name = NameOf(s) };
+                        model.Groups.Add(group);
+                    }
+                    if (!group.Items.Contains(listIndex))
+                        group.Items.Add(listIndex);
+                }
+            }
+            if (model.Groups.Count == 0)
+                return null;
+            model.Group = model.Groups.FindIndex(g => g.Name == preferred);
+            if (model.Group < 0)
+            {
+                model.Group = 0;
+                for (int g = 1; g < model.Groups.Count; g++)
+                {
+                    if (model.Groups[g].Items.Count > model.Groups[model.Group].Items.Count)
+                        model.Group = g;
+                }
+            }
+            model.Seeded = model.Follow != null ? play.SeedFrom(model.Follow.Holder) : play.Seed(live);
+            foreach (int listIndex in model.Shown.Items)
+                model.PersistGroup |= Persists(items[listIndex]);
+            LayerSlot slot = play.Find(model.Shown.Key);
+            model.Toggle = slot is ToggleSlot;
+            model.Composition = slot.GraphComposition;
+            model.Dimension = model.Toggle ? 1 : DimensionOf(slot);
+            model.RandomLengths = !inputs.Free && HasRandomLengths(player, items, owner, inputs.Seed);
+            return slot;
         }
 
         // an item's line alone: the same list with only that item's binding — the same axis, the same seed
@@ -438,6 +478,62 @@ namespace xpTURN.Feedback.Editor
                 play.Scheduler.RunLateApply();
                 if (m_Places != null)
                     m_Places[n] = record >= 0 && play.Runtime.Record(record).Active ? play.Runtime.Position(record) : -1;
+                Vector4 v = slot.GraphValue;
+                Vector4 d = Form(Composition, Toggle, Dimension, in v, in start, ref last, out float size);
+                if (slot.GraphLimit(out float cap) && cap > 0f && Dimension == 3)
+                {
+                    Capped = true;
+                    Cap = cap;
+                    d.w = size;
+                }
+                for (int c = 0; c < 4; c++)
+                    values[n * 4 + c] = d[c];
+            }
+            return values;
+        }
+
+        // played on a clip's axis: a driven play seeked to the clip's target at each tick's start — n · dt, inside [0, duration)
+        // as the clip is — a zero tick after each seek (as the Timeline window's preview does); a triggered one ticked forward —
+        // the player's speed is the runtime's — and played again at the tick after its end when the clip loops
+        float[] RunClip(DryPlay play, LayerSlot slot, FeedbackPlayer player, in PlayArgs args, ClipSeek seek, bool loop)
+        {
+            Vector4 start = slot.GraphValue;
+            int ticks = Columns * PerColumn;
+            TickCount = ticks;
+            var values = new float[ticks * 4];
+            if (seek == null && !(PlayerRuntime.Factor(player.m_Speed) > 0f))
+            {
+                Refused = "Speed 0";
+                return values;
+            }
+            PlaybackHandle handle = play.Runtime.Play(args, default);
+            if (handle == default)
+            {
+                Refused = "the play was refused";
+                return values;
+            }
+            long low = 0, high = 0;
+            if (seek != null && play.Runtime.SeekRange(handle, out low, out high) != SeekRefusal.None)
+            {
+                Refused = "the list cannot be scrubbed";
+                return values;
+            }
+            double dt = Span / ticks;
+            var last = Vector3.zero;
+            for (int n = 0; n < ticks; n++)
+            {
+                if (seek != null)
+                {
+                    play.Runtime.SeekAt(handle, seek(n * dt, low, high));
+                    play.Scheduler.Tick(new FrameTime(0f, 0f));
+                }
+                else
+                {
+                    if (loop && play.Runtime.Position(handle) < 0)
+                        handle = play.Runtime.Play(args, default);
+                    play.Scheduler.Tick((float)dt);
+                    play.Scheduler.RunLateApply();
+                }
                 Vector4 v = slot.GraphValue;
                 Vector4 d = Form(Composition, Toggle, Dimension, in v, in start, ref last, out float size);
                 if (slot.GraphLimit(out float cap) && cap > 0f && Dimension == 3)

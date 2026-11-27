@@ -9,19 +9,25 @@ using Object = UnityEngine.Object;
 
 namespace xpTURN.Feedback.Editor
 {
-    // the player's Graph under the timeline strip: a slot the shown list writes and its items' values composed as the game
-    // composes them, on the strip's axis — the sum, each item alone faint (one more an editor frame), the capped group's size
-    // and limit. Folded at first (per player, the session's); built again after an edit of the list or the player, a change
-    // of the preview session or the settings, and a new width. The list's selection makes its items' lines strong; a press
-    // scrubs the preview. While open it takes the record: the followed play's frames as dots, the line of that play, and a
-    // warning where the frames differ from it
+    // the player's Graph Preview, a box below the bottom bar: a slot the shown list writes and its items' values composed as
+    // the game composes them, on the strip's axis — the sum, each item alone faint (one more an editor frame), the capped
+    // group's size and limit. Its title row's switch is off at first (per player — in a preset's inspector per preset — the
+    // session's): off, the box is its title row and builds nothing; on, built again after an edit of the list or the player,
+    // a change of the preview session or the settings, and a new width. A list that draws nothing shows its note only. The
+    // list's selection makes its items' lines strong; a press scrubs the preview. While on it takes the record: the followed
+    // play's frames as dots, the line of that play, and a warning where the frames differ from it
     internal sealed class SlotGraphField : VisualElement, IRecordView
     {
-        internal const string Title = "Graph";
-        internal const string FoldPrefix = "xpTURN.Feedback.Inspector.SlotGraph.";
+        internal const string Title = "Graph Preview";
+        internal const string TitleTooltip = "What the shown list writes to one property, composed as the game composes it, on the strip's time";
+        internal const string SwitchTooltip = "On: draws the graph and follows the player's next play. Off: nothing is built or recorded";
+        internal const string SwitchPrefix = "xpTURN.Feedback.Inspector.SlotGraph.";
+        internal const string NoPlayerText = "Pick a Graph Player — the graph finds its targets in that player's scene";
         static readonly string[] s_Sized = { "X", "Y", "Z", "Size" };
 
-        internal readonly Foldout Fold;
+        internal readonly Toggle Switch;
+        // what the switch shows — the header, the notice, the graph and the notes
+        internal readonly VisualElement Body;
         internal readonly VisualElement Header;
         internal readonly Label Notes;
         internal readonly HelpBox Notice;
@@ -33,6 +39,8 @@ namespace xpTURN.Feedback.Editor
         internal int Builds;
         // the items alone drawn so far, by list index
         internal readonly List<int> AloneItems = new List<int>();
+        // a line before the notes — null for none
+        internal Func<string> Note;
 
         readonly TimelineStrip m_Strip;
         readonly SerializedObject m_So;
@@ -40,7 +48,7 @@ namespace xpTURN.Feedback.Editor
         readonly Object m_Owner;
         readonly FeedbackPlayer m_Player;
         readonly ItemListView m_List;
-        readonly string m_FoldKey;
+        readonly string m_SwitchKey;
         readonly List<float[]> m_AloneTicks = new List<float[]>();
         IVisualElementScheduledItem m_AloneJob;
         GraphInputs m_Inputs;
@@ -54,21 +62,24 @@ namespace xpTURN.Feedback.Editor
         readonly RecordSeries m_Series = new RecordSeries();
         bool m_Lost;
 
-        internal SlotGraphField(TimelineStrip strip, SerializedObject listSo, FeedbackPlayer player, ItemListView list)
+        // player: null draws nothing (a note) · switchOwner: the switch's object — the player when null
+        internal SlotGraphField(TimelineStrip strip, SerializedObject listSo, FeedbackPlayer player, ItemListView list, Object switchOwner = null)
         {
             AddToClassList(InspectorStyles.Graph);
+            AddToClassList(InspectorStyles.GraphBox);
             m_Strip = strip;
             m_So = listSo;
             m_Owner = listSo.targetObject;
             m_Player = player;
             m_List = list;
-            m_FoldKey = FoldPrefix + player.GetEntityId();
-            Fold = new Foldout { text = Title, value = SessionState.GetBool(m_FoldKey, false) };
-            Fold.RegisterValueChangedCallback(e =>
+            m_SwitchKey = SwitchPrefix + (switchOwner != null ? switchOwner : player).GetEntityId();
+            Switch = TitleRow(this, SessionState.GetBool(m_SwitchKey, false), TitleTooltip, SwitchTooltip);
+            Switch.RegisterValueChangedCallback(e =>
             {
-                if (e.target != Fold)
+                if (e.target != Switch)
                     return;
-                SessionState.SetBool(m_FoldKey, e.newValue);
+                SessionState.SetBool(m_SwitchKey, e.newValue);
+                Body.style.display = e.newValue ? DisplayStyle.Flex : DisplayStyle.None;
                 if (e.newValue)
                 {
                     Watch();
@@ -77,45 +88,79 @@ namespace xpTURN.Feedback.Editor
                 else
                     Unwatch();
             });
-            Add(Fold);
+            Body = new VisualElement { style = { display = Switch.value ? DisplayStyle.Flex : DisplayStyle.None } };
+            Add(Body);
             Header = new VisualElement();
             Header.AddToClassList(InspectorStyles.GraphHeader);
-            Fold.Add(Header);
+            Body.Add(Header);
             Notice = new HelpBox("", HelpBoxMessageType.Warning) { style = { display = DisplayStyle.None } };
-            Fold.Add(Notice);
+            Body.Add(Notice);
             View = new MotionGraphView { Scrubbed = Scrub, Dots = m_Series.Ring };
             // a parent that moves leaves the view's own layout as it was — its geometry and the field's call the alignment too
             View.RegisterCallback<GeometryChangedEvent>(_ => Align());
             RegisterCallback<GeometryChangedEvent>(_ => Align());
-            Fold.contentContainer.RegisterCallback<GeometryChangedEvent>(_ => Align());
-            Fold.Add(View);
+            Body.RegisterCallback<GeometryChangedEvent>(_ => Align());
+            Body.Add(View);
             Notes = new Label();
             Notes.AddToClassList(InspectorStyles.GraphNotes);
-            Fold.Add(Notes);
+            Body.Add(Notes);
             this.TrackSerializedObjectValue(listSo, _ => Edited());
             // an element tracks one object: the player's settings (a linked or a variant list's player) on a child of its own
-            if (listSo.targetObject != player)
+            if (player != null && listSo.targetObject != player)
             {
                 var playerWatch = new VisualElement { style = { display = DisplayStyle.None } };
                 Add(playerWatch);
                 playerWatch.TrackSerializedObjectValue(new SerializedObject(player), _ => Edited());
             }
-            RegisterCallback<AttachToPanelEvent>(_ => Watch());
-            RegisterCallback<DetachFromPanelEvent>(_ => Unwatch());
+            Action<IEnumerable<int>> highlight = _ => Highlight();
+            // the list outlives a field built again (a preset's inspector's Graph Player): the selection's handler while attached
+            RegisterCallback<AttachToPanelEvent>(_ =>
+            {
+                Watch();
+                if (m_List != null)
+                    m_List.List.selectedIndicesChanged += highlight;
+            });
+            RegisterCallback<DetachFromPanelEvent>(_ =>
+            {
+                Unwatch();
+                if (m_List != null)
+                    m_List.List.selectedIndicesChanged -= highlight;
+            });
             strip.Canvas.RegisterCallback<GeometryChangedEvent>(_ =>
             {
                 Align();
-                if (Fold.value && ColumnsNow() != m_Columns)
+                if (Switch.value && ColumnsNow() != m_Columns)
                     Changed();
             });
-            if (list != null)
-                list.List.selectedIndicesChanged += _ => Highlight();
             schedule.Execute(Poll).Every(100);
-            if (Fold.value)
+            if (Switch.value)
                 Changed();
         }
 
-        string GroupKey => m_FoldKey + ".Slot";
+        // a Graph Preview box's title row: the title and, at the row's right end, the switch — the switch
+        internal static Toggle TitleRow(VisualElement box, bool on, string titleTooltip, string switchTooltip)
+        {
+            var row = new VisualElement();
+            row.AddToClassList(InspectorStyles.GraphTitleRow);
+            var title = new Label(Title) { tooltip = titleTooltip };
+            title.AddToClassList(InspectorStyles.GraphTitle);
+            row.Add(title);
+            var toggle = new Toggle { value = on, tooltip = switchTooltip };
+            toggle.AddToClassList(InspectorStyles.GraphSwitch);
+            row.Add(toggle);
+            box.Add(row);
+            return toggle;
+        }
+
+        // a box's parts that only a drawn line has — the header and the graph; the notes say why when there is none
+        internal static void ShowDrawn(VisualElement header, VisualElement view, SlotGraphModel model)
+        {
+            DisplayStyle d = model != null && model.Sum != null && model.Refused == null ? DisplayStyle.Flex : DisplayStyle.None;
+            header.style.display = d;
+            view.style.display = d;
+        }
+
+        string GroupKey => m_SwitchKey + ".Slot";
 
         FeedbackPlayer IRecordView.Player => m_Player;
 
@@ -123,7 +168,7 @@ namespace xpTURN.Feedback.Editor
 
         void Watch()
         {
-            if (Fold.value && panel != null)
+            if (Switch.value && panel != null && m_Player != null)
                 RecordWatch.Add(this);
         }
 
@@ -181,7 +226,7 @@ namespace xpTURN.Feedback.Editor
         // the drawing spans the strip's axis: from its left pad to its right pad
         void Align()
         {
-            // the hierarchy's parent: a foldout's content box — View.parent is the foldout itself
+            // the hierarchy's parent: the body
             VisualElement parent = View.hierarchy.parent;
             Rect c = m_Strip.Canvas.worldBound;
             if (parent == null || float.IsNaN(c.width) || float.IsNaN(parent.worldBound.width) || parent.worldBound.width <= 0f)
@@ -196,22 +241,22 @@ namespace xpTURN.Feedback.Editor
                 View.style.marginRight = right;
         }
 
-        // an edit, a session, settings or a width: built again at the next frame, once — only while open
+        // an edit, a session, settings or a width: built again at the next frame, once — only while on
         internal void Changed()
         {
             m_Dirty = true;
-            if (!Fold.value || m_Scheduled)
+            if (!Switch.value || m_Scheduled)
                 return;
             m_Scheduled = true;
             schedule.Execute(() =>
             {
                 m_Scheduled = false;
-                if (m_Dirty && Fold.value)
+                if (m_Dirty && Switch.value)
                     Build();
             });
         }
 
-        static string SettingsSignature(bool live)
+        internal static string SettingsSignature(bool live)
         {
             SettingsValues v = SlotGraphModel.GameSettings(live);
             var parts = new List<string>();
@@ -224,9 +269,11 @@ namespace xpTURN.Feedback.Editor
 
         void Poll()
         {
-            if (!Fold.value || panel == null)
+            if (!Switch.value || panel == null)
                 return;
             Align();
+            if (m_Player == null)
+                return;
             if (!GraphInputs.Of(m_Player).Same(in m_Inputs))
                 Changed();
             if (Model != null && ++m_Polls % 3 == 0 && SettingsSignature(m_Inputs.Live) != m_Settings)
@@ -245,6 +292,19 @@ namespace xpTURN.Feedback.Editor
         internal void Build()
         {
             m_Dirty = false;
+            if (m_Player == null)
+            {
+                Model = null;
+                View.Model = null;
+                Header.Clear();
+                Components.Clear();
+                GroupChoice = null;
+                DotsChoice = null;
+                Notes.text = NoPlayerText;
+                ShowDrawn(Header, View, null);
+                View.Refresh();
+                return;
+            }
             Builds++;
             m_AloneJob?.Pause();
             m_AloneJob = null;
@@ -269,6 +329,7 @@ namespace xpTURN.Feedback.Editor
             View.Cap = Model.Capped ? Model.Cap : float.NaN;
             BuildHeader();
             Notes.text = NotesText();
+            ShowDrawn(Header, View, Model);
             View.Refresh();
             Align();
             SlotGroup group = Model.Shown;
@@ -322,50 +383,70 @@ namespace xpTURN.Feedback.Editor
 
         void BuildHeader()
         {
-            Header.Clear();
-            Components.Clear();
-            GroupChoice = null;
             DotsChoice = null;
-            if (Model.Groups.Count > 0)
-            {
-                var names = new List<string>();
-                foreach (SlotGroup g in Model.Groups)
-                    names.Add(g.Name + " (" + g.Items.Count + ")");
-                GroupChoice = new PopupField<string>(names, Model.Group);
-                GroupChoice.AddToClassList(InspectorStyles.GraphChannel);
-                GroupChoice.RegisterValueChangedCallback(e =>
-                {
-                    int g = names.IndexOf(e.newValue);
-                    if (g < 0)
-                        return;
-                    SessionState.SetString(GroupKey, Model.Groups[g].Name);
-                    Changed();
-                });
-                Header.Add(GroupChoice);
-            }
-            ItemGraphModel sum = Model.Sum;
-            if (sum != null && sum.Dimension > 1)
-            {
-                for (int d = 0; d < sum.Dimension; d++)
-                {
-                    int component = d;
-                    var toggle = new Toggle { text = View.Names[d], value = View.Shown[d] };
-                    toggle.AddToClassList(InspectorStyles.GraphComponent);
-                    toggle.Q<Label>(className: Toggle.textUssClassName).style.color = MotionGraphView.ComponentColors[d];
-                    toggle.RegisterValueChangedCallback(e =>
-                    {
-                        View.Shown[component] = e.newValue;
-                        View.Refresh();
-                    });
-                    Components.Add(toggle);
-                    Header.Add(toggle);
-                }
-            }
+            GroupChoice = BuildHeader(Header, Model, View, Components, GroupKey, Changed);
             if (Model.Groups.Count > 0)
             {
                 DotsChoice = View.NewDotsToggle();
                 Header.Add(DotsChoice);
             }
+        }
+
+        // a slot graph's header: the groups' choice (the pick kept under groupKey — changed builds again) and a toggle a
+        // component; the choice, null without a group
+        internal static PopupField<string> BuildHeader(VisualElement header, SlotGraphModel model, MotionGraphView view, List<Toggle> components, string groupKey, Action changed)
+        {
+            header.Clear();
+            components.Clear();
+            PopupField<string> choice = null;
+            if (model.Groups.Count > 0)
+            {
+                var names = new List<string>();
+                foreach (SlotGroup g in model.Groups)
+                    names.Add(g.Name + " (" + g.Items.Count + ")");
+                choice = new PopupField<string>(names, model.Group);
+                choice.AddToClassList(InspectorStyles.GraphChannel);
+                choice.RegisterValueChangedCallback(e =>
+                {
+                    int g = names.IndexOf(e.newValue);
+                    if (g < 0)
+                        return;
+                    SessionState.SetString(groupKey, model.Groups[g].Name);
+                    changed();
+                });
+                header.Add(choice);
+            }
+            ItemGraphModel sum = model.Sum;
+            if (sum != null && sum.Dimension > 1)
+            {
+                for (int d = 0; d < sum.Dimension; d++)
+                {
+                    int component = d;
+                    var toggle = new Toggle { text = view.Names[d], value = view.Shown[d] };
+                    toggle.AddToClassList(InspectorStyles.GraphComponent);
+                    toggle.Q<Label>(className: Toggle.textUssClassName).style.color = MotionGraphView.ComponentColors[d];
+                    toggle.RegisterValueChangedCallback(e =>
+                    {
+                        view.Shown[component] = e.newValue;
+                        view.Refresh();
+                    });
+                    components.Add(toggle);
+                    header.Add(toggle);
+                }
+            }
+            return choice;
+        }
+
+        // what a slot graph's line is: a toggle's, a product's, a turn's, an offset's
+        internal static string FormText(SlotGraphModel model)
+        {
+            if (model.Toggle)
+                return "On · off — the latest started wins";
+            if (model.Composition == Composition.Multiplicative)
+                return "× factor − 1 from the start";
+            if (model.Composition == Composition.Rotation)
+                return "Turn from the start in °";
+            return "From the start";
         }
 
         // a press on the graph: the player's preview scrubs to that place — a refusal's words in the notes
@@ -386,18 +467,14 @@ namespace xpTURN.Feedback.Editor
         internal string NotesText()
         {
             var parts = new List<string>();
+            string note = Note?.Invoke();
+            if (note != null)
+                parts.Add(note);
             if (Model.Groups.Count == 0)
                 parts.Add("No item of this list writes a value the graph draws");
             else
             {
-                if (Model.Toggle)
-                    parts.Add("On · off — the latest started wins");
-                else if (Model.Composition == Composition.Multiplicative)
-                    parts.Add("× factor − 1 from the start");
-                else if (Model.Composition == Composition.Rotation)
-                    parts.Add("Turn from the start in °");
-                else
-                    parts.Add("From the start");
+                parts.Add(FormText(Model));
                 RecordFollow follow = Model.Follow;
                 if (follow != null)
                 {

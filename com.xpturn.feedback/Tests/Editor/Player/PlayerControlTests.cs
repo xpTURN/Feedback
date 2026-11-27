@@ -1563,6 +1563,269 @@ namespace xpTURN.Feedback.Tests.Editor
             End();
         }
 
+        // ---- the end of a pass
+
+        void Same(string got, string want, string what) => Check(got == want, what + ": " + got);
+
+        static string Ticked(FeedbackScheduler s, float dt)
+        {
+            s.Tick(dt);
+            return "[" + TakeLog() + "]";
+        }
+
+        static string Ticked(FeedbackScheduler s, int n, float dt) => string.Join(" ", Enumerable.Range(0, n).Select(_ => Ticked(s, dt)));
+
+        FeedbackPlayer Watched(out FeedbackScheduler s, float delay, params FeedbackItem[] items)
+        {
+            s = Sched();
+            FeedbackPlayer p = PlayerOn(s, items);
+            p.m_StartDelay = delay;
+            Watch(p);
+            return p;
+        }
+
+        // the action once, inside the first Execute of the label in the direction
+        static void Once(string label, bool reverse, Action act)
+        {
+            bool done = false;
+            Hooks((b, what, r) =>
+            {
+                if (done || what != "Execute" || b.Item.m_Label != label || b.LastBegin.Reverse != reverse)
+                    return;
+                done = true;
+                act();
+            });
+        }
+
+        static PlaybackHandle Turn(FeedbackPlayer p, bool forward) => p.PlayTurning(forward ? PlayerDirection.Forward : PlayerDirection.Backward);
+
+        static PlayArgs Forward => PlayArgs.Default.WithDirection(PlayerDirection.Forward);
+
+        // a new forward play takes no end from the play before it: stopped in a backward last pass, right after a turn in the
+        // delay, and with a turned cursor still waiting to finish
+        [Test]
+        public void DE19_AnEarlierPlaysEndIsNotInherited()
+        {
+            FeedbackPlayer p = null;
+            p = Watched(out FeedbackScheduler s, 0f, Act("a", 0.2f), Act("i", 0f));
+            Once("i", true, () => p.Stop());
+            p.Play(Backward);
+            s.Tick(0.5f);
+            Hooks();
+            TakeLog();
+            p.Play(Forward);
+            s.Tick(0.05f);
+            TakeLog();
+            p.Runtime.SeekAt(Position(p));
+            Same(TakeLog() + " " + Position(p), "a.Evaluate(0.25) 50000", "stopped in the backward last pass");
+            Same(Ticked(s, 3, 0.1f), "[a.Evaluate(0.75)] [a.Evaluate(1) a.End:Completed a.Settle |Completed] []", "and on");
+
+            FeedbackPlayer q = Watched(out FeedbackScheduler qs, 1f, Act("a", 1f));
+            q.Play(Forward);
+            qs.Tick(0.25f);
+            Turn(q, false);
+            q.Stop();
+            TakeLog();
+            q.Play(Forward);
+            qs.Tick(0.25f);
+            TakeLog();
+            q.Runtime.SeekAt(Position(q));
+            Same(TakeLog() + " " + Position(q), " 250000", "stopped right after a turn in the delay");
+
+            FeedbackPlayer c = Watched(out FeedbackScheduler cs, 0.5f, Act("a", 1f));
+            c.Play(Backward);
+            cs.Tick(0.25f);
+            Turn(c, true);
+            c.Stop();
+            TakeLog();
+            c.Play(Forward);
+            TakeLog();
+            Same(Ticked(cs, 0.25f), "[]", "the cursor's wait does not reach the next play");
+            Check(c.IsPlaying && Position(c) == 250000L, "the next play goes on at " + Position(c));
+            End();
+        }
+
+        // a seek back in the last forward event keeps the play: no Completed in that tick, it plays again to one Completed
+        [Test]
+        public void DE20_ASeekInTheLastForwardEvent()
+        {
+            FeedbackPlayer p = null;
+            p = Watched(out FeedbackScheduler s, 0f, Act("t", 0.4f), Act("z", 0f, 0.4f));
+            Once("z", false, () => p.Seek(0f));
+            p.Play(Forward);
+            TakeLog();
+            Same(Ticked(s, 0.5f) + " " + Position(p), "[t.Evaluate(1) t.End:Completed z.Execute#0 t.Settle z.Execute#0~ t.Begin#0~ t.Evaluate(0) t.Evaluate(0)] 0", "the tick");
+            Same(Ticked(s, 5, 0.1f), "[t.Evaluate(0.25)] [t.Evaluate(0.5)] [t.Evaluate(0.75)] [t.Evaluate(1) t.End:Completed z.Execute#0 t.Settle |Completed] []", "and on");
+            End();
+        }
+
+        // a seek past the delay in the last backward event keeps the play and goes on backward from there, with a start delay too
+        [Test]
+        public void DE21_ASeekInTheLastBackwardEvent()
+        {
+            FeedbackPlayer p = null;
+            p = Watched(out FeedbackScheduler s, 0f, Act("i0", 0f), Act("t", 0.4f));
+            Once("i0", true, () => p.Seek(0.3f));
+            p.Play(Backward);
+            TakeLog();
+            Same(Ticked(s, 0.5f) + " " + Position(p), "[t.Evaluate(0) t.End:Completed i0.Execute#0~ t.Settle i0.Execute#0 t.Begin#0 t.Evaluate(0.75) t.Evaluate(0.75)] 300000", "the tick");
+            Same(Ticked(s, 4, 0.1f), "[t.Evaluate(0.5)] [t.Evaluate(0.25)] [t.Evaluate(0) t.End:Completed i0.Execute#0~ t.Settle |Completed] []", "and on");
+
+            FeedbackPlayer d = null;
+            d = Watched(out FeedbackScheduler ds, 0.25f, Act("i0", 0f), Act("t", 0.5f));
+            Once("i0", true, () => d.Seek(0.5f));
+            d.Play(Backward);
+            TakeLog();
+            Same(Ticked(ds, 1f) + " " + Position(d), "[t.Begin#0~ t.Evaluate(0) t.End:Completed i0.Execute#0~ t.Settle i0.Execute#0 t.Begin#0 t.Evaluate(0.5) t.Evaluate(0.5)] 500000", "with a start delay");
+            Same(Ticked(ds, 3, 0.125f), "[t.Evaluate(0.25)] [t.Evaluate(0) t.End:Completed i0.Execute#0~ t.Settle |Completed] []", "and on");
+            End();
+        }
+
+        // a seek to the play's end in its last event still completes it in that tick — the end, past it, the start going back, a
+        // place inside the start delay — and a Skip beside the seek goes first
+        [Test]
+        public void DE22_ASeekToTheEndStillCompletes()
+        {
+            const string ends = "[t.Evaluate(1) t.End:Completed z.Execute#0 t.Settle |Completed]";
+            foreach (float target in new[] { 0.4f, float.PositiveInfinity })
+            {
+                FeedbackPlayer p = null;
+                p = Watched(out FeedbackScheduler s, 0f, Act("t", 0.4f), Act("z", 0f, 0.4f));
+                Once("z", false, () => p.Seek(target));
+                p.Play(Forward);
+                TakeLog();
+                Same(Ticked(s, 0.5f) + " " + p.IsPlaying, ends + " False", "forward " + target);
+            }
+
+            FeedbackPlayer b = null;
+            b = Watched(out FeedbackScheduler bs, 0f, Act("i0", 0f), Act("t", 0.4f));
+            Once("i0", true, () => b.Seek(0f));
+            b.Play(Backward);
+            TakeLog();
+            Same(Ticked(bs, 0.5f) + " " + b.IsPlaying, "[t.Evaluate(0) t.End:Completed i0.Execute#0~ t.Settle |Completed] False", "backward 0");
+
+            FeedbackPlayer d = null;
+            d = Watched(out FeedbackScheduler ds, 0.25f, Act("i0", 0f), Act("t", 0.25f));
+            Once("i0", true, () => d.Seek(0.125f));
+            d.Play(Backward);
+            TakeLog();
+            string log = Ticked(ds, 1f);
+            Check(log.EndsWith("|Completed]", StringComparison.Ordinal) && !d.IsPlaying, "backward inside the delay: " + log);
+
+            FeedbackPlayer k = null;
+            k = Watched(out FeedbackScheduler ks, 0f, Act("t", 0.4f), Act("z", 0f, 0.4f));
+            Once("z", false, () =>
+            {
+                k.Seek(0f);
+                k.Skip();
+            });
+            k.Play(Forward);
+            TakeLog();
+            Same(Ticked(ks, 0.5f) + " " + k.IsPlaying, ends + " False", "skip first");
+            End();
+        }
+
+        // ---- the first frame of an item the plays leave out
+
+        // an item a play of the player's own settings leaves out — its category turned off, its intensity range — writes no
+        // first frame, forward or backward, and the plays leave its target as it was. The chance is each play's own: an item of
+        // chance 0 writes it. A category turned on after the prepare starts its item at the play, a Rebuild before the first
+        // play writes it, and one turned off after the prepare leaves the frame it wrote to Restore
+        [Test]
+        public void DE23_ALeftOutItemWritesNoFirstFrame()
+        {
+            var one = new Vector3(1f, 0f, 0f);
+            var five = new Vector3(0f, 5f, 0f);
+            // a Motion item: "off" turns the category off before the prepare, "range" is 0 ~ 0.5 (the player plays at 1),
+            // "chance" is 0
+            FeedbackPlayer Made(string cut, bool backward, out FeedbackScheduler s, out GameObject t)
+            {
+                s = Sched();
+                t = At("t23 " + cut, one);
+                PositionItem item = Pos(t, backward ? TweenMode.To : TweenMode.From, five, 0.2f);
+                if (cut == "range")
+                {
+                    item.m_Conditions.m_UseIntensityRange = true;
+                    item.m_Conditions.m_IntensityRange = new Vector2(0f, 0.5f);
+                }
+                else if (cut == "chance")
+                    item.m_Conditions.m_Chance = 0f;
+                else if (cut == "off")
+                    s.Context.Categories.SetEnabled(FeedbackCategory.Motion, false);
+                FeedbackPlayer made = PlayerOn(s, item);
+                made.m_ApplyInitialState = true;
+                if (backward)
+                    made.m_Direction = PlayerDirection.Backward;
+                return made;
+            }
+
+            foreach (string cut in new[] { "off", "range" })
+            {
+                foreach (bool backward in new[] { false, true })
+                {
+                    FeedbackPlayer p = Made(cut, backward, out FeedbackScheduler s, out GameObject t);
+                    p.EnsureRuntime();
+                    string prepared = P(t);
+                    p.Play();
+                    Run(s, 3, 0.1f);
+                    Check(prepared == "(1, 0, 0)" && P(t) == "(1, 0, 0)", cut + (backward ? " backward: " : " forward: ") + prepared + " → " + P(t));
+                }
+            }
+
+            // the category turned on after the prepare, a play's intensity inside the range: the play starts from its first frame
+            FeedbackPlayer on = Made("off", false, out FeedbackScheduler os, out GameObject ot);
+            on.EnsureRuntime();
+            string onPrepared = P(ot);
+            os.Context.Categories.SetEnabled(FeedbackCategory.Motion, true);
+            on.Play();
+            string onPlay = P(ot);
+            Run(os, 3, 0.1f);
+            Check(onPrepared == "(1, 0, 0)" && onPlay == "(0, 5, 0)" && P(ot) == "(1, 0, 0)", "turned on after the prepare: " + onPrepared + " · " + onPlay + " → " + P(ot));
+            FeedbackPlayer inside = Made("range", false, out FeedbackScheduler iss, out GameObject it);
+            inside.EnsureRuntime();
+            string insidePrepared = P(it);
+            inside.Play(PlayArgs.Default.WithIntensity(0.3f));
+            string insidePlay = P(it);
+            Run(iss, 3, 0.1f);
+            Check(insidePrepared == "(1, 0, 0)" && insidePlay == "(0, 5, 0)" && P(it) == "(1, 0, 0)", "a play inside the range: " + insidePrepared + " · " + insidePlay + " → " + P(it));
+
+            // the chance is each play's own: chance 0 writes it, and the plays leave it there
+            FeedbackPlayer never = Made("chance", false, out FeedbackScheduler ns, out GameObject nt);
+            never.EnsureRuntime();
+            string neverPrepared = P(nt);
+            never.Play();
+            Run(ns, 3, 0.1f);
+            Check(neverPrepared == "(0, 5, 0)" && P(nt) == "(0, 5, 0)", "chance 0: " + neverPrepared + " → " + P(nt));
+            // the player's intensity inside the range writes it
+            FeedbackPlayer low = Made("range", false, out FeedbackScheduler ls, out GameObject lt);
+            low.m_Intensity = 0.3f;
+            low.EnsureRuntime();
+            string lowPrepared = P(lt);
+            low.Play();
+            Run(ls, 3, 0.1f);
+            Check(lowPrepared == "(0, 5, 0)" && P(lt) == "(1, 0, 0)", "the player's intensity inside the range: " + lowPrepared + " → " + P(lt));
+            // turned on, then a Rebuild before the first play writes it
+            FeedbackPlayer rebuilt = Made("off", false, out FeedbackScheduler rs, out GameObject rt);
+            rebuilt.EnsureRuntime();
+            rs.Context.Categories.SetEnabled(FeedbackCategory.Motion, true);
+            rebuilt.Rebuild();
+            string afterRebuild = P(rt);
+            rebuilt.Play();
+            Run(rs, 3, 0.1f);
+            Check(afterRebuild == "(0, 5, 0)" && P(rt) == "(1, 0, 0)", "turned on, then Rebuild: " + afterRebuild + " → " + P(rt));
+            // turned off after the prepare: the frame it wrote stays, and Restore puts back the value from before it
+            FeedbackPlayer off = Made("on", false, out FeedbackScheduler fs, out GameObject ft);
+            off.EnsureRuntime();
+            string offPrepared = P(ft);
+            fs.Context.Categories.SetEnabled(FeedbackCategory.Motion, false);
+            off.Play();
+            Run(fs, 3, 0.1f);
+            string offPlayed = P(ft);
+            off.Restore();
+            Check(offPrepared == "(0, 5, 0)" && offPlayed == "(0, 5, 0)" && P(ft) == "(1, 0, 0)", "turned off after the prepare: " + offPrepared + " · " + offPlayed + " → " + P(ft));
+            End();
+        }
+
         static string Values(Type type) => string.Join(" ", Enum.GetNames(type).Select(n => n + "=" + (int)Enum.Parse(type, n)));
     }
 }

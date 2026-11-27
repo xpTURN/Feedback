@@ -1,5 +1,82 @@
 # Changelog
 
+## [0.3.0] - 2026-11-27
+
+The Graph Preview in the player's, preset's and clip's inspectors, a menu that picks one of an object's Feedback
+Players, and fixes for turned, sought and paused plays and their sounds. Requires Unity 6000.0.85f2 or later; no package
+dependencies.
+
+### Added
+- A Feedback Player field in the inspector — a UI trigger row's, a receiver's, the Flow items' and your scripts' — shows
+  a menu beside it while the player's object has more than one Feedback Player, and picks one by its number and
+  **Alias**. On a UI trigger row and a receiver, an empty field's menu names the player it uses: the first on its
+  object. A `Flow/Play Player` header shows the player's number and alias too. The package now draws `FeedbackPlayer`
+  fields, so a property drawer of your own for that type is not used.
+- A preset's inspector has the **Graph Preview** below **Add Feedback**, drawn on a **Graph Player** you pick — a player
+  that links the preset or holds it in its Variants at first, or any scene or prefab player. The strip and the items'
+  graphs take that player's start delay, length and targets.
+- A Feedback clip's Inspector has a **Graph Preview** of the values the clip's play writes, on the clip's time: its
+  **Clip In**, speed, **Loop**, **Seed** and **Intensity**, and in Play mode the director's `FeedbackTimelineOptions`. A
+  press moves the Timeline window's time while its preview is on.
+
+### Changed
+- A player's Inspector **Graph** is now the **Graph Preview**: a box below **Add Feedback**, always shown, that the
+  switch at its top right turns on. It is off at first, and off it builds nothing; a list that writes nothing it can draw
+  shows a note only.
+- During the Timeline window's preview, a player's Inspector **Graph Preview** starts from the values before the
+  preview, as it does during the player's own preview.
+
+### Fixed
+- A backward play turned forward during its Start Delay never completed. It now completes on the next update.
+- A forward play turned backward during its Start Delay never completed after a `Seek` past the delay. It now plays
+  backward from the target.
+- Turning a play twice during its Start Delay lost the time left of the delay. The play now goes on as if it had not
+  been turned.
+- A forward play could complete on a `Seek` to its current time when the previous backward play on that player had been
+  stopped from one of its last events.
+- A `Seek` called from a play's own last event completed the play even when the target was before its end. The play now
+  goes on from the target, and a target at the end still completes it.
+- A play that ended while paused, by `Skip`, a `Seek` to its end or a Pause in its last event, left its
+  `Audio/Source Control` sound paused and its `Audio/Play At Point` voice out of the pool, and its Edit-mode preview did
+  not end. The sound now stops and the voice goes back to the pool.
+- A Pause called from a play's own event missed the sounds that the play's next items started right after it: they
+  played on while the play was paused. They now pause with the play and go on with its Resume, and stop if the play
+  ends there.
+- With the **Overlap** policy, a Play At Point voice of an ended play was paused by a later backward play and stayed
+  paused when that play ended. It now plays on.
+- An item that threw inside `Seek`, `Skip()` or a turn (`PlayFromEvent(bool)`, a UI trigger) threw out of the call and
+  left the play half moved, and on a Timeline track frozen. That play now ends as `PlaybackEnd.Faulted`, the call does
+  not throw, and the player's other plays and Variants still move.
+- `Rebuild()` called from a Variant's prepare released the player's runtime and left the Variants' runtimes unreleased.
+  It now returns false and changes nothing.
+- With the **Overlap** policy, a backward play started from inside another backward play's evaluation made that play's
+  later items take the new play's place for one frame.
+- An instant item whose category override is Flash was not undone by a `Seek` back over it or a backward play once the
+  flash limit was reached, and below the limit its undo used up one of the limit's flash starts. The undo now always
+  runs and does not count toward the limit.
+- A **Background** item that its **Play Direction** runs against the play jumped to where it would have finished when
+  the rest of the list ended and cut it. It now ends where it was cut, as other cut **Background** items do.
+- A turn (`PlayFromEvent(bool)`) called from a play's last event returned that play's handle, yet the play completed
+  instead of turning. The play now turns at its end and goes back.
+- A **Reverse Only** instant passed the other way — by a backward play turned forward, or a `Seek` toward the end of a
+  backward play — acted again: its Unity Event was called again, and a `Flow/Play Player` played its player forward
+  again. It is now undone, as other instants are.
+- With **Apply Initial State**, an item in a category turned off or outside its intensity range wrote its first frame
+  when the player prepared, and its target stayed there, since the plays leave the item out. Such an item now writes
+  nothing, as one its direction condition leaves out does.
+- A player destroyed with `DestroyImmediate` from one of its items' prepare kept what that prepare made — its items
+  stayed bound to their targets — and `Rebuild()` returned true and `Play` a handle. The prepare now releases it, and
+  those calls return false and `default`.
+- Under the game's `AudioListener.pause`, the player's Pause did not pause the sound its `Audio/Source Control`
+  started: when the listener's pause ended, the sound played while the play stayed paused, or after the play had ended
+  paused. It now waits for the player's Resume, and stops if the play ends paused.
+- A turn back (`PlayFromEvent(bool)`) called right after a turn the other way from one of a play's own events, or
+  after a `Seek` whose sweep asked a turn, started a new play. The play started over, on the player's own list if
+  `Play` had named a Variant; with **Overlap** it turned and played beside the new one; from an event at the play's
+  start the call was refused with a warning while the play turned and ended. The turn back now takes the first one
+  back, and the play goes on as it was. Turning a play there and back after such a `Seek` no longer turns it again at
+  the next update.
+
 ## [0.2.3] - 2026-11-23
 
 The Replay Monitor sample, Cinemachine feedbacks on a brain that updates in `FixedUpdate`, and test assemblies that

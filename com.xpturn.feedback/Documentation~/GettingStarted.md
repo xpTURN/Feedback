@@ -106,8 +106,8 @@ Select an object with a Feedback Player. From the top, its inspector shows:
 - The timeline strip: each item as a bar on the player's time — its delay thin, its runs in the item's category color —
   with the total time at its head. Drag a bar to move its delay and its right end to change its duration, in 0.01 s
   steps (hold Shift for none); one drag is one Undo.
-- The **Graph** under the strip — see [The graphs](#the-graphs).
 - The item list, then a bar with the validation summary, **Paste** and **Add Feedback**.
+- The **Graph Preview** below that bar — see [The graphs](#the-graphs).
 
 ![A Feedback Player's inspector: the preview bar, the player's settings, the timeline strip and a list of five items](images/inspector.png)
 
@@ -164,27 +164,36 @@ Play mode ▶ ❚❚ ■ play, pause and stop the player itself, with **Intensit
 ### The graphs
 
 An item that writes a value has a folded **Graph** under its motion — so does a Motion Driver in **Loop** mode — and the
-player has one under the timeline strip. Open, they draw what the player writes:
+player has a **Graph Preview** box below **Add Feedback**. The box is always shown; the switch at its top right turns it
+on, and it is off at first — off, it builds nothing. Open or on, they draw what the player writes:
 
 - An item's graph is the value the item writes over its time — its motion and ease, its timing, the intensity and the
   category's scale — in the motion's units. A band shows a random output's range, and an item its **Chance** would skip
   says so. Outside a preview it draws one sample seed at intensity 1; during a preview, the preview's seed and
   **Intensity**.
-- The strip's graph picks one property the list writes — an object's position, say — and draws the items on it as the
+- The Graph Preview picks one property the list writes — an object's position, say — and draws the items on it as the
   game combines them, on the strip's time: the sum strong, each item alone faint, the item selected in the list strong.
   A camera shake's cap shows as its size and a dashed limit, a scale as a factor, and a rotation as angles, with a note
-  when the axes interact.
+  when the axes interact. A list that writes nothing it can draw shows a note only.
 - Press and drag on either graph to scrub the preview.
 
-![A player's inspector with its graphs open: the strip's Graph of the position its two items write, with a paused preview's frames as dots, and the first item's own Graph](images/graphs.png)
+![A player's inspector from the timeline strip to the Graph Preview: the first item's own Graph open, and below Add Feedback the Graph Preview of the position the two items write, with a paused preview's frames as dots](images/graphs.png)
 
-While a graph is open, the next play of its player — in the preview or in Play mode — is followed: the line becomes that
-play's, with its seed, intensity and direction, and **Dots** in the graph's header — one choice for every graph, off at
-first — draws the value written at each frame. When the frames leave the line, a warning says so: another player, a
-Motion Driver or a script writes the same property. While a [Persist](Concepts.md#how-values-are-written) item runs, its
-writes cover the others. An edit lets the followed play go, and in Play mode an edit to the list waits for **Rebuild**.
-The graphs use the project's category settings and camera shake cap, while the preview plays at ×1 without the cap — a
-note under the graph says so.
+While an item's graph is open or the Graph Preview is on, the next play of its player — in the preview or in Play mode —
+is followed: the line becomes that play's, with its seed, intensity and direction, and **Dots** in the graph's header —
+one choice for every graph, off at first — draws the value written at each frame. When the frames leave the line, a
+warning says so: another player, a Motion Driver or a script writes the same property. While a
+[Persist](Concepts.md#how-values-are-written) item runs, its writes cover the others. An edit lets the followed play go,
+and in Play mode an edit to the list waits for **Rebuild**. The graphs use the project's category settings and camera
+shake cap, while the preview plays at ×1 without the cap — a note under the graph says so.
+
+A preset's inspector draws its strip and graphs on a **Graph Player**: at first a player in the open scenes that links
+the preset or holds it in its Variants, or any player you pick — a scene's or a prefab's, chosen by number and alias
+when its object has several. The strip and the graphs take that player's start delay, length and targets, and say so
+when the player does not list the preset. A Feedback clip's Inspector has a **Graph Preview** too, on the clip's time: a
+Driven clip's line follows its **Clip In**, speed and **Loop** at the clip's **Seed** and **Intensity**, a Triggered
+clip's is one play from the clip's start at a sample seed, and a press moves the Timeline window's time there while its
+preview is on.
 
 ### Presets
 

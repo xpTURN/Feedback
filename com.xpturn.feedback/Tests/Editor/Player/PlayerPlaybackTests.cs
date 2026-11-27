@@ -1526,5 +1526,388 @@ namespace xpTURN.Feedback.Tests.Editor
                 "Speed 0 — seconds " + B("frozen").LastBegin.Seconds + " · endless " + B("frozen").LastBegin.Endless + " · " + B("frozen endless").LastBegin.Endless);
             End();
         }
+
+        // ---- an item that throws in a Seek, a Skip or a turn called from outside the play's events
+
+        sealed class Heard : IPlaybackListener
+        {
+            readonly List<PlaybackEnd> m_Heard;
+
+            internal Heard(List<PlaybackEnd> heard) => m_Heard = heard;
+
+            public void OnPlaybackEnded(PlaybackHandle handle, PlaybackEnd end) => m_Heard.Add(end);
+        }
+
+        // the Seek does not throw: the play that threw ends with no event and its listener hears Faulted — running or paused,
+        // the player's Seek and one play's — the other play moves to the target, a Seek whose only play threw is false and the
+        // next play's Seek runs at once
+        [Test]
+        public void BE20_AThrowInASeekEndsThatPlay()
+        {
+            foreach (bool paused in new[] { false, true })
+            {
+                string row = paused ? "paused" : "running";
+                PlayerTestBinding.Log.Clear();
+                m_HandleNo.Clear();
+                FeedbackScheduler s = Scheduler();
+                FeedbackPlayer p = Player(s, Act("a", 1f), Act("b", 0.1f, 0.5f));
+                p.m_Policy = PlayPolicy.Overlap;
+                p.m_MaxOverlap = 2;
+                Watch(p);
+                var heard = new List<PlaybackEnd>();
+                PlaybackHandle first = p.Play(PlayArgs.Default.WithListener(new Heard(heard)));
+                PlaybackHandle second = p.Play();
+                s.Tick(0.1f);
+                if (paused)
+                    p.Pause();
+                PlayerTestBinding.Hook = (b, what, record) =>
+                {
+                    if (what == "Begin" && b.Item.m_Label == "b" && record == 0)
+                        throw new InvalidOperationException("seek throws");
+                };
+                LogAssert.Expect(LogType.Exception, "InvalidOperationException: seek throws");
+                bool moved = p.Seek(0.7f);
+                PlayerTestBinding.Hook = null;
+                Check(moved && string.Join(",", heard) == "Faulted" && Events() == "|Played1 |Played2" + (paused ? " |Paused" : ""),
+                    row + " — the play that threw ends quietly: " + moved + " · " + string.Join(",", heard) + " · " + Events());
+                Check(!p.Runtime.Owns(first) && p.Runtime.Position(second) == TimelineTime.FromSeconds(0.7f) && p.HasPaused == paused,
+                    row + " — the other play moved: " + p.Runtime.Position(second));
+            }
+            FeedbackScheduler s2 = Scheduler();
+            FeedbackPlayer q = Player(s2, Act("a", 1f), Act("b", 0.1f, 0.5f));
+            q.Play();
+            s2.Tick(0.1f);
+            PlayerTestBinding.ThrowsIn.Add("b.Begin");
+            LogAssert.Expect(LogType.Exception, "InvalidOperationException: test b.Begin");
+            bool only = q.Seek(0.7f);
+            PlaybackHandle one = q.Play();
+            LogAssert.Expect(LogType.Exception, "InvalidOperationException: test b.Begin");
+            bool byHandle = q.SeekAt(one, TimelineTime.FromSeconds(0.7f));
+            PlayerTestBinding.ThrowsIn.Clear();
+            Check(!only && !byHandle && !q.IsPlaying, "the only play threw: " + only + " · one play's " + byHandle + " · playing " + q.IsPlaying);
+            PlaybackHandle next = q.Play();
+            bool again = q.Seek(0.3f);
+            Check(again && q.Runtime.Position(next) == TimelineTime.FromSeconds(0.3f), "the next play's Seek: " + again + " · " + q.Runtime.Position(next));
+            End();
+        }
+
+        // the Skip does not throw: the play that threw ends with no event and its listener hears Faulted, running or paused; the
+        // other play completes, and a Skip whose only play threw is true — that play ended
+        [Test]
+        public void BE21_AThrowInASkipEndsThatPlay()
+        {
+            foreach (bool paused in new[] { false, true })
+            {
+                string row = paused ? "paused" : "running";
+                PlayerTestBinding.Log.Clear();
+                m_HandleNo.Clear();
+                FeedbackScheduler s = Scheduler();
+                FeedbackPlayer p = Player(s, Act("a", 1f), Act("b", 0.1f, 0.5f));
+                p.m_Policy = PlayPolicy.Overlap;
+                p.m_MaxOverlap = 2;
+                Watch(p);
+                var heard = new List<PlaybackEnd>();
+                p.Play(PlayArgs.Default.WithListener(new Heard(heard)));
+                p.Play();
+                s.Tick(0.1f);
+                if (paused)
+                    p.Pause();
+                PlayerTestBinding.Hook = (b, what, record) =>
+                {
+                    if (what == "Begin" && b.Item.m_Label == "b" && record == 0)
+                        throw new InvalidOperationException("skip throws");
+                };
+                LogAssert.Expect(LogType.Exception, "InvalidOperationException: skip throws");
+                bool ended = p.Skip();
+                PlayerTestBinding.Hook = null;
+                Check(ended && !p.IsPlaying && string.Join(",", heard) == "Faulted" && Events() == "|Played1 |Played2" + (paused ? " |Paused" : "") + " |Completed2",
+                    row + ": " + ended + " · playing " + p.IsPlaying + " · " + string.Join(",", heard) + " · " + Events());
+            }
+            FeedbackScheduler s2 = Scheduler();
+            FeedbackPlayer q = Player(s2, Act("a", 1f), Act("b", 0.1f, 0.5f));
+            q.Play();
+            s2.Tick(0.1f);
+            PlayerTestBinding.ThrowsIn.Add("b.Begin");
+            LogAssert.Expect(LogType.Exception, "InvalidOperationException: test b.Begin");
+            bool only = q.Skip();
+            PlayerTestBinding.ThrowsIn.Clear();
+            Check(only && !q.IsPlaying, "the only play threw: " + only + " · playing " + q.IsPlaying);
+            End();
+        }
+
+        // a turn does not throw: the play that threw ends with no event, its listener hears Faulted, and no new play starts
+        [Test]
+        public void BE22_AThrowInATurnEndsThatPlay()
+        {
+            FeedbackScheduler s = Scheduler();
+            FeedbackPlayer p = Player(s, Act("a", 1f));
+            Watch(p);
+            var heard = new List<PlaybackEnd>();
+            p.Play(PlayArgs.Default.WithListener(new Heard(heard)));
+            s.Tick(0.3f);
+            PlayerTestBinding.ThrowsIn.Add("a.Evaluate");
+            LogAssert.Expect(LogType.Exception, "InvalidOperationException: test a.Evaluate");
+            p.PlayFromEvent(false);
+            PlayerTestBinding.ThrowsIn.Clear();
+            Check(!p.IsPlaying && string.Join(",", heard) == "Faulted" && Events() == "|Played1", "the turn: playing " + p.IsPlaying + " · " + string.Join(",", heard) + " · " + Events());
+            End();
+        }
+
+        // inside the play's events a Seek's or a Skip's throw is the Play's or the tick's own: at t = 0 no handle and no event,
+        // in a tick no event after Played — the listener hears Faulted
+        [Test]
+        public void BE23_AThrowInASeekOrSkipFromThePlaysEvents()
+        {
+            foreach (bool skip in new[] { false, true })
+            {
+                string row = skip ? "Skip" : "Seek";
+                PlayerTestBinding.Log.Clear();
+                m_HandleNo.Clear();
+                FeedbackScheduler s = Scheduler();
+                FeedbackPlayer p = null;
+                p = Player(s, Act("x", 0f), Act("y", 0f, 0.2f), Act("a", 1f), Act("b", 0.1f, 0.5f));
+                Watch(p);
+                string asks = "x";
+                PlayerTestBinding.Hook = (b, what, record) =>
+                {
+                    if (what != "Execute" || b.Item.m_Label != asks)
+                        return;
+                    if (skip)
+                        p.Skip();
+                    else
+                        p.Seek(0.9f);
+                };
+                PlayerTestBinding.ThrowsIn.Add("b.Begin");
+                var atZero = new List<PlaybackEnd>();
+                LogAssert.Expect(LogType.Exception, "InvalidOperationException: test b.Begin");
+                PlaybackHandle h = p.Play(PlayArgs.Default.WithListener(new Heard(atZero)));
+                Check(h == default && !p.IsPlaying && Events() == "" && string.Join(",", atZero) == "Faulted",
+                    row + " at t = 0: " + No(h) + " · playing " + p.IsPlaying + " · " + Events() + " · " + string.Join(",", atZero));
+                asks = "y";
+                var inTick = new List<PlaybackEnd>();
+                p.Play(PlayArgs.Default.WithListener(new Heard(inTick)));
+                LogAssert.Expect(LogType.Exception, "InvalidOperationException: test b.Begin");
+                s.Tick(0.3f);
+                PlayerTestBinding.Hook = null;
+                PlayerTestBinding.ThrowsIn.Clear();
+                Check(!p.IsPlaying && Events() == "|Played1" && string.Join(",", inTick) == "Faulted",
+                    row + " in a tick: playing " + p.IsPlaying + " · " + Events() + " · " + string.Join(",", inTick));
+            }
+            End();
+        }
+
+        // a binding's call that starts another backward play of the same player leaves the backward play it is in at its own
+        // place — its later items are evaluated there; a forward play reads its cursor
+        [Test]
+        public void BE24_ABackwardPlayStartedInsideAnEvaluation()
+        {
+            foreach (bool back in new[] { true, false })
+            {
+                FeedbackScheduler s = Scheduler();
+                FeedbackPlayer p = null;
+                p = Player(s, Act("x", 1f), Act("y", 1f), Act("z", 1f));
+                p.m_Policy = PlayPolicy.Overlap;
+                p.m_MaxOverlap = 2;
+                p.Play(back ? PlayArgs.Default.WithDirection(PlayerDirection.Backward) : PlayArgs.Default);
+                s.Tick(0.25f);
+                bool once = false;
+                PlayerTestBinding.Hook = (b, what, record) =>
+                {
+                    if (once || what != "Evaluate" || b.Item.m_Label != "x" || record != 0)
+                        return;
+                    once = true;
+                    p.Play(PlayArgs.Default.WithDirection(PlayerDirection.Backward));
+                };
+                PlayerTestBinding.LogRecords = true;
+                PlayerTestBinding.Log.Clear();
+                s.Tick(0.25f);
+                PlayerTestBinding.Hook = null;
+                PlayerTestBinding.LogRecords = false;
+                string own = string.Join(" ", PlayerTestBinding.Log.Where(l => l.Contains(".Evaluate") && l.EndsWith("@0", StringComparison.Ordinal)));
+                Check(once && own == "x.Evaluate(0.5)@0 y.Evaluate(0.5)@0 z.Evaluate(0.5)@0", (back ? "backward" : "forward") + ": " + own);
+            }
+            End();
+        }
+
+        // ---- an instant's undo and the flash limit
+
+        // a Set to 1 at 0.2 s, its category Flash
+        static CustomFloatItem FlashSet(FeedbackTestFloatTarget target, DirectionCondition direction = DirectionCondition.Always)
+        {
+            var set = new CustomFloatItem
+            {
+                m_Target = new TargetRef { m_Mode = TargetRefMode.Direct, m_Object = target, m_Path = "", m_Anchor = "" },
+                m_Motion = new SetMotion { m_Params = new SetParams { m_Value = Vector4.one } },
+            };
+            set.m_Timing.m_Delay = 0.2f;
+            set.m_Category = new CategoryOverride { m_Override = true, m_Category = FeedbackCategory.Flash };
+            set.m_Conditions.m_Direction = direction;
+            return set;
+        }
+
+        // an instant's backward act starts no flash: with the limit full a Seek back over the Set and a backward play after a
+        // forward one write the value back and hold nothing, with room left the undo takes none of it, and a turned Set's
+        // backward act in a forward play is not held
+        [Test]
+        public void BE25_AnInstantsUndoStartsNoFlash()
+        {
+            foreach (bool seek in new[] { true, false })
+            {
+                string row = seek ? "a Seek back" : "a backward play";
+                FeedbackScheduler s = Scheduler();
+                s.Context.Categories.SetFlashLimit(3);
+                FeedbackTestFloatTarget t = Made("target").AddComponent<FeedbackTestFloatTarget>();
+                FeedbackPlayer p = Player(s, Act("a", 1f), FlashSet(t));
+                p.Play();
+                s.Tick(seek ? 0.3f : 1.1f);
+                float forward = t.m_Value;
+                s.Context.Categories.TryFlash(3);
+                int held = s.Context.Categories.FlashHeld;
+                if (seek)
+                    p.Seek(0.1f);
+                else
+                {
+                    p.Play(PlayArgs.Default.WithDirection(PlayerDirection.Backward));
+                    for (int i = 0; i < 12; i++)
+                        s.Tick(0.1f);
+                }
+                Check(forward == 1f && t.m_Value == 0f && s.Context.Categories.FlashHeld == held,
+                    row + " with the limit full: " + Fmt(forward) + " → " + Fmt(t.m_Value) + " · held " + held + " → " + s.Context.Categories.FlashHeld);
+            }
+            FeedbackScheduler s2 = Scheduler();
+            s2.Context.Categories.SetFlashLimit(3);
+            FeedbackTestFloatTarget t2 = Made("target").AddComponent<FeedbackTestFloatTarget>();
+            FeedbackPlayer q = Player(s2, Act("a", 1f), FlashSet(t2));
+            q.Play();
+            s2.Tick(0.3f);
+            int entries = s2.Context.Categories.FlashEntries;
+            q.Seek(0.1f);
+            Check(entries == 1 && t2.m_Value == 0f && s2.Context.Categories.FlashEntries == 1,
+                "with room left the undo takes none: entries " + entries + " → " + s2.Context.Categories.FlashEntries + " · " + Fmt(t2.m_Value));
+            FeedbackScheduler s3 = Scheduler();
+            s3.Context.Categories.SetFlashLimit(3);
+            FeedbackTestFloatTarget t3 = Made("target").AddComponent<FeedbackTestFloatTarget>();
+            CustomFloatItem turned = FlashSet(t3);
+            turned.m_PlayDirection = ItemPlayDirection.Opposite;
+            FeedbackPlayer r = Player(s3, Act("a", 1f), turned);
+            s3.Context.Categories.TryFlash(3);
+            int before = s3.Context.Categories.FlashHeld;
+            r.Play();
+            s3.Tick(0.3f);
+            Check(t3.m_Value == 0f && s3.Context.Categories.FlashHeld == before,
+                "a turned Set in a forward play: " + Fmt(t3.m_Value) + " · held " + before + " → " + s3.Context.Categories.FlashHeld);
+            End();
+        }
+
+        // the limit still counts a Reverse Only Set's fire in a backward play — its forward act, held with the limit full — and
+        // a Seek back into a timed item marked Flash, which starts it again
+        [Test]
+        public void BE26_TheLimitCountsAReverseOnlyFireAndASeekIntoAFlash()
+        {
+            FeedbackScheduler s = Scheduler();
+            s.Context.Categories.SetFlashLimit(3);
+            FeedbackTestFloatTarget t = Made("target").AddComponent<FeedbackTestFloatTarget>();
+            FeedbackPlayer p = Player(s, Act("a", 1f), FlashSet(t, DirectionCondition.ReverseOnly));
+            s.Context.Categories.TryFlash(3);
+            int held = s.Context.Categories.FlashHeld;
+            p.Play(PlayArgs.Default.WithDirection(PlayerDirection.Backward));
+            for (int i = 0; i < 12; i++)
+                s.Tick(0.1f);
+            Check(t.m_Value == 0f && s.Context.Categories.FlashHeld == held + 1,
+                "a Reverse Only fire with the limit full: " + Fmt(t.m_Value) + " · held " + held + " → " + s.Context.Categories.FlashHeld);
+            FeedbackScheduler s2 = Scheduler();
+            s2.Context.Categories.SetFlashLimit(3);
+            FeedbackTestFloatTarget t2 = Made("target").AddComponent<FeedbackTestFloatTarget>();
+            var flash = new CustomFloatItem
+            {
+                m_Target = new TargetRef { m_Mode = TargetRefMode.Direct, m_Object = t2, m_Path = "", m_Anchor = "" },
+                m_Motion = new FlashMotion(),
+            };
+            flash.m_Category = new CategoryOverride { m_Override = true, m_Category = FeedbackCategory.Flash };
+            flash.m_Timing.m_Duration = 0.4f;
+            flash.m_Timing.m_Delay = 0.2f;
+            FeedbackPlayer q = Player(s2, Act("a", 1f), flash);
+            q.Play();
+            s2.Tick(0.3f);
+            int started = s2.Context.Categories.FlashEntries;
+            s2.Tick(0.4f);
+            q.Seek(0.3f);
+            Check(started == 1 && s2.Context.Categories.FlashEntries == 2, "a Seek back into a timed flash: entries " + started + " → " + s2.Context.Categories.FlashEntries);
+            End();
+        }
+
+        // ---- a truncated turned item's end
+
+        // a background item turned the other way and cut where the rest ends ends at the T it was cut at — in a tick, a Skip and
+        // after a Seek; an item only cut or only turned, and a backward play, end as before
+        [Test]
+        public void BE27_ATruncatedTurnedItemEndsWhereItWasCut()
+        {
+            foreach ((string row, float rest, bool background, bool turned, string how, string end) in new[]
+            {
+                ("background turned · tick", 0.4f, true, true, "tick", "0.6"),
+                ("background turned · Skip", 0.4f, true, true, "skip", "0.6"),
+                ("background turned · Seek", 0.4f, true, true, "seek", "0.6"),
+                ("background", 0.4f, true, false, "tick", "0.4"),
+                ("turned", 1f, false, true, "tick", "0"),
+                ("background turned · backward", 0.4f, true, true, "back", "1"),
+                ("background · backward", 0.4f, true, false, "back", "0"),
+            })
+            {
+                PlayerTestBinding.Log.Clear();
+                FeedbackScheduler s = Scheduler();
+                var b = new PlayerTestTarget { m_Label = "b", m_Motion = new TweenMotion(), m_Target = new TargetRef { m_Mode = TargetRefMode.Self, m_Path = "", m_Anchor = "" } };
+                b.m_Timing.m_Duration = 1f;
+                b.m_Timing.m_Background = background;
+                if (turned)
+                    b.m_PlayDirection = ItemPlayDirection.Opposite;
+                FeedbackPlayer p = Player(s, Act("a", rest), b);
+                if (how == "back")
+                {
+                    p.Play(PlayArgs.Default.WithDirection(PlayerDirection.Backward));
+                    for (int i = 0; i < 8; i++)
+                        s.Tick(0.1f);
+                }
+                else
+                {
+                    p.Play();
+                    s.Tick(0.1f);
+                    if (how == "skip")
+                        p.Skip();
+                    else if (how == "seek")
+                        p.Seek(0.35f);
+                    for (int i = 0; i < 12 && p.IsPlaying; i++)
+                        s.Tick(0.1f);
+                }
+                string last = string.Join(" ", PlayerTestBinding.Log.Where(l => l.StartsWith("b.Evaluate", StringComparison.Ordinal) || l.StartsWith("b.End", StringComparison.Ordinal)).Reverse().Take(2).Reverse());
+                Check(!p.IsPlaying && last == "b.Evaluate(" + end + ") b.End:Completed", row + ": " + last + " · playing " + p.IsPlaying);
+            }
+            End();
+        }
+
+        // ---- a flow marker's item place
+
+        // a flow marker has no place to seek to: Loop Start, Loop End and Hold give −1, forward and backward — an effect, an
+        // inactive one too, gives its node's start forward and its end backward
+        [Test]
+        public void BE28_AFlowMarkerHasNoItemPlace()
+        {
+            foreach (bool back in new[] { false, true })
+            {
+                FeedbackScheduler s = Scheduler();
+                PlayerTestAction off = Act("off", 0.1f);
+                off.m_Active = false;
+                FeedbackPlayer p = Player(s, Act("x", 0.2f), new LoopStartItem(), Act("a", 0.3f, 0.1f), LoopEnd(2), Act("b", 0.2f, 0.4f), off);
+                PlaybackHandle h = p.Play(back ? PlayArgs.Default.WithDirection(PlayerDirection.Backward) : PlayArgs.Default);
+                string places = string.Join(" ", Enumerable.Range(0, p.m_Items.Count).Select(i => p.ItemPlace(h, i)));
+                Check(places == (back ? "200000 -1 400000 -1 600000 500000" : "0 -1 100000 -1 400000 400000"), (back ? "backward: " : "forward: ") + places);
+            }
+            FeedbackScheduler s2 = Scheduler();
+            FeedbackPlayer q = Player(s2, Act("a", 0.3f), new HoldItem(), Act("b", 0.2f, 0.1f));
+            PlaybackHandle held = q.Play();
+            string hold = string.Join(" ", Enumerable.Range(0, q.m_Items.Count).Select(i => q.ItemPlace(held, i)));
+            Check(hold == "0 -1 400000", "Hold: " + hold);
+            End();
+        }
     }
 }

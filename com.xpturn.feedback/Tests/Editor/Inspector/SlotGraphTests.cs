@@ -21,8 +21,8 @@ namespace xpTURN.Feedback.Tests.Editor
     // the slot graph: its sum against what the runtime writes frame by frame (offsets in three spaces under a turned and
     // stretched parent, a camera shake's capped group, a product of turns, a scale's product, an override over an offset, a
     // Persist under an offset, start orders), the items alone, the forms, the cap, the groups and their names, lists with
-    // other items, the cost, the Unconditional, the player's Graph under the strip, the scrub, the live player untouched and
-    // none in a preset's inspector
+    // other items, the cost, the Unconditional, the player's Graph Preview below the bottom bar and its switch, the scrub, the
+    // live player untouched and a preset's inspector without a player
     public sealed class SlotGraphTests
     {
         const float Dt = 1f / 120f;
@@ -406,8 +406,10 @@ namespace xpTURN.Feedback.Tests.Editor
             Assert.That(ruled.Ticks.Where((v, i) => i % 4 == 0).Max(Math.Abs), Is.LessThan(1e-6f), "ruled: left out");
         }
 
-        // the player's Graph: under the strip, folded and idle at first; open, built once; the groups' popup; the drawing
-        // spans the strip's axis; the alone lines arrive; the list's selection makes its item's line strong
+        // the player's Graph Preview: the box right after the bottom bar, apart from it; its title row and switch, off and idle
+        // at first — the title row only; on, built once; the groups' popup; the drawing spans the strip's axis between its pads;
+        // the alone lines arrive; the list's selection makes its item's line strong; off again, the title row only and an edit
+        // builds nothing; on again, built for that edit
         [UnityTest]
         public IEnumerator SG09_ThePlayersGraph()
         {
@@ -416,29 +418,40 @@ namespace xpTURN.Feedback.Tests.Editor
             m_Window.Show();
             GameObject cam = CameraUnderParent(out _);
             FeedbackPlayer p = Player(cam, CameraItems());
-            SessionState.EraseBool(SlotGraphField.FoldPrefix + p.GetEntityId());
+            SessionState.EraseBool(SlotGraphField.SwitchPrefix + p.GetEntityId());
             InspectorElement inspector = InspectorTesting.Inspector(m_Window, p);
             yield return InspectorTesting.Wait(0.4);
             var editorRoot = inspector.Q<SlotGraphField>();
-            Assert.That(editorRoot, Is.Not.Null, "a Graph");
+            Assert.That(editorRoot, Is.Not.Null, "a Graph Preview");
             TimelineStrip strip = inspector.Q<TimelineStrip>();
-            Assert.That(editorRoot.parent.IndexOf(editorRoot), Is.EqualTo(editorRoot.parent.IndexOf(strip) + 1), "right under the strip");
-            Assert.That(editorRoot.Fold.value, Is.False, "folded at first");
-            Assert.That(editorRoot.Builds, Is.Zero, "idle while folded");
+            VisualElement bottom = inspector.Q(className: InspectorStyles.Bottom);
+            Assert.That(bottom.parent, Is.SameAs(editorRoot.parent));
+            Assert.That(editorRoot.parent.IndexOf(editorRoot), Is.EqualTo(editorRoot.parent.IndexOf(bottom) + 1), "right after the bottom bar");
+            Assert.That(editorRoot.parent.IndexOf(editorRoot), Is.EqualTo(editorRoot.parent.childCount - 1), "the section's last");
+            Assert.That(editorRoot.worldBound.yMin - bottom.worldBound.yMax, Is.GreaterThanOrEqualTo(6f), "apart from the bottom bar");
+            Assert.That(editorRoot.Q<Foldout>(), Is.Null, "no fold");
+            Assert.That(editorRoot.Q<Label>(className: InspectorStyles.GraphTitle).text, Is.EqualTo("Graph Preview"));
+            Assert.That(editorRoot.Switch.value, Is.False, "off at first");
+            Assert.That(editorRoot.Body.resolvedStyle.display, Is.EqualTo(DisplayStyle.None), "off: the title row only");
+            Assert.That(editorRoot.Builds, Is.Zero, "idle while off");
             var so = new SerializedObject(p);
             so.FindProperty(ItemListEdits.ItemsPath).GetArrayElementAtIndex(0).FindPropertyRelative("m_Timing.m_Duration").floatValue = 0.45f;
             so.ApplyModifiedProperties();
             yield return InspectorTesting.Wait(0.4);
-            Assert.That(editorRoot.Builds, Is.Zero, "an edit while folded builds nothing");
-            editorRoot.Fold.value = true;
+            Assert.That(editorRoot.Builds, Is.Zero, "an edit while off builds nothing");
+            editorRoot.Switch.value = true;
             yield return InspectorTesting.Wait(0.6);
-            Assert.That(editorRoot.Builds, Is.EqualTo(1), "open: built once");
+            Assert.That(editorRoot.Body.resolvedStyle.display, Is.EqualTo(DisplayStyle.Flex), "on: the body");
+            Assert.That(editorRoot.Builds, Is.EqualTo(1), "on: built once");
             Assert.That(editorRoot.GroupChoice.choices.Count, Is.EqualTo(2), "position · rotation");
             Assert.That(editorRoot.AloneItems.Count, Is.EqualTo(3), "the items alone arrived");
             double t = editorRoot.Model.Span * 0.37;
             float graphX = editorRoot.View.worldBound.x + editorRoot.View.X(t);
             float stripX = strip.Canvas.worldBound.x + strip.X(t);
             Assert.That(graphX, Is.EqualTo(stripX).Within(1.5f), "the strip's axis");
+            Rect canvas = strip.Canvas.worldBound;
+            Assert.That(editorRoot.View.worldBound.xMin, Is.EqualTo(canvas.xMin + TimelineStrip.Pad).Within(0.5f), "the strip's left pad");
+            Assert.That(editorRoot.View.worldBound.xMax, Is.EqualTo(canvas.xMax - TimelineStrip.Pad).Within(0.5f), "the strip's right pad");
             ItemListView list = inspector.Q<ItemListView>();
             list.List.SetSelection(1);
             yield return InspectorTesting.Wait(0.2);
@@ -446,6 +459,166 @@ namespace xpTURN.Feedback.Tests.Editor
             Assert.That(editorRoot.View.Strong[at], Is.True, "the selected item strong");
             Assert.That(editorRoot.View.Strong.Count(s => s), Is.EqualTo(1));
             Assert.That(editorRoot.Notes.text, Does.Contain("Sample seed"));
+            int builds = editorRoot.Builds;
+            editorRoot.Switch.value = false;
+            yield return InspectorTesting.Wait(0.2);
+            Assert.That(editorRoot.Body.resolvedStyle.display, Is.EqualTo(DisplayStyle.None), "off again: the title row only");
+            so.Update();
+            so.FindProperty(ItemListEdits.ItemsPath).GetArrayElementAtIndex(0).FindPropertyRelative("m_Timing.m_Duration").floatValue = 0.5f;
+            so.ApplyModifiedProperties();
+            yield return InspectorTesting.Wait(0.4);
+            Assert.That(editorRoot.Builds, Is.EqualTo(builds), "off: an edit builds nothing");
+            editorRoot.Switch.value = true;
+            yield return InspectorTesting.Wait(0.4);
+            Assert.That(editorRoot.Builds, Is.GreaterThan(builds), "on again: built for the edit made while off");
+            SessionState.EraseBool(SlotGraphField.SwitchPrefix + p.GetEntityId());
+        }
+
+        // the box's place for each list the inspector shows — the player's own (Paste · Add Feedback), a linked preset's (Open
+        // Preset · Unlink) and a Variant's (Open Preset): right after the bottom bar
+        [UnityTest]
+        public IEnumerator SG18_TheBoxAfterEachBottomBar()
+        {
+            m_Window = ScriptableObject.CreateInstance<PreviewBarTestWindow>();
+            m_Window.position = new Rect(0, 0, 520, 900);
+            m_Window.Show();
+            var preset = ScriptableObject.CreateInstance<FeedbackPreset>();
+            m_Made.Add(preset);
+            preset.m_Items.Add(Pos(Punch(new Vector4(0.2f, 0f, 0f, 0f)), 0.3f));
+            var variant = ScriptableObject.CreateInstance<FeedbackPreset>();
+            m_Made.Add(variant);
+            variant.m_Items.Add(Pos(Punch(new Vector4(0f, 0.2f, 0f, 0f)), 0.3f));
+            FeedbackPlayer own = Player(Go("Own"), Pos(Punch(new Vector4(0.5f, 0f, 0f, 0f)), 0.4f));
+            FeedbackPlayer linked = Player(Go("Linked"));
+            linked.m_Preset = preset;
+            FeedbackPlayer shown = Player(Go("Shown"), Pos(Punch(new Vector4(0.5f, 0f, 0f, 0f)), 0.4f));
+            shown.m_Variants.Add(variant);
+            VariantShow.Set(shown, variant);
+            try
+            {
+                foreach ((FeedbackPlayer p, string[] buttons) in new[]
+                {
+                    (own, new[] { FeedbackPlayerEditor.PasteText, FeedbackPlayerEditor.AddText }),
+                    (linked, new[] { "Open Preset", "Unlink", "Unlink and Copy" }),
+                    (shown, new[] { "Open Preset" }),
+                })
+                {
+                    m_Window.rootVisualElement.Clear();
+                    InspectorElement inspector = InspectorTesting.Inspector(m_Window, p);
+                    yield return InspectorTesting.Wait(0.4);
+                    var field = inspector.Q<SlotGraphField>();
+                    VisualElement bottom = inspector.Q(className: InspectorStyles.Bottom);
+                    Assert.That(bottom.Query<Button>().ToList().Where(b => !b.ClassListContains(InspectorStyles.ValidationSummary)).Select(b => b.text), Is.EqualTo(buttons), p.name + ": its bottom bar");
+                    Assert.That(field.parent, Is.SameAs(bottom.parent), p.name);
+                    Assert.That(field.parent.IndexOf(field), Is.EqualTo(field.parent.IndexOf(bottom) + 1), p.name + ": right after the bottom bar");
+                    Assert.That(field.worldBound.yMin, Is.GreaterThan(inspector.Q<ItemListView>().worldBound.yMax), p.name + ": below the list");
+                }
+            }
+            finally
+            {
+                VariantShow.Set(shown, null);
+            }
+        }
+
+        // on, a list that draws nothing — empty, or with no item that writes a value — shows its note only: no header, no
+        // graph; an item that writes one brings them at the next build. A preset's inspector without a player: the note only
+        [UnityTest]
+        public IEnumerator SG19_NothingToDraw()
+        {
+            m_Window = ScriptableObject.CreateInstance<PreviewBarTestWindow>();
+            m_Window.position = new Rect(0, 0, 520, 900);
+            m_Window.Show();
+            FeedbackPlayer p = Player(Go("Empty"));
+            SessionState.SetBool(SlotGraphField.SwitchPrefix + p.GetEntityId(), true);
+            try
+            {
+                InspectorElement inspector = InspectorTesting.Inspector(m_Window, p);
+                yield return InspectorTesting.Wait(0.5);
+                var field = inspector.Q<SlotGraphField>();
+                Assert.That(field.Switch.value, Is.True);
+                Assert.That(field.Builds, Is.GreaterThanOrEqualTo(1));
+                Assert.That(field.Notes.resolvedStyle.display, Is.EqualTo(DisplayStyle.Flex));
+                Assert.That(field.Notes.text, Does.Contain("No item of this list writes a value the graph draws"));
+                Assert.That(field.Header.resolvedStyle.display, Is.EqualTo(DisplayStyle.None), "no header");
+                Assert.That(field.View.resolvedStyle.display, Is.EqualTo(DisplayStyle.None), "no graph");
+                var so = new SerializedObject(p);
+                SerializedProperty items = so.FindProperty(ItemListEdits.ItemsPath);
+                items.arraySize++;
+                items.GetArrayElementAtIndex(items.arraySize - 1).managedReferenceValue = Pos(Punch(new Vector4(0.5f, 0f, 0f, 0f)), 0.4f);
+                so.ApplyModifiedProperties();
+                yield return InspectorTesting.Wait(0.5);
+                Assert.That(field.Model.Sum, Is.Not.Null);
+                Assert.That(field.Header.resolvedStyle.display, Is.EqualTo(DisplayStyle.Flex), "an item that writes: the header");
+                Assert.That(field.View.resolvedStyle.display, Is.EqualTo(DisplayStyle.Flex), "and the graph");
+                Assert.That(field.View.resolvedStyle.height, Is.GreaterThan(40f));
+            }
+            finally
+            {
+                SessionState.EraseBool(SlotGraphField.SwitchPrefix + p.GetEntityId());
+            }
+        }
+
+        // the switch is kept per player for the session under the key the group choice is kept under too: an inspector built
+        // again keeps it on, another player's is off
+        [UnityTest]
+        public IEnumerator SG20_TheSwitchKept()
+        {
+            m_Window = ScriptableObject.CreateInstance<PreviewBarTestWindow>();
+            m_Window.position = new Rect(0, 0, 520, 900);
+            m_Window.Show();
+            FeedbackPlayer a = Player(Go("A"), Pos(Punch(new Vector4(0.5f, 0f, 0f, 0f)), 0.4f));
+            FeedbackPlayer b = Player(Go("B"), Pos(Punch(new Vector4(0.5f, 0f, 0f, 0f)), 0.4f));
+            string key = SlotGraphField.SwitchPrefix + a.GetEntityId();
+            Assert.That(key, Is.EqualTo("xpTURN.Feedback.Inspector.SlotGraph." + a.GetEntityId()), "the key a fold was kept under");
+            SessionState.EraseBool(key);
+            SessionState.EraseBool(SlotGraphField.SwitchPrefix + b.GetEntityId());
+            try
+            {
+                InspectorElement inspector = InspectorTesting.Inspector(m_Window, a);
+                yield return InspectorTesting.Wait(0.3);
+                inspector.Q<SlotGraphField>().Switch.value = true;
+                Assert.That(SessionState.GetBool(key, false), Is.True, "kept for the session");
+                m_Window.rootVisualElement.Clear();
+                inspector = InspectorTesting.Inspector(m_Window, a);
+                yield return InspectorTesting.Wait(0.5);
+                var again = inspector.Q<SlotGraphField>();
+                Assert.That(again.Switch.value, Is.True, "built again: still on");
+                Assert.That(again.Builds, Is.GreaterThanOrEqualTo(1), "and built");
+                m_Window.rootVisualElement.Clear();
+                inspector = InspectorTesting.Inspector(m_Window, b);
+                yield return InspectorTesting.Wait(0.3);
+                Assert.That(inspector.Q<SlotGraphField>().Switch.value, Is.False, "another player: off");
+            }
+            finally
+            {
+                SessionState.EraseBool(key);
+            }
+        }
+
+        // the title row: the title, then the switch at the row's right end — no text, a tooltip, on the title's line
+        [UnityTest]
+        public IEnumerator SG21_TheTitleRow()
+        {
+            m_Window = ScriptableObject.CreateInstance<PreviewBarTestWindow>();
+            m_Window.position = new Rect(0, 0, 520, 900);
+            m_Window.Show();
+            FeedbackPlayer p = Player(Go("Row"), Pos(Punch(new Vector4(0.5f, 0f, 0f, 0f)), 0.4f));
+            InspectorElement inspector = InspectorTesting.Inspector(m_Window, p);
+            yield return InspectorTesting.Wait(0.3);
+            var field = inspector.Q<SlotGraphField>();
+            VisualElement row = field.Q(className: InspectorStyles.GraphTitleRow);
+            var title = row.Q<Label>(className: InspectorStyles.GraphTitle);
+            Assert.That(row.parent, Is.SameAs(field));
+            Assert.That(field.IndexOf(row), Is.Zero, "the box's first row");
+            Assert.That(field.Switch.parent, Is.SameAs(row));
+            Assert.That(row.IndexOf(field.Switch), Is.EqualTo(row.IndexOf(title) + 1), "after the title");
+            Assert.That(string.IsNullOrEmpty(field.Switch.text), Is.True, "no text");
+            Assert.That(field.Switch.tooltip, Is.EqualTo(SlotGraphField.SwitchTooltip));
+            Assert.That(title.tooltip, Is.EqualTo(SlotGraphField.TitleTooltip));
+            float right = field.worldBound.xMax - field.resolvedStyle.borderRightWidth - field.resolvedStyle.paddingRight;
+            Assert.That(field.Switch.worldBound.xMax, Is.EqualTo(right).Within(2f), "at the right end");
+            Assert.That(field.Switch.worldBound.center.y, Is.EqualTo(title.worldBound.center.y).Within(3f), "on the title's line");
+            Assert.That(field.Switch.worldBound.xMin, Is.GreaterThan(title.worldBound.xMin + 40f));
         }
 
         // a press scrubs: no session — the bar's play starts and stops at that place; an endless list refuses with words
@@ -460,7 +633,7 @@ namespace xpTURN.Feedback.Tests.Editor
             InspectorElement inspector = InspectorTesting.Inspector(m_Window, p);
             yield return InspectorTesting.Wait(0.4);
             SlotGraphField field = inspector.Q<SlotGraphField>();
-            field.Fold.value = true;
+            field.Switch.value = true;
             yield return InspectorTesting.Wait(0.5);
             field.View.Scrubbed(0.3);
             yield return InspectorTesting.Wait(0.2);
@@ -667,9 +840,9 @@ namespace xpTURN.Feedback.Tests.Editor
             Assert.That((first + 1) * Dt, Is.EqualTo(0.2f).Within(2f * Dt), "after the time limit");
         }
 
-        // a preset's own inspector has no Graph (no scene to find the targets in)
+        // a preset's own inspector with no Graph Player: the Graph is there and builds nothing (no scene to find the targets in)
         [UnityTest]
-        public IEnumerator SG12_NoneInAPresetsInspector()
+        public IEnumerator SG12_APresetsInspectorWithoutAPlayer()
         {
             m_Window = ScriptableObject.CreateInstance<PreviewBarTestWindow>();
             m_Window.Show();
@@ -679,7 +852,15 @@ namespace xpTURN.Feedback.Tests.Editor
             InspectorElement inspector = InspectorTesting.Inspector(m_Window, preset);
             yield return InspectorTesting.Wait(0.3);
             Assert.That(inspector.Q<TimelineStrip>(), Is.Not.Null);
-            Assert.That(inspector.Q<SlotGraphField>(), Is.Null);
+            var field = inspector.Q<SlotGraphField>();
+            Assert.That(field, Is.Not.Null);
+            field.Switch.value = true;
+            yield return InspectorTesting.Wait(0.3);
+            Assert.That(field.Builds, Is.EqualTo(0));
+            Assert.That(field.Notes.text, Is.EqualTo(SlotGraphField.NoPlayerText));
+            Assert.That(field.Header.resolvedStyle.display, Is.EqualTo(DisplayStyle.None), "the note only");
+            Assert.That(field.View.resolvedStyle.display, Is.EqualTo(DisplayStyle.None));
+            SessionState.EraseBool(SlotGraphField.SwitchPrefix + preset.GetEntityId());
         }
         // ---- every graph item's combo (the bindings play test's table): the graph's dry play leaves the scene as it was —
         // the objects' serialized state, their materials and blocks, the render settings, the time scale, the roots and the

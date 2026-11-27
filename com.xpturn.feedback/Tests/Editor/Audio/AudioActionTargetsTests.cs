@@ -137,6 +137,28 @@ namespace xpTURN.Feedback.Tests.Editor
             s.Stop();
         }
 
+        static UnityEventItem Call(UnityEngine.Events.UnityAction action, float delay = 0f)
+        {
+            var item = new UnityEventItem();
+            item.m_Event.AddListener(action);
+            item.m_Timing.m_Delay = delay;
+            return item;
+        }
+
+        static T Delayed<T>(T item, float delay) where T : FeedbackItem
+        {
+            item.m_Timing.m_Delay = delay;
+            return item;
+        }
+
+        static T ReverseOnly<T>(T item) where T : EffectItem
+        {
+            item.m_Conditions.m_Direction = DirectionCondition.ReverseOnly;
+            return item;
+        }
+
+        static string Note(FeedbackPlayer p, int item) => p.Runtime.Binding(item).DebugNote(0) ?? "none";
+
         // ---- the one-shot's volume — the item's × the intensity × the category's scale · above 1 louder · below 0 silent
         [Test]
         public void AA01_TheOneShotVolume()
@@ -472,5 +494,166 @@ namespace xpTURN.Feedback.Tests.Editor
 
         static string Diff(Dictionary<string, string> a, Dictionary<string, string> b)
             => string.Join(" · ", a.Where(kv => !b.TryGetValue(kv.Key, out string v) || v != kv.Value).Select(kv => kv.Key + " " + kv.Value + " → " + (b.TryGetValue(kv.Key, out string w) ? w : "none")));
+
+        // ---- a play that ends while paused stops the sound it paused — by Skip, a Seek to its end, Played's subscriber on a
+        // play that ends at its start, a backward play sought to its start — and a Resume has nothing to go on
+        [Test, Category(OptionalAssemblyTests.DevProjectCategory)]
+        public void AA09_APlayEndingPaused()
+        {
+            FeedbackScheduler s = Sched();
+            AudioSource a = Source("A");
+            PositiveControl(a);
+            foreach (bool skip in new[] { true, false })
+            {
+                FeedbackPlayer p = Player(s, Control(a, AudioSourceAction.Play), Keeper(a));
+                p.Play(); s.Tick(0f);
+                a.timeSamples = 4410;
+                p.Pause();
+                if (skip)
+                    p.Skip();
+                else
+                    p.Seek(2f);
+                Assert.That((St(a), p.IsPlaying, Note(p, 0)), Is.EqualTo(("not playing at 0", false, "none")), skip ? "Skip" : "a Seek to the end");
+                p.Resume();
+                Assert.That(a.isPlaying, Is.False, "the Resume has nothing to go on");
+            }
+            FeedbackPlayer atStart = Player(s, Control(a, AudioSourceAction.Play));
+            atStart.Played += (pl, h) =>
+            {
+                a.timeSamples = 4410;
+                pl.Pause();
+            };
+            atStart.Play();
+            Assert.That((St(a), atStart.IsPlaying), Is.EqualTo(("not playing at 0", false)), "Played's subscriber pauses a play ending at its start");
+            FeedbackPlayer back = Player(s, ReverseOnly(Delayed(Control(a, AudioSourceAction.Play), 0.1f)), Keeper(a, 0.5f));
+            back.Play(in Back);
+            s.Tick(0.55f);
+            Assert.That(a.isPlaying, Is.True, "a Reverse Only sound");
+            a.timeSamples = 4410;
+            back.Pause();
+            back.Seek(0f);
+            Assert.That((St(a), back.IsPlaying), Is.EqualTo(("not playing at 0", false)), "a backward play sought to its start");
+        }
+
+        // ---- a sound started after a Pause in the same pass pauses with the play and goes on with its Resume — a tick, the
+        // Begin window, a backward pass
+        [Test, Category(OptionalAssemblyTests.DevProjectCategory)]
+        public void AA10_APauseInsideThePlaysEvents()
+        {
+            FeedbackScheduler s = Sched();
+            AudioSource a = Source("A");
+            PositiveControl(a);
+            FeedbackPlayer tick = null;
+            tick = Player(s, Call(() => tick.Pause(), 0.1f), Control(a, AudioSourceAction.Play), Keeper(a));
+            tick.Play(); s.Tick(0f); s.Tick(0.2f);
+            Assert.That((a.isPlaying, tick.HasPaused, Note(tick, 1)), Is.EqualTo((false, true, "paused with the player")), "a tick");
+            tick.Resume();
+            Assert.That(a.isPlaying, Is.True, "a tick — goes on");
+            AudioSource b = Source("B");
+            FeedbackPlayer begin = null;
+            begin = Player(s, Call(() => begin.Pause()), Control(b, AudioSourceAction.Play), Keeper(b));
+            begin.Play();
+            Assert.That((b.isPlaying, begin.HasPaused, Note(begin, 1)), Is.EqualTo((false, true, "paused with the player")), "the Begin window");
+            begin.Resume();
+            Assert.That(b.isPlaying, Is.True, "the Begin window — goes on");
+            AudioSource c = Source("C");
+            FeedbackPlayer back = null;
+            back = Player(s, ReverseOnly(Delayed(Control(c, AudioSourceAction.Play), 0.1f)), ReverseOnly(Call(() => back.Pause(), 0.1f)), Keeper(c, 0.5f));
+            back.Play(in Back);
+            s.Tick(0.65f);
+            Assert.That((c.isPlaying, back.HasPaused, Note(back, 0)), Is.EqualTo((false, true, "paused with the player")), "a backward pass");
+            back.Resume();
+            Assert.That(c.isPlaying, Is.True, "a backward pass — goes on");
+        }
+
+        // ---- a play that ends in the pass of its Pause stops the sound whichever came first, and with a Skip beside the Pause
+        [Test, Category(OptionalAssemblyTests.DevProjectCategory)]
+        public void AA11_APauseInThePassThatEnds()
+        {
+            FeedbackScheduler s = Sched();
+            AudioSource a = Source("A");
+            PositiveControl(a);
+            FeedbackPlayer before = null;
+            before = Player(s, Control(a, AudioSourceAction.Play), Call(() => before.Pause(), 0.1f));
+            before.Play(); s.Tick(0f);
+            a.timeSamples = 4410;
+            s.Tick(0.2f);
+            Assert.That((St(a), before.IsPlaying), Is.EqualTo(("not playing at 0", false)), "the sound before the Pause");
+            FeedbackPlayer after = null;
+            after = Player(s, Call(() => after.Pause(), 0.1f), Control(a, AudioSourceAction.Play));
+            after.Play(); s.Tick(0f); s.Tick(0.2f);
+            Assert.That((St(a), after.IsPlaying), Is.EqualTo(("not playing at 0", false)), "the sound after the Pause");
+            FeedbackPlayer skip = null;
+            skip = Player(s, Call(() =>
+            {
+                skip.Pause();
+                skip.Skip();
+            }, 0.1f), Control(a, AudioSourceAction.Play), Keeper(a));
+            skip.Play(); s.Tick(0f); s.Tick(0.2f);
+            Assert.That((St(a), skip.IsPlaying), Is.EqualTo(("not playing at 0", false)), "a Skip beside the Pause");
+        }
+
+        // ---- a Pause and a Resume before the sound leave it ringing · a plain Completed rings on · a paused play's Seek keeps
+        // the pause, and leaves a sound the game started itself on that source
+        [Test, Category(OptionalAssemblyTests.DevProjectCategory)]
+        public void AA12_WhatAPauseLeavesAlone()
+        {
+            FeedbackScheduler s = Sched();
+            AudioSource a = Source("A");
+            PositiveControl(a);
+            FeedbackPlayer both = null;
+            both = Player(s, Call(() =>
+            {
+                both.Pause();
+                both.Resume();
+            }, 0.1f), Control(a, AudioSourceAction.Play), Keeper(a));
+            both.Play(); s.Tick(0f); s.Tick(0.2f);
+            Assert.That((a.isPlaying, both.HasPaused), Is.EqualTo((true, false)), "a Pause and a Resume before the sound");
+            both.Stop(StopMode.Hold);
+            a.Stop();
+            FeedbackPlayer done = Player(s, Control(a, AudioSourceAction.Play));
+            done.Play(); Tick(s, 2);
+            Assert.That((a.isPlaying, done.IsPlaying), Is.EqualTo((true, false)), "a plain Completed rings on");
+            a.Stop();
+            FeedbackPlayer inside = Player(s, Control(a, AudioSourceAction.Play), Keeper(a));
+            inside.Play(); s.Tick(0f);
+            a.timeSamples = 4410;
+            inside.Pause();
+            inside.Seek(0.5f);
+            Assert.That((St(a), inside.IsPlaying), Is.EqualTo(("not playing at 4410", true)), "a Seek inside keeps the pause");
+            inside.Resume();
+            Assert.That(a.isPlaying, Is.True, "and goes on");
+            inside.Stop(StopMode.Hold);
+            a.Stop();
+            FeedbackPlayer theirs = Player(s, Control(a, AudioSourceAction.Play), Keeper(a));
+            theirs.Play(); s.Tick(0f);
+            a.Stop();
+            theirs.Pause();
+            a.Play();
+            theirs.Seek(0.5f);
+            Assert.That(a.isPlaying, Is.True, "a paused play's Seek leaves the game's own sound");
+        }
+
+        // ---- a preview whose paused play is skipped gives its voice back, so the session ends by itself
+        [Test, Category(OptionalAssemblyTests.DevProjectCategory)]
+        public void AA13_APausedPreviewEnds()
+        {
+            AudioSource a = Source("A");
+            PositiveControl(a);
+            var voice = new AudioPlayAtPointItem
+            {
+                m_Resource = m_Long,
+                m_Target = new TargetRef { m_Mode = TargetRefMode.Direct, m_Object = a.transform, m_Path = "", m_Anchor = "" },
+                m_Motion = new SetMotion { m_Params = new SetParams { m_Value = new Vector4(1f, 0, 0, 0) } },
+            };
+            FeedbackPlayer p = Player(null, voice, Keeper(a));
+            s_Now += 1.0;
+            Assert.That(PreviewSession.Start(p, default), Is.EqualTo(PreviewRefusal.None));
+            Pump(6);
+            p.Pause();
+            p.Skip();
+            Pump(300);
+            Assert.That(PreviewSession.Current, Is.Null, "the session ended");
+        }
     }
 }

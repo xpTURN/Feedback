@@ -662,9 +662,9 @@ namespace xpTURN.Feedback.Tests.Editor.Docs
             return box;
         }
 
-        // the graphs: a cube's player of a Punch on its position's Y and a small Shake, the strip's Graph and the first item's
-        // body and Graph open, Dots on, the preview played on a stepped clock to 0.3 s and paused — the part from the strip to
-        // the item's Graph
+        // the graphs: a cube's player of a Punch on its position's Y and a small Shake, the Graph Preview on and the first
+        // item's body and Graph open, Dots on, the preview played on a stepped clock to 0.3 s and paused — the part from the
+        // strip to the Graph Preview below the bottom bar
         static IEnumerable<int> GraphsShot(Shot shot)
         {
             NewScene();
@@ -687,7 +687,7 @@ namespace xpTURN.Feedback.Tests.Editor.Docs
             long rid = new SerializedObject(player).FindProperty("m_Items").GetArrayElementAtIndex(0).managedReferenceId;
             Check(rid == 1000, "the first item's reference id is " + rid);
             string fold = ItemListView.FoldKey(player, rid);
-            SessionState.SetBool(SlotGraphField.FoldPrefix + player.GetEntityId(), true);
+            SessionState.SetBool(SlotGraphField.SwitchPrefix + player.GetEntityId(), true);
             SessionState.SetBool(fold, true);
             SessionState.SetBool(fold + ItemGraphField.FoldSuffix, true);
             EditorPrefs.SetBool(MotionGraphView.DotsKey, true);
@@ -709,23 +709,23 @@ namespace xpTURN.Feedback.Tests.Editor.Docs
             var strip = inspector.rootVisualElement.Q<TimelineStrip>();
             var slot = inspector.rootVisualElement.Q<SlotGraphField>();
             var graph = inspector.rootVisualElement.Q<ItemGraphField>();
-            Check(strip != null && slot != null && graph != null, "no strip, strip's Graph or item's Graph");
+            Check(strip != null && slot != null && graph != null, "no strip, Graph Preview or item's Graph");
             Check(slot.View.Dots != null && slot.View.Dots.Count > 0 && graph.View.Dots != null && graph.View.Dots.Count > 0, "the graphs recorded no frame");
             Check(slot.Notes.text.Contains("Play 1") && graph.Notes.text.Contains("Play 1"), "the graphs do not follow the preview's play");
             ScrollTo(inspector, strip);
             yield return Settle;
             Vector2 origin = inspector.rootVisualElement.worldBound.position;
             float top = strip.worldBound.yMin - origin.y - 4f;
-            float bottom = graph.worldBound.yMax - origin.y + 4f;
-            Check(top >= 0f && bottom <= inspector.position.height, $"the strip to the item's Graph ({bottom - top:F0} pt) does not fit the inspector");
+            float bottom = slot.worldBound.yMax - origin.y + 4f;
+            Check(top >= 0f && bottom <= inspector.position.height, $"the strip to the Graph Preview ({bottom - top:F0} pt) does not fit the inspector");
             foreach (int w in Capture(inspector, Rect.MinMaxRect(0f, top, Within(inspector, strip).xMax, bottom), shot.id))
                 yield return w;
         }
 
-        // the README's graphs: a cube's player of a Punch on its position's Y and a Shake that starts later, the strip's Graph
-        // open and the items folded, Dots on, the preview played to its end on a stepped clock — a frame every two ticks, its
-        // last frame held — the part from the strip to the last item's header, the same in every frame. frames-<id>.txt lists
-        // the frames and their times
+        // the README's graphs: a cube's player of a Punch on its position's Y and a Shake that starts later, the Graph Preview
+        // on and the items folded, Dots on, the preview played to its end on a stepped clock — a frame every two ticks, its
+        // last frame held — the part from the strip to the Graph Preview below the bottom bar, the same in every frame.
+        // frames-<id>.txt lists the frames and their times
         static IEnumerable<int> GraphsPlay(Shot shot)
         {
             NewScene();
@@ -748,7 +748,7 @@ namespace xpTURN.Feedback.Tests.Editor.Docs
             EditorSceneManager.SaveScene(crate.scene);
             long rid = new SerializedObject(player).FindProperty("m_Items").GetArrayElementAtIndex(0).managedReferenceId;
             Check(rid == 1000, "the first item's reference id is " + rid);
-            SessionState.SetBool(SlotGraphField.FoldPrefix + player.GetEntityId(), true);
+            SessionState.SetBool(SlotGraphField.SwitchPrefix + player.GetEntityId(), true);
             EditorPrefs.SetBool(MotionGraphView.DotsKey, true);
             EditorWindow inspector = Inspect(crate);
             yield return Settle;
@@ -761,16 +761,16 @@ namespace xpTURN.Feedback.Tests.Editor.Docs
             var strip = inspector.rootVisualElement.Q<TimelineStrip>();
             var slot = inspector.rootVisualElement.Q<SlotGraphField>();
             List<ItemHeader> headers = PlayerRoot(inspector, player).Query<ItemHeader>().ToList();
-            Check(strip != null && slot != null && headers.Count == 2, $"no strip or strip's Graph, or {headers.Count} item headers");
+            Check(strip != null && slot != null && headers.Count == 2, $"no strip or Graph Preview, or {headers.Count} item headers");
             Check(inspector.rootVisualElement.Q<ItemGraphField>() == null, "an item is open");
-            VisualElement last = headers[1];
+            VisualElement last = slot;
             ScrollTo(inspector, strip);
             yield return Settle;
-            Check(slot.Notes.text.Contains("Play 1"), "the strip's Graph does not follow the preview's play");
+            Check(slot.Notes.text.Contains("Play 1"), "the Graph Preview does not follow the preview's play");
             Vector2 origin = inspector.rootVisualElement.worldBound.position;
             float top = strip.worldBound.yMin - origin.y - 4f;
             float bottom = last.worldBound.yMax - origin.y + 4f;
-            Check(top >= 0f && bottom <= inspector.position.height, $"the strip to the last item's header ({bottom - top:F0} pt) does not fit the inspector");
+            Check(top >= 0f && bottom <= inspector.position.height, $"the strip to the Graph Preview ({bottom - top:F0} pt) does not fit the inspector");
             Rect crop = Rect.MinMaxRect(0f, top, Within(inspector, strip).xMax, bottom);
             const int ticks = 2;
             int steps = (int)Math.Ceiling(high / (ticks * PreviewClock.TickInterval) - 1e-6);
@@ -789,10 +789,10 @@ namespace xpTURN.Feedback.Tests.Editor.Docs
                 foreach (int w in Capture(inspector, crop, name))
                     yield return w;
                 origin = inspector.rootVisualElement.worldBound.position;
-                Check(Math.Abs(strip.worldBound.yMin - origin.y - 4f - top) < 0.5f && Math.Abs(last.worldBound.yMax - origin.y + 4f - bottom) < 0.5f, $"the strip or the last item's header moved at frame {k}");
+                Check(Math.Abs(strip.worldBound.yMin - origin.y - 4f - top) < 0.5f && Math.Abs(last.worldBound.yMax - origin.y + 4f - bottom) < 0.5f, $"the strip or the Graph Preview moved at frame {k}");
                 frames.Add(name + " " + F(k == steps ? HeldFrame : FrameStep));
             }
-            Check(slot.View.Dots != null && slot.View.Dots.Count > 0, "the strip's Graph recorded no frame");
+            Check(slot.View.Dots != null && slot.View.Dots.Count > 0, "the Graph Preview recorded no frame");
             File.WriteAllLines(Path.Combine(s_Out, $"frames-{shot.id}.txt"), frames);
         }
 

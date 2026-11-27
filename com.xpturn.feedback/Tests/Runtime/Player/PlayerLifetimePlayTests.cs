@@ -323,5 +323,52 @@ namespace xpTURN.Feedback.Tests
             Check(woke.EnsureRuntime() && Has(woke), "a player that woke is prepared while its object is inactive");
             End();
         }
+
+        // ---- destroyed inside its own prepare — OnDestroy comes inside it
+
+        // an item's prepare destroys the woken player (DestroyImmediate): the list's, a Variant's, a Rebuild's and a Lazy Play's
+        // prepare is refused, no runtime is left, every reservation is given back and each binding is released once
+        [UnityTest]
+        public IEnumerator CP06_DestroyedInsideItsOwnPrepare()
+        {
+            yield return null;
+            FeedbackScheduler scheduler = FeedbackScheduler.Default;
+            var presets = new List<FeedbackPreset>();
+            foreach (string row in new[] { "list", "variant", "rebuild", "play" })
+            {
+                int reserved = scheduler.ReservedCount;
+                int from = PlayerTestBinding.Made.Count;
+                FeedbackPlayer player = Make(PlayerInitialization.Lazy);
+                if (row == "variant")
+                {
+                    var variant = ScriptableObject.CreateInstance<FeedbackPreset>();
+                    presets.Add(variant);
+                    variant.m_Items.Add(new PlayerTestAction { m_Label = "destroy", m_Length = 0.25f });
+                    player.m_Variants.Add(variant);
+                }
+                else
+                    player.m_Items.Add(new PlayerTestAction { m_Label = "destroy", m_Length = 0.25f });
+                if (row == "rebuild")
+                    Check(player.EnsureRuntime(), row + ": the first prepare is true");
+                GameObject owner = player.gameObject;
+                int made = PlayerTestBinding.Made.Count;
+                PlayerTestBinding.OnPrepare = b =>
+                {
+                    if (b.Item.m_Label == "destroy" && PlayerTestBinding.Made.IndexOf(b) >= made && owner != null)
+                        Object.DestroyImmediate(owner);
+                };
+                bool result = row == "rebuild" ? player.Rebuild() : row == "play" ? player.Play() != default : player.EnsureRuntime();
+                PlayerTestBinding.OnPrepare = null;
+                List<PlayerTestBinding> bindings = PlayerTestBinding.Made.Skip(from).ToList();
+                Check(owner == null && !result, row + ": the call is refused (" + result + ")");
+                Check(!Has(player) && player.VariantRuntimeCount == 0 && scheduler.ReservedCount == reserved,
+                    row + ": no runtime is left (runtime " + Has(player) + " · reserved " + (scheduler.ReservedCount - reserved) + ")");
+                Check(bindings.Count > 0 && bindings.All(b => b.Released == 1), row + ": each binding is released once (" + string.Join(",", bindings.Select(b => b.Item.m_Label + ":" + b.Released)) + ")");
+                yield return null;
+            }
+            foreach (FeedbackPreset preset in presets)
+                Object.Destroy(preset);
+            End();
+        }
     }
 }

@@ -1207,5 +1207,33 @@ namespace xpTURN.Feedback.Tests
             string innerKey = S(p);
             Assert.That((outerKey, innerKey), Is.EqualTo(("(0.50, 0.00, 0.00)", "(0.00, 0.50, 0.00)")));
         }
+
+        // ---- a Triggered clip's play turned at its start
+
+        // a backward list whose Reverse Only Unity Event at 0 turns it forward: the turned play stays the clip's — the clip stops
+        // it at its end, and a looped clip starts no other play
+        [UnityTest]
+        public IEnumerator TL16_ATriggeredPlayTurnedAtItsStartStaysTheClips([Values(false, true)] bool loop)
+        {
+            var turn = new UnityEventItem();
+            turn.m_Conditions.m_Direction = DirectionCondition.ReverseOnly;
+            FeedbackPlayer p = Player("clip", turn, Line(0.5f));
+            p.m_Direction = PlayerDirection.Backward;
+            int calls = 0, completed = 0, stopped = 0;
+            turn.m_Event.AddListener(() =>
+            {
+                calls++;
+                p.PlayFromEvent(true);
+            });
+            p.Completed += (pl, h) => completed++;
+            p.Stopped += (pl, h) => stopped++;
+            PlayableDirector d = Director(DirectorUpdateMode.GameTime, p, out FeedbackTrack track);
+            Clip(track, 0.1, 0.8, FeedbackClipTiming.Triggered, out _).m_Loop = loop;
+            Clip(track, 3.0, 0.1, FeedbackClipTiming.Driven, out _);
+            d.Play();
+            while (d.time < 1.0)
+                yield return null;
+            Assert.That((calls, s_Played, completed, stopped, p.IsPlaying), Is.EqualTo((1, 1, 0, 1, false)));
+        }
     }
 }

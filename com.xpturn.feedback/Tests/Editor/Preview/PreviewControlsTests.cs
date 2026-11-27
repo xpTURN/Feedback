@@ -839,6 +839,29 @@ namespace xpTURN.Feedback.Tests.Editor
             Assert.That(a.position.x, Is.EqualTo(0f), "the next play");
         }
 
+        // a flow marker's item play (the inspector shows no ▶ for one — editor code can call it) throws nothing and moves
+        // nothing: the seek finds no place for it; an effect's item play in the same session skips its delay
+        [Test]
+        public void PX14n_AFlowMarkersItemPlayMovesNothing()
+        {
+            Transform b = new GameObject("B").transform;
+            FeedbackPlayer p = Player("Items");
+            p.m_Items.Add(new LoopStartItem());
+            On<ScaleItem>(p, b, Tween(2f), 0.3f).m_Timing.m_Delay = 0.5f;
+            p.m_Items.Add(new LoopEndItem { m_LoopCount = 1 });
+            p.m_Items.Add(new HoldItem());
+            PreviewSession.Start(p, Free);
+            S.PlayItem(1, true);
+            Seconds(0.1);
+            Assert.That(b.localScale.x, Is.GreaterThan(1.2f), "the effect's delay skipped");
+            foreach (int marker in new[] { 0, 2, 3 })
+            {
+                S.PlayItem(marker, true);
+                Seconds(0.1);
+                Assert.That(b.localScale.x, Is.EqualTo(1f), "marker " + marker);
+            }
+        }
+
         // ---- the live tuning and the repeat
 
         // the wait (editor clock), then in the tuning's update the new runtime and the replay from the start values

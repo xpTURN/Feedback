@@ -128,7 +128,7 @@ namespace xpTURN.Feedback
                 return;
             }
             // the timeline's time is the direction: a driven play is forward
-            m_Handle = player.Play(m_Args.WithSeed(m_Clip.m_Seed).WithDirection(PlayerDirection.Forward).WithDriven());
+            m_Handle = player.Play(DrivenArgs(in m_Args, m_Clip));
             if (m_Handle == default)
                 return;
             SeekRefusal refusal = Application.isPlaying ? player.SeekRange(m_Handle, out _, out _) : TrackPreview.Hook.Scrub(player, m_Handle, preset);
@@ -162,16 +162,19 @@ namespace xpTURN.Feedback
 #endif
         }
 
+        PlayArgs Args(FeedbackPlayer player) => Args(m_Clip, player, m_Owner);
+
         // the clip's preset and intensity; in Play mode its director's options too: the row of its Hit Key — that row's
-        // Variant key when the player has a list of that alias, its intensity — and the options' own key and intensity
-        PlayArgs Args(FeedbackPlayer player)
+        // Variant key when the player has a list of that alias, its intensity — and the options' own key and intensity.
+        // owner: the director's GameObject
+        internal static PlayArgs Args(FeedbackClip clip, FeedbackPlayer player, GameObject owner)
         {
-            PlayArgs args = PlayArgs.Default.WithPreset(m_Clip.m_Preset);
-            float intensity = m_Clip.m_Intensity;
-            if (Application.isPlaying && m_Owner != null && m_Owner.TryGetComponent(out FeedbackTimelineOptions options))
+            PlayArgs args = PlayArgs.Default.WithPreset(clip.m_Preset);
+            float intensity = clip.m_Intensity;
+            if (Application.isPlaying && owner != null && owner.TryGetComponent(out FeedbackTimelineOptions options))
             {
                 string key = options.m_VariantKey;
-                if (options.TryGetHit(m_Clip.m_HitKey, out float hit, out string hitKey))
+                if (options.TryGetHit(clip.m_HitKey, out float hit, out string hitKey))
                 {
                     intensity *= PlayerRuntime.Factor(hit);
                     if (player.TryGetVariant(hitKey, out _))
@@ -183,6 +186,9 @@ namespace xpTURN.Feedback
             return args.WithIntensity(intensity);
         }
 
+        // a driven play's: the clip's seed, forward (the timeline's time is the direction), the driven mark
+        internal static PlayArgs DrivenArgs(in PlayArgs args, FeedbackClip clip) => args.WithSeed(clip.m_Seed).WithDirection(PlayerDirection.Forward).WithDriven();
+
         void PlayTriggered(Playable playable)
         {
             m_Handle = m_Player.Play(in m_Args);
@@ -192,7 +198,6 @@ namespace xpTURN.Feedback
                 Hold(!DirectorPlays(playable));
         }
 
-        // the clip's local time — its clip-in and speed in — on the play's range; a looping clip wraps it by the list's length
         void Drive(Playable playable)
         {
             if (m_Player.SeekRange(m_Handle, out long low, out long high) != SeekRefusal.None)
@@ -200,8 +205,17 @@ namespace xpTURN.Feedback
                 m_Handle = default;
                 return;
             }
-            long target = (long)Math.Round(playable.GetTime() * 1e6);
-            if (m_Clip.m_Loop)
+            m_Player.SeekAt(m_Handle, Target(playable.GetTime(), m_Clip.m_Loop, low, high));
+            if (!Application.isPlaying)
+                TrackPreview.Hook.Seeked();
+        }
+
+        // the clip's local time — its clip-in and speed in — on the play's range [low, high] (µs); a looping clip wraps it by the
+        // list's length
+        internal static long Target(double local, bool loop, long low, long high)
+        {
+            long target = (long)Math.Round(local * 1e6);
+            if (loop)
             {
                 long length = high + 1;
                 if (length > 0)
@@ -215,9 +229,7 @@ namespace xpTURN.Feedback
                 target = low;
             else if (target > high)
                 target = high;
-            m_Player.SeekAt(m_Handle, target);
-            if (!Application.isPlaying)
-                TrackPreview.Hook.Seeked();
+            return target;
         }
 
         void Hold(bool held)

@@ -583,6 +583,87 @@ namespace xpTURN.Feedback.Tests.Timeline
             AssertState(rig.At(to), 1, TimelineStage.Running, 2);
         }
 
+        // ---- a turned play's head ----
+
+        // a head done inside the start delay comes back for a target past the delay and plays on; a target inside it stays done
+        [Test]
+        public void TN1_ADoneHeadComesBackPastTheDelay()
+        {
+            var back = new CursorRig(Compile(Fx(duration: 1f)), rootDelay: 1f);
+            back.Begin();
+            back.Tick(0.25);
+            back.S.Sampler.PlaceReverse(back.Cursor.Position + 1);
+            back.S.Sampler.SeekBegin(back.S.Sampler.ReversePosition, 2 * S, true);
+            Assert.That(Fmt(back.S.Drain()), Is.EqualTo(new[] { "Started 0#0@1000000" }));
+            Assert.That((back.S.Sampler.ReversePosition, back.S.Sampler.IsReverseFinished), Is.EqualTo((2 * S, false)));
+            back.S.Sampler.AdvanceReverse(0.25);
+            Assert.That(back.S.Drain(), Is.Empty);
+            Assert.That(back.S.Sampler.ReversePosition, Is.EqualTo(1750000L));
+            back.S.Sampler.AdvanceReverse(5.0);
+            Assert.That(Fmt(back.S.Drain()), Is.EqualTo(new[] { "~Ended 0#0@1000000", "~Finished@1000000" }));
+
+            var inside = new CursorRig(Compile(Fx(duration: 1f)), rootDelay: 1f);
+            inside.Begin();
+            inside.Tick(0.25);
+            inside.S.Sampler.PlaceReverse(inside.Cursor.Position + 1);
+            inside.S.Sampler.SeekBegin(inside.S.Sampler.ReversePosition, S / 2, true);
+            Assert.That(inside.S.Drain(), Is.Empty);
+            Assert.That(inside.S.Sampler.IsReverseFinished, Is.True, "inside the delay it stays done");
+        }
+
+        // a forward place in the start delay is kept on the head, and the play ends once at the next pass
+        [Test]
+        public void TN2_APlaceInTheDelayIsKept()
+        {
+            var rig = new CursorRig(Compile(Fx(duration: 1f)), rootDelay: 1f);
+            rig.Begin();
+            rig.Tick(0.25);
+            rig.S.Sampler.PlaceReverse(rig.Cursor.Position + 1);
+            Assert.That(rig.S.Sampler.ReversePosition, Is.EqualTo(250001L));
+            Assert.That(Fmt(rig.S.Drain()), Is.EqualTo(new[] { "~Finished@1000000" }));
+            Assert.That(rig.S.Drain(), Is.Empty);
+        }
+
+        // a sweep state cleared before a new play leaves no end for a seek to the same place
+        [Test]
+        public void TN4_TheSweepStateIsCleared()
+        {
+            var rig = new CursorRig(Compile(Fx(duration: 1f)));
+            rig.S.Sampler.BeginReverse();
+            rig.S.Drain();
+            rig.S.Sampler.AdvanceReverse(2.0);
+            rig.S.Sampler.TryNext(out TimelineEvent _);
+            rig.S.Sampler.ClearSweep();
+            rig.Begin();
+            rig.S.Sampler.SeekBegin(0, 0, false);
+            Assert.That(rig.S.Drain(), Is.Empty);
+        }
+
+        // a head waiting out the start delay keeps its elapsed time through two turns
+        [Test]
+        public void TN5_TheReverseDelayIsKeptThroughTwoTurns()
+        {
+            CursorRig rig = TimelineCursorTests.TurnedAtTheEnd();
+            rig.S.Sampler.PlaceReverse(rig.Cursor.Position + 1);
+            Assert.That(rig.S.Sampler.ReversePosition, Is.EqualTo(1500001L));
+            rig.S.Sampler.AdvanceReverse(0.125);
+            Assert.That(rig.S.Drain(), Is.Empty);
+            rig.S.Sampler.AdvanceReverse(0.25);
+            Assert.That(Fmt(rig.S.Drain()), Is.EqualTo(new[] { "~Started 0#0@1500000" }));
+        }
+
+        // a reset head waits for no start delay: a turn past the total moves it at once — TN5's counterpart
+        [Test]
+        public void TN6_AResetHeadKeepsNoDelay()
+        {
+            CursorRig rig = TimelineCursorTests.TurnedAtTheEnd();
+            rig.S.Sampler.ResetHead();
+            rig.S.Sampler.PlaceReverse(rig.Cursor.Position + 1);
+            Assert.That(rig.S.Sampler.ReversePosition, Is.EqualTo(1500001L));
+            rig.S.Sampler.AdvanceReverse(0.125);
+            Assert.That(Fmt(rig.S.Drain()), Is.EqualTo(new[] { "~Started 0#0@1500000" }));
+        }
+
         // ---- a regression case ----
 
         // a reverse play over a wait and a root delay finishes after the whole total, not the initial delay only.

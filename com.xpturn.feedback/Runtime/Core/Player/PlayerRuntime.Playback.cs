@@ -81,6 +81,14 @@ namespace xpTURN.Feedback
             if (index < 0)
                 return false;
             PlaybackRecord record = m_Records[index];
+            // a turn the play waits to make — asked inside its events, or by a Seek's sweep — is taken back by one the
+            // other way: the same play goes on as it was, as two turns outside the events undo each other
+            if (record.HasPendingTurn && record.PendingTurnReverse != reverse)
+            {
+                record.HasPendingTurn = false;
+                handle = record.Handle;
+                return true;
+            }
             if (!Turnable(record, reverse))
                 return false;
             handle = record.Handle;
@@ -90,7 +98,9 @@ namespace xpTURN.Feedback
                 record.PendingTurnReverse = reverse;
                 return true;
             }
-            TurnRecord(record, index, reverse);
+            // a turn made now leaves none waiting — before it, so that one asked inside it waits
+            record.HasPendingTurn = false;
+            TurnOutside(record, index, reverse);
             return true;
         }
 
@@ -109,7 +119,11 @@ namespace xpTURN.Feedback
                 record.Sampler.PlaceReverse(TimelineTime.Add(record.Cursor.Position, 1));
             }
             else
-                record.Cursor.BeginAt(baseClock, record.Sampler.ReversePosition - 1);
+            {
+                long place = record.Sampler.ReversePosition - 1;
+                record.Sampler.ClearSweep();
+                record.Cursor.BeginAt(baseClock, place);
+            }
             record.Reverse = reverse;
             long serial = record.Serial;
             ItemBinding[] bindings = m_Bindings;
@@ -369,6 +383,7 @@ namespace xpTURN.Feedback
                 }
                 else
                 {
+                    record.Sampler.ClearSweep();
                     record.Cursor.Begin(baseClock);
                     passed = Pass(record, index, serial, true);
                 }
@@ -595,6 +610,7 @@ namespace xpTURN.Feedback
         bool Pass(PlaybackRecord record, int index, long serial, bool pending)
         {
             TimelineCursor cursor = record.Cursor;
+            bool paused = record.Paused;
             record.InEvents = true;
             while (cursor.TryNext(out TimelineEvent e))
             {
@@ -605,6 +621,8 @@ namespace xpTURN.Feedback
             cursor.EndAdvance();
             record.InEvents = false;
             Settle(record, index);
+            if (record.Paused && !paused)
+                Suspend(record, index, true);
             return !pending || RunPending(record, index, serial);
         }
 
@@ -612,6 +630,7 @@ namespace xpTURN.Feedback
         bool SamplerPass(PlaybackRecord record, int index, long serial, bool pending)
         {
             TimelineSampler sampler = record.Sampler;
+            bool paused = record.Paused;
             record.InEvents = true;
             while (sampler.TryNext(out TimelineEvent e))
             {
@@ -621,11 +640,14 @@ namespace xpTURN.Feedback
             }
             record.InEvents = false;
             Settle(record, index);
+            if (record.Paused && !paused)
+                Suspend(record, index, true);
             return !pending || RunPending(record, index, serial);
         }
 
         // the Seek · Skip a play's own events asked for, at the pass's end — Skip first, once (a seek in the middle of the
-        // cursor's tick runs an instant twice and the tick's end writes over its place) — then a turn they asked for
+        // cursor's tick runs an instant twice and the tick's end writes over its place) — then a turn they asked for: one asked
+        // in the last pass turns the play at its end, with no wait of its own left
         bool RunPending(PlaybackRecord record, int index, long serial)
         {
             if (record.PendingSkip)
@@ -637,15 +659,34 @@ namespace xpTURN.Feedback
             else if (record.HasPendingSeek)
             {
                 record.HasPendingSeek = false;
+                if (record.Finished && SeekKeeps(record, record.PendingSeek))
+                    record.Finished = false;
                 SeekRecord(record, index, record.PendingSeek);
             }
             if (record.HasPendingTurn)
             {
                 record.HasPendingTurn = false;
-                if (record.Active && record.Serial == serial && Turnable(record, record.PendingTurnReverse))
-                    TurnRecord(record, index, record.PendingTurnReverse);
+                if (record.Active && record.Serial == serial)
+                {
+                    bool finished = record.Finished;
+                    record.Finished = false;
+                    if (Turnable(record, record.PendingTurnReverse))
+                    {
+                        if (finished)
+                            record.Sampler.ResetHead();
+                        TurnRecord(record, index, record.PendingTurnReverse);
+                    }
+                    else
+                        record.Finished = finished;
+                }
             }
             return record.Active && record.Serial == serial;
+        }
+
+        static bool SeekKeeps(PlaybackRecord record, long target)
+        {
+            long to = TimelineTime.Max(0, TimelineTime.Min(target, record.Resolved.Total));
+            return record.Reverse ? to > record.Resolved.RootDelay : to < record.Resolved.Total;
         }
 
         void Handle(PlaybackRecord record, int index, in TimelineEvent e)
@@ -677,9 +718,10 @@ namespace xpTURN.Feedback
                     {
                         if (!record.Running[item])
                             return;
-                        // a backward end is the T = 0 side — a turned item's the other, its seconds from the occurrence's end
+                        // a backward end is the T = 0 side — a turned item's the other, where a truncated one was cut, its seconds
+                        // from the occurrence's end
                         if (record.Turned[item])
-                            binding.Evaluate(index, new MotionTime(e.Reverse ? 1f : 0f, (TimelineTime.Add(e.OccurrenceStart, record.Resolved.ItemDuration(item)) - e.Time) / TimelineTime.MicrosPerSecond));
+                            binding.Evaluate(index, new MotionTime(1f - EventTime(record, in e, e.Reverse ? 0f : 1f).T, (TimelineTime.Add(e.OccurrenceStart, record.Resolved.ItemDuration(item)) - e.Time) / TimelineTime.MicrosPerSecond));
                         else
                             binding.Evaluate(index, EventTime(record, in e, e.Reverse ? 0f : 1f));
                         record.Running[item] = false;
@@ -689,16 +731,18 @@ namespace xpTURN.Feedback
                     }
                     EffectItem effect = m_Effects[item];
                     float intensity = PlayMath.ItemIntensity(effect.m_Intensity, record.Intensity, record.Output[item]);
-                    // a one-direction instant does its forward act in its own direction
+                    // a one-direction instant does its forward act in its own direction and its backward act passed the
+                    // other way
                     // a turned item runs the other way
-                    bool reverse = (e.Reverse != record.Turned[item]) && !(e.Kind == TimelineEventKind.Fired && effect.m_Conditions.m_Direction == DirectionCondition.ReverseOnly);
+                    bool reverse = e.Kind == TimelineEventKind.Fired && effect.m_Conditions.m_Direction == DirectionCondition.ReverseOnly ? !e.Reverse : e.Reverse != record.Turned[item];
                     // the occurrence's real length — the resolved length / Speed, +∞ at Speed 0 (a hit stop asks for it). The
                     // flash limit counts each occurrence of an item it covers on the item's clock: a refused one does not run —
-                    // no binding call, not running, so its end goes nowhere either
+                    // no binding call, not running, so its end goes nowhere either. An instant's backward act, its undo, starts
+                    // no flash
                     double itemSeconds = TimelineTime.ToSeconds(record.Resolved.ItemDuration(item));
                     double speed = Factor(m_Player.m_Speed);
                     double seconds = speed > 0.0 ? itemSeconds / speed : double.PositiveInfinity;
-                    if (m_Flashes[item] && !m_Gate.TryFlash(FlashCount(effect, itemSeconds)))
+                    if (m_Flashes[item] && !(reverse && e.Kind == TimelineEventKind.Fired) && !m_Gate.TryFlash(FlashCount(effect, itemSeconds)))
                         return;
                     // the play's place — once the player is gone, the Play's
                     bool hasPosition = record.HasPosition;
@@ -781,7 +825,7 @@ namespace xpTURN.Feedback
             TimelineSample sample = null;
             if (record.Reverse)
             {
-                sample = m_Sample;
+                sample = record.Sample;
                 record.Sampler.Sample(record.Sampler.ReversePosition, true, sample);
             }
             for (int i = 0; i < bindings.Length; i++)
@@ -843,11 +887,17 @@ namespace xpTURN.Feedback
             ItemBinding[] bindings = m_Bindings;
             for (int i = bindings.Length - 1; i >= 0; i--)
             {
-                if (!record.Running[i])
+                ItemBinding binding = bindings[i];
+                if (binding == null)
                     continue;
-                record.Running[i] = false;
-                EndItem(bindings[i], index, EndReason.Completed);
-                Mark(record, i);
+                if (record.Running[i])
+                {
+                    record.Running[i] = false;
+                    EndItem(binding, index, EndReason.Completed);
+                    Mark(record, i);
+                }
+                else if (record.Touched[i] && binding.EndsInstants)
+                    EndItem(binding, index, EndReason.Completed);
             }
             SettleEnded(record, index);
             record.Active = false;
@@ -1098,14 +1148,15 @@ namespace xpTURN.Feedback
                 PlaybackRecord record = m_Records[r];
                 if (!record.Active || record.Serial > last || !record.Resolved.IsSeekable || (!record.Reverse && record.Cursor.IsOffNominal))
                     continue;
-                any = true;
                 if (record.InEvents)
                 {
+                    any = true;
                     record.HasPendingSeek = true;
                     record.PendingSeek = target;
                     continue;
                 }
-                SeekRecord(record, r, target);
+                if (SeekOutside(record, r, target))
+                    any = true;
             }
             return any;
         }
@@ -1196,8 +1247,7 @@ namespace xpTURN.Feedback
                 record.PendingSeek = target;
                 return true;
             }
-            SeekRecord(record, index, target);
-            return true;
+            return SeekOutside(record, index, target);
         }
 
         // a track holds one play while its director stands — the clock does not move it; Pause · Resume pass it
@@ -1209,17 +1259,18 @@ namespace xpTURN.Feedback
             return true;
         }
 
-        // the play's place on the nominal axis in microseconds — −1 for a handle that is not a live play
+        // the play's place on the nominal axis in microseconds — −1 for a handle that is not a live play. A live play's is not
+        // below 0: a play turned forward at its start stands 1 µs before it until its next pass
         internal long Position(PlaybackHandle handle)
         {
             if (handle == default || !Find(handle, out int index))
                 return -1;
             PlaybackRecord record = m_Records[index];
-            return record.Reverse ? record.Sampler.ReversePosition : record.Cursor.Position;
+            return record.Reverse ? record.Sampler.ReversePosition : TimelineTime.Max(0, record.Cursor.Position);
         }
 
         // where a seek starts the item at once: forward its node's start, backward its node's end (where a backward play meets
-        // it) — −1 when not a live play or not in the program
+        // it) — −1 when not a live play, not in the program or a flow marker, which has no node
         internal long ItemPlace(PlaybackHandle handle, int listIndex)
         {
             if (handle == default || !Find(handle, out int index))
@@ -1229,6 +1280,8 @@ namespace xpTURN.Feedback
                 return -1;
             PlaybackRecord record = m_Records[index];
             int node = m_Program.NodeOfItem(item);
+            if (node < 0)
+                return -1;
             return record.Reverse ? record.Resolved.NodeEnd(node) : record.Resolved.NodeStart(node);
         }
 
@@ -1250,7 +1303,7 @@ namespace xpTURN.Feedback
                     record.PendingSkip = true;
                     continue;
                 }
-                SkipRecord(record, r);
+                SkipOutside(record, r);
             }
             return any;
         }
@@ -1299,6 +1352,57 @@ namespace xpTURN.Feedback
             }
             if (record.Finished)
                 FinishOutsideBegin(record, index);
+        }
+
+        // a call from outside the play's passes: a binding's exception ends that play alone (Faulted, no event), as in a
+        // tick — the other plays and lists go on, and a Seek does not count that play as moved. Inside a pass the tick's or
+        // the Play's own catch takes it
+        bool SeekOutside(PlaybackRecord record, int index, long target)
+        {
+            long serial = record.Serial;
+            try
+            {
+                SeekRecord(record, index, target);
+                return true;
+            }
+            catch (Exception e)
+            {
+                FaultRecord(record, index, serial, e);
+                return false;
+            }
+        }
+
+        void SkipOutside(PlaybackRecord record, int index)
+        {
+            long serial = record.Serial;
+            try
+            {
+                SkipRecord(record, index);
+            }
+            catch (Exception e)
+            {
+                FaultRecord(record, index, serial, e);
+            }
+        }
+
+        void TurnOutside(PlaybackRecord record, int index, bool reverse)
+        {
+            long serial = record.Serial;
+            try
+            {
+                TurnRecord(record, index, reverse);
+            }
+            catch (Exception e)
+            {
+                FaultRecord(record, index, serial, e);
+            }
+        }
+
+        void FaultRecord(PlaybackRecord record, int index, long serial, Exception e)
+        {
+            m_Scheduler.Context.LogException(e);
+            if (record.Active && record.Serial == serial)
+                End(record, index, EndReason.Aborted, PlaybackEnd.Faulted, false);
         }
 
         // a play its own Begin window finished (a seek · skip its t = 0 events asked for) ends after Played

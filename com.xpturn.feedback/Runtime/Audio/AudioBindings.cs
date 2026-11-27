@@ -379,7 +379,10 @@ namespace xpTURN.Feedback
                 return;
             if (paused)
             {
-                if (m_Paused[record] || !m_Source.isPlaying)
+                // a sound the game's listener pause holds reads as not playing, yet goes on with the listener — no member
+                // tells that pause from the source's own, so under it the sound is taken as playing and paused, as a Play At
+                // Point voice is
+                if (m_Paused[record] || !(m_Source.isPlaying || (AudioListener.pause && !m_Source.ignoreListenerPause)))
                     return;
                 m_Source.Pause();
                 m_Paused[record] = true;
@@ -806,6 +809,8 @@ namespace xpTURN.Feedback
         {
             if (context.Reverse)
             {
+                if (m_Serials[record] != context.Serial)
+                    m_Serials[record] = -1;
                 if (m_Origin >= 0)
                     m_Voices?.Stop(this, -1, m_Origin, false);
                 return;

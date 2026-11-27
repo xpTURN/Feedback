@@ -732,6 +732,75 @@ namespace xpTURN.Feedback.Tests.Editor
             End();
         }
 
+        // ---- a Rebuild inside a Variant's prepare
+
+        // refused before it stops or releases anything: the player keeps its list's runtime and the Variant's, the next Play
+        // prepares nothing again, and the release gives every reservation back and releases each binding once
+        [Test]
+        public void CE14_RebuildInsideAVariantsPrepare()
+        {
+            FeedbackScheduler scheduler = Scheduler();
+            var variant = ScriptableObject.CreateInstance<FeedbackPreset>();
+            m_Made.Add(variant);
+            variant.m_Items.Add(Action("rebuild", 0.25f));
+            FeedbackPlayer player = Player(scheduler, Action("a", 0.5f));
+            player.m_Variants.Add(variant);
+            PlayerTestBinding.Reenters.Add("rebuild");
+            Check(player.EnsureRuntime(), "the outer prepare is true");
+            PlayerTestBinding.Reenters.Clear();
+            Check(PlayerTestBinding.Reentered.Count == 1 && PlayerTestBinding.Reentered[0] == "rebuild:False", "the inner Rebuild is false (" + string.Join(",", PlayerTestBinding.Reentered) + ")");
+            Check(player.Runtime != null && player.VariantRuntimeCount == 1 && player.VariantRuntime(0) != null && scheduler.ReservedCount == 2,
+                "both runtimes stand (runtime " + (player.Runtime != null) + " · reserved " + scheduler.ReservedCount + ")");
+            Check(player.Play() != default && PlayerTestBinding.Made.Count == 2 && scheduler.ReservedCount == 2, "the next Play prepares nothing again (" + PlayerTestBinding.Made.Count + " bindings · reserved " + scheduler.ReservedCount + ")");
+            player.ReleaseRuntime();
+            Check(scheduler.ReservedCount == 0 && PlayerTestBinding.Made.All(b => b.Released == 1),
+                "nothing is left after the release (" + scheduler.ReservedCount + " · " + string.Join(",", PlayerTestBinding.Made.Select(b => b.Item.m_Label + ":" + b.Released)) + ")");
+            End();
+        }
+
+        // ---- a player destroyed inside its own prepare
+
+        // an item's prepare destroys the player (DestroyImmediate — edit mode brings no OnDestroy): the list's, a Variant's, a
+        // Rebuild's and a Play's prepare is refused with no warning, no runtime is left, every reservation is given back and
+        // each binding is released once. A later call makes nothing
+        [Test]
+        public void CE15_DestroyedInsideItsOwnPrepare([Values("list", "variant", "rebuild", "play")] string row)
+        {
+            FeedbackScheduler scheduler = Scheduler();
+            FeedbackPlayer player;
+            if (row == "variant")
+            {
+                var variant = ScriptableObject.CreateInstance<FeedbackPreset>();
+                m_Made.Add(variant);
+                variant.m_Items.Add(Action("destroy", 0.25f));
+                player = Player(scheduler, Action("a", 0.5f));
+                player.m_Variants.Add(variant);
+            }
+            else
+                player = Player(scheduler, Action("a", 0.5f), Action("destroy", 0.25f));
+            if (row == "rebuild")
+                Check(player.EnsureRuntime(), "the first prepare is true");
+            GameObject owner = player.gameObject;
+            int made = PlayerTestBinding.Made.Count;
+            PlayerTestBinding.OnPrepare = b =>
+            {
+                if (b.Item.m_Label == "destroy" && PlayerTestBinding.Made.IndexOf(b) >= made && owner != null)
+                    Object.DestroyImmediate(owner);
+            };
+            int warnings = s_Warnings.Count;
+            bool result = row == "rebuild" ? player.Rebuild() : row == "play" ? player.Play() != default : player.EnsureRuntime();
+            PlayerTestBinding.OnPrepare = null;
+            Check(owner == null && PlayerTestBinding.Made.Count > made, "the item's prepare destroyed the player");
+            Check(!result, "the call is refused");
+            Check(player.Runtime == null && player.VariantRuntimeCount == 0 && scheduler.ReservedCount == 0,
+                "no runtime is left (runtime " + (player.Runtime != null) + " · reserved " + scheduler.ReservedCount + ")");
+            Check(PlayerTestBinding.Made.All(b => b.Released == 1), "each binding is released once (" + string.Join(",", PlayerTestBinding.Made.Select(b => b.Item.m_Label + ":" + b.Released)) + ")");
+            Check(s_Warnings.Count == warnings, "no warning (" + string.Join(" | ", s_Warnings.Skip(warnings)) + ")");
+            int count = PlayerTestBinding.Made.Count;
+            Check(!player.EnsureRuntime() && PlayerTestBinding.Made.Count == count && scheduler.ReservedCount == 0, "a later call makes nothing");
+            End();
+        }
+
         // ---- IL by reflection (no Cecil — the minimal manifest runs these too)
 
         static readonly Dictionary<int, OpCode> s_OpCodes = typeof(OpCodes).GetFields(BindingFlags.Public | BindingFlags.Static)

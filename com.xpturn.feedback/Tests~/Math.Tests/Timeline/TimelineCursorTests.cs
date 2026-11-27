@@ -654,6 +654,48 @@ namespace xpTURN.Feedback.Tests.Timeline
             held.Rebuild(12 * S / 10);
             Assert.That(Fmt(held.Tick(0, 0.3)), Is.EqualTo(new[] { "Started 2#0@1500000" }));
         }
+
+        // a backward play in its start delay, turned forward: the cursor stands at the total
+        internal static CursorRig TurnedAtTheEnd()
+        {
+            var rig = new CursorRig(Compile(Fx(duration: 1f)), rootDelay: 0.5f);
+            rig.S.Sampler.BeginReverse();
+            rig.S.Drain();
+            rig.S.Sampler.AdvanceReverse(0.25);
+            rig.S.Drain();
+            rig.Cursor.BeginAt(TimelineClock.Scaled, rig.S.Sampler.ReversePosition - 1);
+            return rig;
+        }
+
+        // a cursor turned at the end finishes once on a tick or a completion; a rebuild at the end keeps that, one before it drops it
+        [Test]
+        public void TN3_ACursorTurnedAtTheEndFinishesOnce()
+        {
+            CursorRig tick = TurnedAtTheEnd();
+            Assert.That(Fmt(tick.Tick(0.1)), Is.EqualTo(new[] { "Finished@1500000" }));
+            Assert.That(tick.Tick(0.1), Is.Empty);
+
+            CursorRig complete = TurnedAtTheEnd();
+            Assert.That(Fmt(complete.Complete()), Is.EqualTo(new[] { "Finished@1500000" }));
+
+            CursorRig atEnd = TurnedAtTheEnd();
+            atEnd.Cursor.Rebuild(3 * S / 2);
+            Assert.That(Fmt(atEnd.Tick(0.1)), Is.EqualTo(new[] { "Finished@1500000" }), "a rebuild at the end keeps the wait");
+
+            CursorRig before = TurnedAtTheEnd();
+            before.Cursor.Rebuild(S);
+            Assert.That(before.Tick(0.1), Is.Empty, "a rebuild before the end drops it");
+        }
+
+        // a plain rebuild at the end, never turned, waits for nothing
+        [Test]
+        public void TN6_APlainRebuildAtTheEndWaitsForNothing()
+        {
+            var rig = new CursorRig(Compile(Fx(duration: 1f)));
+            rig.Begin();
+            rig.Cursor.Rebuild(S);
+            Assert.That(rig.Tick(0.1), Is.Empty);
+        }
     }
 
     static class TimelinePropertyAssert

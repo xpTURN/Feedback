@@ -166,5 +166,144 @@ namespace xpTURN.Feedback.Tests
             play.Stop(StopMode.Revert); s.Tick(0f);
             Assert.That((a.isPlaying, a.timeSamples), Is.EqualTo((false, 0)), "the Revert stopped it — the start state");
         }
+
+        static IEnumerator Frames(int n)
+        {
+            for (int i = 0; i < n; i++)
+                yield return null;
+        }
+
+        static string On(AudioSource a) => a.isPlaying ? "playing" : "silent";
+
+        // ---- under the game's listener pause the player's Pause holds the sound its Source Control started, as it does with
+        // none: the listener's pause going off leaves it paused, the player's Resume plays it and a play that ends paused stops
+        // it — a sound started after a Pause the play's own event asked for too. A Resume under the listener's pause lets it go
+        // on with the listener; an Ignore Listener Pause source pauses with the player alone
+        [UnityTest]
+        public IEnumerator AP04_ThePlayersPauseUnderTheListeners()
+        {
+            yield return null;
+            FeedbackScheduler s = Sched();
+            PositiveControl(Source("Control"));
+            var fail = new List<string>();
+            var rows = new[]
+            {
+                ("under the listener's", "before silent · paused with the player · off silent · resumed playing"),
+                ("ends paused", "before silent · paused with the player · off silent"),
+                ("no listener pause", "before playing · paused with the player · off silent · resumed playing"),
+                ("resumed under the listener's", "before silent · off playing"),
+                ("ignore listener pause", "before playing · paused with the player · off silent · resumed playing"),
+            };
+            foreach ((string row, string expected) in rows)
+            {
+                AudioSource a = Source(row);
+                a.ignoreListenerPause = row == "ignore listener pause";
+                FeedbackPlayer p = Player(s, a, AudioSourceAction.Play);
+                p.Play(); s.Tick(0f);
+                yield return null;
+                AudioListener.pause = row != "no listener pause";
+                yield return null;
+                string seen = "before " + On(a);
+                p.Pause();
+                if (row == "resumed under the listener's")
+                    p.Resume();
+                else
+                    seen += " · " + (p.Runtime.Binding(0).DebugNote(0) ?? "no note");
+                if (row == "ends paused")
+                    p.Stop(StopMode.Hold);
+                AudioListener.pause = false;
+                yield return Frames(2);
+                seen += " · off " + On(a);
+                if (row != "ends paused" && row != "resumed under the listener's")
+                {
+                    p.Resume();
+                    yield return Frames(2);
+                    seen += " · resumed " + On(a);
+                }
+                if (seen != expected)
+                    fail.Add(row + ": " + seen);
+                p.Stop(StopMode.Hold);
+                a.Stop();
+            }
+            AudioSource e = Source("event");
+            FeedbackPlayer ep = Player(s, e, AudioSourceAction.Play);
+            var pause = new UnityEventItem();
+            pause.m_Event.AddListener(() => ep.Pause());
+            ep.m_Items.Insert(0, pause);
+            ep.Rebuild();
+            AudioListener.pause = true;
+            ep.Play(); s.Tick(0f);
+            yield return null;
+            string evt = "paused " + ep.HasPaused;
+            AudioListener.pause = false;
+            yield return Frames(2);
+            evt += " · off " + On(e);
+            ep.Resume();
+            yield return Frames(2);
+            evt += " · resumed " + On(e);
+            if (evt != "paused True · off silent · resumed playing")
+                fail.Add("its own event's Pause before the sound: " + evt);
+            Assert.That(fail, Is.Empty);
+        }
+
+        // ---- under the game's listener pause the engine cannot tell its pause from the source's own: a source the game paused
+        // itself, under it or before it, plays at the player's Resume. One the game stopped and a sound at its end stay silent,
+        // and an Ignore Listener Pause source the game paused stays paused
+        [UnityTest]
+        public IEnumerator AP05_TheGamesOwnPauseUnderTheListeners()
+        {
+            yield return null;
+            FeedbackScheduler s = Sched();
+            PositiveControl(Source("Control"));
+            AudioClip brief = AudioClip.Create("brief", 4410, 1, 44100, false);
+            m_Made.Add(brief);
+            var fail = new List<string>();
+            var rows = new[]
+            {
+                ("paused under the listener's", "off silent · resumed playing"),
+                ("paused before the listener's", "off silent · resumed playing"),
+                ("stopped under the listener's", "off silent · resumed silent"),
+                ("at its end", "ended · off silent · resumed silent"),
+                ("ignore listener pause, paused", "off silent · resumed silent"),
+            };
+            foreach ((string row, string expected) in rows)
+            {
+                AudioSource a = Source(row);
+                a.ignoreListenerPause = row == "ignore listener pause, paused";
+                if (row == "at its end")
+                    a.clip = brief;
+                FeedbackPlayer p = Player(s, a, AudioSourceAction.Play);
+                p.Play(); s.Tick(0f);
+                yield return null;
+                string seen = "";
+                if (row == "at its end")
+                {
+                    var wall = System.Diagnostics.Stopwatch.StartNew();
+                    while (a.isPlaying && wall.Elapsed.TotalSeconds < 2.0)
+                        yield return null;
+                    seen = a.isPlaying ? "ringing · " : "ended · ";
+                }
+                if (row == "paused before the listener's")
+                    a.Pause();
+                AudioListener.pause = true;
+                yield return null;
+                if (row == "paused under the listener's" || row == "ignore listener pause, paused")
+                    a.Pause();
+                else if (row == "stopped under the listener's")
+                    a.Stop();
+                p.Pause();
+                AudioListener.pause = false;
+                yield return Frames(2);
+                seen += "off " + On(a);
+                p.Resume();
+                yield return Frames(2);
+                seen += " · resumed " + On(a);
+                if (seen != expected)
+                    fail.Add(row + ": " + seen);
+                p.Stop(StopMode.Hold);
+                a.Stop();
+            }
+            Assert.That(fail, Is.Empty);
+        }
     }
 }
